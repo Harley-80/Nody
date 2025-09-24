@@ -1,0 +1,240 @@
+.commande-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 1.5rem;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+
+    &:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #f0f0f0;
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+
+            .client-name {
+                color: #3498db;
+            }
+        }
+
+        .status-badge {
+            font-size: 0.85rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+        }
+    }
+
+    .card-content {
+        .client-info {
+            margin-bottom: 1.5rem;
+
+            p {
+                margin: 0.5rem 0;
+                display: flex;
+                flex-wrap: wrap;
+
+                .info-label {
+                    font-weight: 500;
+                    color: #7f8c8d;
+                    min-width: 80px;
+                    margin-right: 0.5rem;
+                }
+
+                .info-value {
+                    color: #34495e;
+                    flex: 1;
+                }
+            }
+        }
+
+        .produits-list {
+            h4 {
+                font-size: 1.1rem;
+                color: #2c3e50;
+                margin-bottom: 1rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 1px solid #eee;
+            }
+
+            .produits {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+
+                .produit-item {
+                    display: flex;
+                    align-items: flex-start;
+                    margin-bottom: 1rem;
+                    padding: 0.75rem;
+                    background-color: #f9f9f9;
+                    border-radius: 8px;
+                    transition: background-color 0.2s;
+
+                    &:hover {
+                        background-color: #f0f0f0;
+                    }
+
+                    .produit-image {
+                        width: 70px;
+                        height: 70px;
+                        object-fit: cover;
+                        margin-right: 1.25rem;
+                        border-radius: 6px;
+                        border: 1px solid #eee;
+                        background: #fff;
+                    }
+
+                    .produit-details {
+                        flex: 1;
+
+                        .produit-nom {
+                            font-weight: 500;
+                            color: #34495e;
+                            margin-bottom: 0.25rem;
+                        }
+
+                        .produit-quantite-prix {
+                            color: #7f8c8d;
+                            margin-bottom: 0.5rem;
+                        }
+
+                        .produit-options {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 0.5rem;
+
+                            .option {
+                                font-size: 0.85rem;
+                                background: #e8f4fc;
+                                padding: 0.25rem 0.5rem;
+                                border-radius: 4px;
+                                color: #2980b9;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+
+        .total {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #2c3e50;
+
+            span {
+                color: #27ae60;
+            }
+        }
+
+        .statut-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+
+            .select-label {
+                font-size: 0.9rem;
+                color: #7f8c8d;
+                white-space: nowrap;
+            }
+
+            .form-select {
+                min-width: 180px;
+                padding: 0.5rem 0.75rem;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                background-color: #fff;
+                font-size: 0.95rem;
+                transition: all 0.3s;
+
+                &:focus {
+                    outline: none;
+                    border-color: #3498db;
+                    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+                }
+            }
+        }
+    }
+
+    @media (max-width: 768px) {
+        padding: 1rem;
+
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+
+            .status-badge {
+                align-self: flex-start;
+            }
+        }
+
+        .produit-item {
+            flex-direction: column;
+
+            .produit-image {
+                margin-right: 0;
+                margin-bottom: 0.75rem;
+                width: 100%;
+                height: auto;
+                max-height: 150px;
+            }
+        }
+
+        .card-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+
+            .statut-selector {
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+
+                .form-select {
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+    @media print {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        margin-bottom: 2rem;
+        break-inside: avoid;
+
+        .card-footer .statut-selector {
+            display: none;
+        }
+
+        .produit-item {
+            page-break-inside: avoid;
+        }
+    }
+}

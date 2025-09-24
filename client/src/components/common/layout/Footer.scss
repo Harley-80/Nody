@@ -1,0 +1,85 @@
+@use '../../../styles/variables' as *; 
+@use '../../../styles/mixins' as *;   
+
+.footer {
+    background-color: $primary-color;
+    color: $text-color;
+    padding: $padding-base 0;
+
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -15px;
+    }
+
+    .col-md-3, .col-md-2 {
+        padding: 0 15px;
+        margin-bottom: 1rem;
+    }
+
+    h5, h6 {
+        font-family: $font-modern;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    h5 strong {
+        font-weight: bolder;
+    }
+
+    p {
+        font-size: $font-size-base;
+        margin-bottom: 1rem;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+
+        li {
+            margin-bottom: 0.5rem;
+
+            a {
+                color: $text-color;
+                text-decoration: none;
+                @include transition(color);
+
+                &:hover {
+                    color: $link-hover-color;
+                }
+            }
+        }
+    }
+
+    .d-flex {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 1rem;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    @include respond-to(medium) {
+        .col-md-3, .col-md-2 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+    }
+
+    @include respond-to(small) {
+        .col-md-3, .col-md-2 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+}

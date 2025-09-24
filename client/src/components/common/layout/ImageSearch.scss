@@ -1,0 +1,201 @@
+// Variables spécifiques au composant
+$upload-area-border: #ddd;
+$upload-area-active: #3498db;
+$preview-bg: #f8f9fa;
+
+.image-search {
+    background: $white;
+    border-radius: $border-radius;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    width: 100%;
+    max-width: 500px;
+
+    .image-search-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.2rem 1.5rem;
+        background: #f8f9fa;
+        border-bottom: 1px solid #eee;
+
+        h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: $primary-color;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: $text-light;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: $transition;
+
+            &:hover {
+                background: #e9ecef;
+                color: $secondary-color;
+            }
+        }
+    }
+
+    .image-search-content {
+        padding: 1.5rem;
+    }
+}
+
+.upload-area {
+    border: 2px dashed $upload-area-border;
+    border-radius: $border-radius;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &.drag-over {
+        border-color: $upload-area-active;
+        background-color: rgba($upload-area-active, 0.05);
+
+        .upload-icon {
+            color: $upload-area-active;
+        }
+    }
+
+    &:hover {
+        border-color: $upload-area-active;
+    }
+
+    .upload-content {
+        color: $text-light;
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #adb5bd;
+            transition: $transition;
+        }
+
+        .upload-text {
+            margin: 0 0 1rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .upload-hint {
+            font-size: 0.9rem;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: #6c757d;
+        }
+    }
+
+    .camera-btn {
+        margin-top: 1rem;
+        padding: 0.6rem 1.2rem;
+        background: $accent-color;
+        color: $white;
+        border: none;
+        border-radius: $border-radius;
+        cursor: pointer;
+        transition: $transition;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+
+        &:hover {
+            background: color.scale($accent-color, $lightness: -10%);
+        }
+    }
+}
+
+.image-preview-container {
+    text-align: center;
+
+    .preview-image {
+        margin-bottom: 1.5rem;
+
+        img {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: $border-radius;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+    }
+
+    .preview-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+
+        button {
+            padding: 0.7rem 1.2rem;
+            border: 1px solid #dee2e6;
+            background: $white;
+            border-radius: $border-radius;
+            cursor: pointer;
+            transition: $transition;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+
+            &:hover {
+                background: #f8f9fa;
+                border-color: #ced4da;
+            }
+
+            &.btn-search {
+                background: $accent-color;
+                color: $white;
+                border-color: $accent-color;
+
+                &:hover {
+                    background: color.scale($accent-color, $lightness: -10%);
+                    border-color: color.scale($accent-color, $lightness: -10%);
+                }
+            }
+        }
+    }
+}
+
+.file-input {
+    display: none;
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .image-search {
+        margin: 0 1rem;
+
+        .image-search-content {
+            padding: 1rem;
+        }
+    }
+
+    .upload-area {
+        padding: 2rem 1rem;
+    }
+
+    .preview-actions {
+        flex-direction: column;
+        align-items: center;
+
+        button {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+}

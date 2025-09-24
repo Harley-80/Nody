@@ -1,0 +1,27 @@
+/* client/src/GrilleProduitsAccueil.css */
+
+/* Élément 1 : Effets de Survol (Hover Effects) Épurés sur les Cartes Produit */
+.card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transition douce pour l'élévation et l'ombre */
+    cursor: pointer; /* Indique que la carte est cliquable */
+}
+
+.card-hover:hover {
+    transform: translateY(-5px); /* La carte s'élève légèrement */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Ombre plus prononcée pour l'effet de profondeur */
+}
+
+/* Effet de zoom sur l'image lors du survol de la carte */
+.card-hover .card-img-top {
+    transition: transform 0.3s ease; /* Transition douce pour le zoom de l'image */
+}
+
+.card-hover:hover .card-img-top {
+    transform: scale(1.05); /* L'image zoome légèrement */
+}
+
+/* Élément 4 : Optimisation de l'Espace Blanc et de la Typographie */
+/* Les classes Bootstrap (g-4, mb-4, py-5, text-center, small, text-muted, fw-bold, mt-2, mt-auto)
+   gèrent déjà une bonne partie de l'espace blanc et de la typographie.
+   Vous pouvez ajuster les valeurs de g-4 ou py-5 dans le JSX si nécessaire.
+   Pour la typographie, si vous souhaitez des polices personnalisées, vous les importeriez ici. */

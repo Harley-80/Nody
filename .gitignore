@@ -1,0 +1,41 @@
+# Fichiers de configuration sensibles
+/client/.env
+/server/.env
+
+# Fichiers de dépendances
+/client/node_modules
+/server/node_modules
+
+# Fichiers de log générés
+/client/logs
+logs
+*.log
+/server/logs
+*.log
+
+# Fichiers de cache et temporaires
+.parcel-cache
+.cache
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Fichiers de build et de sortie pour Vite
+node_modules
+dist
+dist-ssr
+*.local
+
+# Répertoires et fichiers de l'éditeur
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

@@ -1,0 +1,32 @@
+.facture {
+    font-size: 0.9rem;
+    padding: 2rem;
+    color: #000;
+    background: #fff;
+
+    .facture-header {
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 1rem;
+    }
+
+    .client-info {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 6px;
+    }
+
+    .produits {
+        th, td {
+            text-align: center;
+        }
+    }
+
+    .total {
+        text-align: right;
+    }
+
+    .qr-section {
+        border-top: 1px dashed #ccc;
+        padding-top: 1rem;
+    }
+}

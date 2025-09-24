@@ -1,0 +1,15 @@
+@media print {
+    body {
+        background: white !important;
+        color: black !important;
+    }
+
+    .btn, nav, footer {
+        display: none !important;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border: none;
+    }
+}

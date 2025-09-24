@@ -1,0 +1,54 @@
+.statut-legend {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    margin-bottom: 1.5rem;
+
+    .legend-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+    }
+
+    .legend-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+
+        &.compact {
+            gap: 0.5rem;
+        
+            .legend-item {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-right: 0.5rem;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .status-description {
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    @media (max-width: 768px) {
+        .legend-items:not(.compact) {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+}
