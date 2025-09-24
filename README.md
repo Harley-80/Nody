@@ -45,5 +45,10 @@ Créer la base du projet serveur avec ES6 et installer les dépendances essentie
 }
 ```
 
+# (Étape 2) : Configurer les variables d'environnement et les configurations de base.
 
+## Fichiers :
 
+    .env
+    env.js
+    database.js
