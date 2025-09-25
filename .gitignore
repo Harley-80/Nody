@@ -1,6 +1,5 @@
 # Fichiers de configuration sensibles
-/client/.env
-/server/.env
+.env
 
 # Fichiers de dépendances
 /client/node_modules

@@ -3,6 +3,19 @@ import dotenv from 'dotenv';
 // Charge les variables d'environnement depuis le fichier .env
 dotenv.config();
 
+// --- Validation des variables critiques ---
+// Vérifie si les variables d'environnement essentielles sont définies AVANT de continuer.
+if (!process.env.JWT_SECRET) {
+    throw new Error(
+        "La variable d'environnement JWT_SECRET doit être définie."
+    );
+}
+if (!process.env.MONGODB_URI) {
+    throw new Error(
+        "La variable d'environnement MONGODB_URI doit être définie."
+    );
+}
+
 // Objet de configuration de l'application, centralisant toutes les variables
 const config = {
     // --- Paramètres du serveur ---
@@ -63,19 +76,5 @@ const config = {
     // Nombre maximum de requêtes autorisées par fenêtre
     rateLimitMaxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
 };
-
-// --- Validation des variables critiques ---
-// Vérifie si les variables d'environnement essentielles sont définies
-if (!config.jwtSecret) {
-    throw new Error(
-        "La variable d'environnement JWT_SECRET doit être définie."
-    );
-}
-
-if (!config.mongodbUri) {
-    throw new Error(
-        "La variable d'environnement MONGODB_URI doit être définie."
-    );
-}
 
 export default config;

@@ -1,6 +1,7 @@
 import app from './app.js';
 import config from './config/env.js';
 import logger from './utils/logger.js';
+import mongoose from 'mongoose';
 
 // Récupère le port du serveur à partir de la configuration
 const PORT = config.port;
@@ -16,49 +17,51 @@ const server = app.listen(PORT, () => {
 
 // --- Gestion de l'arrêt progressif (Graceful Shutdown) ---
 
-// Fonction pour arrêter le serveur de manière propre
-const arretProgressif = () => {
-    logger.info(
-        "Signal d'arrêt reçu, le serveur s'éteint de manière progressive..."
-    );
+/**
+ * Arrête le serveur de manière propre.
+ * @param {string} signal - Le signal qui a déclenché l'arrêt.
+ * @param {Error} [error] - L'erreur éventuelle qui a causé l'arrêt.
+ */
+const gracefulShutdown = (signal, error) => {
+    if (error) {
+        logger.error(`Erreur non gérée détectée : ${error.name}`, error);
+    }
+    logger.info(`Signal ${signal} reçu. Arrêt progressif du serveur...`);
 
-    // Ferme le serveur HTTP, n'acceptant plus de nouvelles requêtes
     server.close(() => {
         logger.info('Serveur HTTP fermé.');
-        // Met fin au processus avec un code de succès (0)
-        process.exit(0);
+        // Ferme la connexion à la base de données
+        mongoose.connection.close(false, () => {
+            logger.info('Connexion MongoDB fermée.');
+            // Quitte le processus avec un code de succès (0) si pas d'erreur, sinon échec (1)
+            process.exit(error ? 1 : 0);
+        });
     });
-
-    // En cas de blocage, force l'arrêt après 10 secondes
-    setTimeout(() => {
-        logger.error(
-            'Impossible de fermer les connexions à temps, arrêt forcé.'
-        );
-        // Met fin au processus avec un code d'erreur (1)
-        process.exit(1);
-    }, 10000);
 };
 
 // Écoute les signaux d'arrêt standards (SIGTERM et SIGINT)
 // SIGTERM : signal envoyé par la plupart des gestionnaires de processus (ex: Docker)
 // SIGINT  : signal généré par l'utilisateur (ex: Ctrl+C dans le terminal)
-process.on('SIGTERM', arretProgressif);
-process.on('SIGINT', arretProgressif);
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // --- Gestion des erreurs non capturées ---
 
 // Gère les rejets de promesses non gérés
-process.on('unhandledRejection', err => {
-    logger.error('Rejet de promesse non géré :', err);
-    // Arrête le serveur pour éviter un état instable
-    arretProgressif();
+process.on('unhandledRejection', (reason, promise) => {
+    // 'reason' est souvent une erreur, mais peut être autre chose.
+    const error =
+        reason instanceof Error
+            ? reason
+            : new Error(`Unhandled Rejection: ${reason}`);
+    logger.error('Rejet de promesse non géré :', { error, promise });
+    gracefulShutdown('unhandledRejection', error);
 });
 
 // Gère les exceptions non capturées
 process.on('uncaughtException', err => {
     logger.error('Exception non capturée :', err);
-    // Arrête le serveur pour éviter un état imprévisible
-    arretProgressif();
+    gracefulShutdown('uncaughtException', err);
 });
 
 export default server;

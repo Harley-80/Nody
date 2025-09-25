@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import session from 'express-session';
-import RedisStore from 'connect-redis';
+import { RedisStore } from 'connect-redis';
 import redis from 'redis';
 
 import config from './config/env.js';
@@ -14,11 +14,11 @@ import logger from './utils/logger.js';
 
 // Importation des routes de l'API
 import authRoutes from './routes/authRoutes.js';
-import userRoutes from './routes/userRoutes.js';
-import productRoutes from './routes/productRoutes.js';
-import categoryRoutes from './routes/categoryRoutes.js';
-import orderRoutes from './routes/orderRoutes.js';
-import paymentRoutes from './routes/paymentRoutes.js';
+import utilisateursRoutes from './routes/utilisateursRoutes.js';
+import produitsRoutes from './routes/produitsRoutes.js';
+import categorieRoutes from './routes/categorieRoutes.js';
+import commandesRoutes from './routes/commandesRoutes.js';
+import paiementRoutes from './routes/paiementRoutes.js';
 
 // Création de l'application Express
 const app = express();
@@ -107,11 +107,11 @@ app.use(
 
 // --- Définition des routes de l'API ---
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/payments', paymentRoutes);
+app.use('/api/users', utilisateursRoutes);
+app.use('/api/products', produitsRoutes);
+app.use('/api/categories', categorieRoutes);
+app.use('/api/orders', commandesRoutes);
+app.use('/api/payments', paiementRoutes);
 
 // Point de contrôle de l'état du serveur (health check)
 app.get('/api/health', (req, res) => {
