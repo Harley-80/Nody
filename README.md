@@ -13,7 +13,7 @@ Currently, two official plugins are available:
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
 
-# Partie server :
+## Partie server :
 
 # Nody - Serveur Backend (Étape 1)
 
@@ -52,3 +52,13 @@ Créer la base du projet serveur avec ES6 et installer les dépendances essentie
     .env
     env.js
     database.js
+
+# (Étape 3) : Configurer le serveur Express et les middlewares essentiels.
+
+## Fichiers :
+
+    app.js
+    server.js
+    utils/logger.js
+
+## (Étape 4) : Créer les modèles Mongoose pour les catégories, produits, utilisateurs, commandes et paiements.
