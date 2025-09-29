@@ -1,7 +1,13 @@
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Détermine le chemin du fichier .env à la racine du projet
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Charge les variables d'environnement depuis le fichier .env
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '..', '..', '.env') });
 
 // --- Validation des variables critiques ---
 // Vérifie si les variables d'environnement essentielles sont définies AVANT de continuer.

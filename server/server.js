@@ -1,19 +1,33 @@
-import app from './app.js';
+import initializeApp from './app.js';
 import config from './config/env.js';
 import logger from './utils/logger.js';
 import mongoose from 'mongoose';
 
-// Récupère le port du serveur à partir de la configuration
-const PORT = config.port;
+let server;
 
-// Démarre le serveur et écoute les connexions sur le port spécifié
-const server = app.listen(PORT, () => {
-    // Affiche des messages de journalisation au démarrage
-    logger.info(
-        `Serveur démarré en mode ${config.nodeEnv} sur le port ${PORT}`
-    );
-    logger.info(`Documentation de l'API : ${config.serverUrl}/api/health`);
-});
+/**
+ * Fonction principale pour démarrer le serveur.
+ * Initialise l'application Express (qui inclut la connexion à la base de données)
+ * puis démarre le serveur HTTP.
+ */
+async function startServer() {
+    try {
+        const app = await initializeApp();
+        const PORT = config.port;
+
+        server = app.listen(PORT, () => {
+            logger.info(
+                `Serveur démarré en mode ${config.nodeEnv} sur le port ${PORT}`
+            );
+            logger.info(
+                `Documentation de l'API : ${config.serverUrl}/api/health`
+            );
+        });
+    } catch (error) {
+        logger.error('Échec du démarrage du serveur.', { error });
+        process.exit(1);
+    }
+}
 
 // --- Gestion de l'arrêt progressif (Graceful Shutdown) ---
 
@@ -25,6 +39,11 @@ const server = app.listen(PORT, () => {
 const gracefulShutdown = (signal, error) => {
     if (error) {
         logger.error(`Erreur non gérée détectée : ${error.name}`, error);
+    }
+    // Si le serveur n'a pas encore démarré, on quitte directement.
+    if (!server) {
+        logger.info('Arrêt du processus avant le démarrage du serveur.');
+        process.exit(error ? 1 : 0);
     }
     logger.info(`Signal ${signal} reçu. Arrêt progressif du serveur...`);
 
@@ -64,4 +83,12 @@ process.on('uncaughtException', err => {
     gracefulShutdown('uncaughtException', err);
 });
 
-export default server;
+// Point d'entrée de l'application
+// On utilise une IIFE (Immediately Invoked Function Expression) asynchrone
+// pour pouvoir utiliser await au plus haut niveau et bien gérer les erreurs de démarrage.
+(async () => {
+    await startServer();
+})();
+
+// Ce fichier est le point d'entrée, il n'a pas besoin d'exporter la variable server.
+// export default server;

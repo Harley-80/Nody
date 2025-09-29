@@ -7,8 +7,8 @@ import session from 'express-session';
 import { RedisStore } from 'connect-redis';
 import redis from 'redis';
 
-import config from './config/env.js';
-import connectDatabase from './config/database.js';
+import config from './config/env.js'; // Correction du nom de fichier
+import connectDatabase from './config/database.js'; // Correction du nom de fichier
 import errorHandler from './middleware/errorMiddleware.js';
 import logger from './utils/logger.js';
 
@@ -22,38 +22,6 @@ import paiementRoutes from './routes/paiementRoutes.js';
 
 // Création de l'application Express
 const app = express();
-
-// Connexion à la base de données
-connectDatabase();
-
-// --- Configuration de Redis pour les sessions ---
-let clientRedis;
-let magasinRedis;
-
-// N'initialise pas Redis en mode de test
-if (config.nodeEnv !== 'test') {
-    clientRedis = redis.createClient({
-        host: config.redisHost,
-        port: config.redisPort,
-        password: config.redisPassword,
-    });
-
-    // Gère les erreurs de connexion à Redis
-    clientRedis.on('error', erreur => {
-        logger.error('Erreur Redis :', erreur);
-    });
-
-    // Confirmation de la connexion réussie
-    clientRedis.on('connect', () => {
-        logger.info('Connexion Redis réussie');
-    });
-
-    // Crée le magasin de sessions basé sur Redis
-    magasinRedis = new RedisStore({
-        client: clientRedis,
-        prefix: 'nody:', // Préfixe pour les clés de session dans Redis
-    });
-}
 
 // --- Middlewares de sécurité et de configuration ---
 // Active Helmet pour sécuriser les en-têtes HTTP
@@ -90,47 +58,110 @@ app.use(
 app.use(express.json({ limit: '10mb' })); // Analyse les corps de requête JSON
 app.use(express.urlencoded({ extended: true, limit: '10mb' })); // Analyse les corps de requête encodés en URL
 
-// Middleware de gestion des sessions
-app.use(
-    session({
-        store: magasinRedis, // Utilise Redis pour stocker les sessions
-        secret: config.jwtSecret, // Clé secrète pour signer le cookie de session
-        resave: false, // Évite de réenregistrer la session si elle n'a pas été modifiée
-        saveUninitialized: false, // Évite d'enregistrer les sessions non initialisées
-        cookie: {
-            secure: config.nodeEnv === 'production', // Le cookie est sécurisé uniquement en production
-            httpOnly: true, // Le cookie n'est accessible que via HTTP(S)
-            maxAge: 24 * 60 * 60 * 1000, // Durée de vie du cookie (24 heures)
-        },
-    })
-);
+/**
+ * Initialise l'application de manière asynchrone.
+ * Se connecte d'abord à la base de données, puis configure les sessions et les routes.
+ * @returns {Promise<express.Express>} L'application Express configurée.
+ */
+const initializeApp = async () => {
+    try {
+        // Connexion à la base de données (attend que la connexion soit établie)
+        await connectDatabase();
 
-// --- Définition des routes de l'API ---
-app.use('/api/auth', authRoutes);
-app.use('/api/users', utilisateursRoutes);
-app.use('/api/products', produitsRoutes);
-app.use('/api/categories', categorieRoutes);
-app.use('/api/orders', commandesRoutes);
-app.use('/api/payments', paiementRoutes);
+        // --- Configuration de Redis pour les sessions ---
+        let magasinRedis;
+        if (config.nodeEnv !== 'test') {
+            try {
+                const clientRedis = redis.createClient({
+                    url: `redis://${config.redisHost}:${config.redisPort}`,
+                    password: config.redisPassword,
+                });
 
-// Point de contrôle de l'état du serveur (health check)
-app.get('/api/health', (req, res) => {
-    res.status(200).json({
-        status: 'OK',
-        message: "Le serveur Nody est en cours d'exécution.",
-        timestamp: new Date().toISOString(),
-    });
-});
+                clientRedis.on('error', erreur => {
+                    // Gère les erreurs qui surviennent APRÈS la connexion initiale
+                    logger.error('Erreur du client Redis :', erreur);
+                });
 
-// Gestion de la route 404 (non trouvée)
-app.use('*', (req, res) => {
-    res.status(404).json({
-        erreur: 'Route non trouvée',
-        message: `L'itinéraire demandé '${req.originalUrl}' n'existe pas sur ce serveur.`,
-    });
-});
+                clientRedis.on('connect', () => {
+                    logger.info('Connexion à Redis en cours...');
+                });
 
-// Middleware de gestion des erreurs, à placer en dernier
-app.use(errorHandler);
+                clientRedis.on('ready', () => {
+                    logger.info('Connexion Redis réussie et prête.');
+                });
 
-export default app;
+                // Attendre que la connexion soit établie
+                await clientRedis.connect();
+
+                // Initialiser le store de Redis APRÈS la connexion
+                magasinRedis = new RedisStore({
+                    client: clientRedis,
+                    prefix: 'nody:',
+                });
+            } catch (error) {
+                logger.error(
+                    "Échec de la connexion à Redis. L'application ne pourra pas gérer les sessions correctement.",
+                    error
+                );
+                // En production, il serait judicieux de ne pas démarrer si Redis est requis.
+                // Pour le développement, on peut continuer sans sessions persistantes.
+            }
+        }
+
+        // Middleware de gestion des sessions (placé ici pour utiliser magasinRedis)
+        app.use(
+            session({
+                store: magasinRedis,
+                secret: config.jwtSecret,
+                resave: false,
+                saveUninitialized: false,
+                cookie: {
+                    // En production, le cookie ne sera envoyé que via HTTPS
+                    secure: config.nodeEnv === 'production',
+                    // Empêche l'accès au cookie depuis le JavaScript côté client
+                    httpOnly: true,
+                    // Durée de vie du cookie (ici, 24 heures)
+                    maxAge: 24 * 60 * 60 * 1000,
+                },
+            })
+        );
+
+        // --- Définition des routes de l'API (placées ici pour qu'elles aient accès à la session) ---
+        app.use('/api/auth', authRoutes);
+        app.use('/api/users', utilisateursRoutes);
+        app.use('/api/products', produitsRoutes);
+        app.use('/api/categories', categorieRoutes);
+        app.use('/api/orders', commandesRoutes);
+        app.use('/api/payments', paiementRoutes);
+
+        // Point de contrôle de l'état du serveur (health check)
+        app.get('/api/health', (req, res) => {
+            res.status(200).json({
+                status: 'OK',
+                message: "Le serveur Nody est en cours d'exécution.",
+                timestamp: new Date().toISOString(),
+            });
+        });
+
+        // Gestion de la route 404 (non trouvée)
+        app.use((req, res) => {
+            res.status(404).json({
+                erreur: 'Route non trouvée',
+                message: `L'itinéraire demandé '${req.originalUrl}' n'existe pas sur ce serveur.`,
+            });
+        });
+
+        // Middleware de gestion des erreurs, à placer en dernier
+        app.use(errorHandler);
+
+        return app;
+    } catch (error) {
+        logger.error(
+            "Erreur lors de l'initialisation de l'application:",
+            error
+        );
+        throw error; // Propager l'erreur pour que le serveur puisse la gérer
+    }
+};
+
+export default initializeApp;
