@@ -129,6 +129,7 @@ const Inscription = () => {
                                     name="prenom"
                                     className="form-control"
                                     value={form.prenom}
+                                    autoComplete="given-name"
                                     onChange={handleChange}
                                     required
                                 />
@@ -140,6 +141,7 @@ const Inscription = () => {
                                     name="nom"
                                     className="form-control"
                                     value={form.nom}
+                                    autoComplete="family-name"
                                     onChange={handleChange}
                                     required
                                 />
@@ -156,6 +158,7 @@ const Inscription = () => {
                             type="email"
                             name="email"
                             className="form-control"
+                                autoComplete="email"
                             value={form.email}
                             onChange={handleChange}
                             required
@@ -172,6 +175,7 @@ const Inscription = () => {
                                 type={showPassword ? 'text' : 'password'}
                                 name="motDePasse"
                                 className="form-control"
+                                autoComplete="new-password"
                                 value={form.motDePasse}
                                 onChange={handleChange}
                                 required

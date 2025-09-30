@@ -21,11 +21,11 @@ export default function PageDetailProduit() {
     useEffect(() => {
         setLoading(true);
         setError(null);
-        
+
         // Simulation d'un appel API
         setTimeout(() => {
             const foundProduit = produitsMock.find(p => p.id === parseInt(id));
-            
+
             if (foundProduit) {
                 setProduit(foundProduit);
                 // Définit la première image comme image active par défaut
@@ -33,13 +33,13 @@ export default function PageDetailProduit() {
             } else {
                 setError('Produit non trouvé.');
             }
-            
+
             setLoading(false);
         }, 500);
     }, [id]);
 
     // Gestion du changement de quantité
-    const handleQuantityChange = (e) => {
+    const handleQuantityChange = e => {
         const value = parseInt(e.target.value);
         if (!isNaN(value) && value > 0) {
             setSelectedQuantity(value);
@@ -54,17 +54,29 @@ export default function PageDetailProduit() {
 
     // Affichage pendant le chargement
     if (loading) {
-        return <div className="container mt-5 text-center">Chargement du produit...</div>;
+        return (
+            <div className="container mt-5 text-center">
+                Chargement du produit...
+            </div>
+        );
     }
 
     // Gestion des erreurs
     if (error) {
-        return <div className="container mt-5 alert alert-danger text-center">{error}</div>;
+        return (
+            <div className="container mt-5 alert alert-danger text-center">
+                {error}
+            </div>
+        );
     }
 
     // Produit non trouvé
     if (!produit) {
-        return <div className="container mt-5 text-center">Produit introuvable.</div>;
+        return (
+            <div className="container mt-5 text-center">
+                Produit introuvable.
+            </div>
+        );
     }
 
     return (
@@ -78,7 +90,7 @@ export default function PageDetailProduit() {
                         alt={produit.nom}
                         className="img-fluid rounded shadow-sm"
                     />
-                    
+
                     {/* Miniatures de la galerie (si plusieurs images) */}
                     {produit.images && produit.images.length > 1 && (
                         <div className="d-flex mt-3">
@@ -89,14 +101,28 @@ export default function PageDetailProduit() {
                                     onClick={() => setActiveImage(imgSrc)} // Change l'image active au clic
                                     alt={`Vue ${index + 1}`}
                                     className={`img-thumbnail me-2 ${imgSrc === activeImage ? 'border border-primary' : ''}`}
-                                    style={{ 
-                                        width: '80px', 
-                                        height: '80px', 
-                                        objectFit: 'cover', 
-                                        cursor: 'pointer' 
+                                    style={{
+                                        width: '80px',
+                                        height: '80px',
+                                        objectFit: 'cover',
+                                        cursor: 'pointer',
                                     }}
                                 />
                             ))}
+                        </div>
+                    )}
+
+                    {/* Section Vidéo (si disponible) */}
+                    {produit.video && (
+                        <div className="mt-4">
+                            <h5 className="mb-3">Vidéo du produit</h5>
+                            <div className="ratio ratio-16x9">
+                                <video
+                                    src={produit.video}
+                                    controls
+                                    className="rounded"
+                                ></video>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -104,37 +130,51 @@ export default function PageDetailProduit() {
                 {/* Section Détails du produit */}
                 <div className="col-md-6">
                     <h1 className="mb-3">{produit.nom}</h1>
-                    <p className="lead text-primary fw-bold mb-4" style={{ fontSize: '2rem' }}>
+                    <p
+                        className="lead text-primary fw-bold mb-4"
+                        style={{ fontSize: '2rem' }}
+                    >
                         {produit.prix.toLocaleString()} XOF
                     </p>
                     <p className="text-muted mb-4">{produit.description}</p>
 
                     {/* Sélecteurs d'options dynamiques */}
-                    {produit.variations && produit.variations.map((variation, index) => (
-                        <div className="mb-3" key={index}>
-                            <label htmlFor={`select-${variation.type}`} className="form-label fw-bold">
-                                Sélectionnez {variation.type} :
-                            </label>
-                            <select 
-                                className="form-select" 
-                                id={`select-${variation.type}`}
-                                onChange={(e) =>
-                                    setSelectedOptions((prev) => ({
-                                        ...prev,
-                                        [variation.type]: e.target.value,
-                                    }))
-                                }
-                            >
-                                {variation.options.map((option, idx) => (
-                                    <option key={idx} value={option}>{option}</option>
-                                ))}
-                            </select>
-                        </div>
-                    ))}
+                    {produit.variations &&
+                        produit.variations.map((variation, index) => (
+                            <div className="mb-3" key={index}>
+                                <label
+                                    htmlFor={`select-${variation.type}`}
+                                    className="form-label fw-bold"
+                                >
+                                    Sélectionnez {variation.type} :
+                                </label>
+                                <select
+                                    className="form-select"
+                                    id={`select-${variation.type}`}
+                                    onChange={e =>
+                                        setSelectedOptions(prev => ({
+                                            ...prev,
+                                            [variation.type]: e.target.value,
+                                        }))
+                                    }
+                                >
+                                    {variation.options.map((option, idx) => (
+                                        <option key={idx} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        ))}
 
                     {/* Sélecteur de quantité */}
                     <div className="mb-4">
-                        <label htmlFor="quantity" className="form-label fw-bold">Quantité :</label>
+                        <label
+                            htmlFor="quantity"
+                            className="form-label fw-bold"
+                        >
+                            Quantité :
+                        </label>
                         <input
                             type="number"
                             id="quantity"
@@ -147,14 +187,26 @@ export default function PageDetailProduit() {
                     </div>
 
                     {/* Bouton d'ajout au panier */}
-                    <button className="btn btn-dark btn-lg w-100" onClick={handleAddToCart}>
-                        <i className="fas fa-cart-plus me-2"></i> Ajouter au panier
+                    <button
+                        className="btn btn-dark btn-lg w-100"
+                        onClick={handleAddToCart}
+                    >
+                        <i className="fas fa-cart-plus me-2"></i> Ajouter au
+                        panier
                     </button>
 
                     {/* Informations supplémentaires */}
                     <hr className="my-4" />
-                    <p><strong>Catégorie :</strong> {produit.category || 'Non spécifié'}</p>
-                    <p><strong>En stock :</strong> {produit.stock > 0 ? `${produit.stock} unités` : 'Bientôt disponible'}</p>
+                    <p>
+                        <strong>Catégorie :</strong>{' '}
+                        {produit.category || 'Non spécifié'}
+                    </p>
+                    <p>
+                        <strong>En stock :</strong>{' '}
+                        {produit.stock > 0
+                            ? `${produit.stock} unités`
+                            : 'Bientôt disponible'}
+                    </p>
                 </div>
             </div>
         </div>

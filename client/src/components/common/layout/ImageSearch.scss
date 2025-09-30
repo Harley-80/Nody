@@ -4,8 +4,8 @@ $upload-area-active: #3498db;
 $preview-bg: #f8f9fa;
 
 .image-search {
-    background: $white;
-    border-radius: $border-radius;
+    background: white;
+    border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     overflow: hidden;
     width: 100%;
@@ -22,14 +22,14 @@ $preview-bg: #f8f9fa;
         h3 {
             margin: 0;
             font-size: 1.2rem;
-            color: $primary-color;
+            color: #2c3e50;
             font-weight: 600;
         }
 
         .close-btn {
             background: none;
             border: none;
-            color: $text-light;
+            color: #777;
             cursor: pointer;
             padding: 0.25rem;
             border-radius: 50%;
@@ -38,11 +38,11 @@ $preview-bg: #f8f9fa;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: $transition;
+            transition: all 0.3s ease;
 
             &:hover {
                 background: #e9ecef;
-                color: $secondary-color;
+                color: #e74c3c;
             }
         }
     }
@@ -54,7 +54,7 @@ $preview-bg: #f8f9fa;
 
 .upload-area {
     border: 2px dashed $upload-area-border;
-    border-radius: $border-radius;
+    border-radius: 8px;
     padding: 2.5rem 1.5rem;
     text-align: center;
     cursor: pointer;
@@ -74,13 +74,13 @@ $preview-bg: #f8f9fa;
     }
 
     .upload-content {
-        color: $text-light;
+        color: #777;
 
         .upload-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
             color: #adb5bd;
-            transition: $transition;
+            transition: all 0.3s ease;
         }
 
         .upload-text {
@@ -103,19 +103,19 @@ $preview-bg: #f8f9fa;
     .camera-btn {
         margin-top: 1rem;
         padding: 0.6rem 1.2rem;
-        background: $accent-color;
-        color: $white;
+        background: #3498db;
+        color: white;
         border: none;
-        border-radius: $border-radius;
+        border-radius: 4px;
         cursor: pointer;
-        transition: $transition;
+        transition: all 0.3s ease;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
         font-size: 0.95rem;
 
         &:hover {
-            background: color.scale($accent-color, $lightness: -10%);
+            background: #2980b9;
         }
     }
 }
@@ -129,7 +129,7 @@ $preview-bg: #f8f9fa;
         img {
             max-width: 100%;
             max-height: 250px;
-            border-radius: $border-radius;
+            border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
     }
@@ -143,10 +143,10 @@ $preview-bg: #f8f9fa;
         button {
             padding: 0.7rem 1.2rem;
             border: 1px solid #dee2e6;
-            background: $white;
-            border-radius: $border-radius;
+            background: white;
+            border-radius: 4px;
             cursor: pointer;
-            transition: $transition;
+            transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
@@ -158,13 +158,13 @@ $preview-bg: #f8f9fa;
             }
 
             &.btn-search {
-                background: $accent-color;
-                color: $white;
-                border-color: $accent-color;
+                background: #3498db;
+                color: white;
+                border-color: #3498db;
 
                 &:hover {
-                    background: color.scale($accent-color, $lightness: -10%);
-                    border-color: color.scale($accent-color, $lightness: -10%);
+                    background: #2980b9;
+                    border-color: #2980b9;
                 }
             }
         }
@@ -173,29 +173,4 @@ $preview-bg: #f8f9fa;
 
 .file-input {
     display: none;
-}
-
-// Responsive
-@media (max-width: 768px) {
-    .image-search {
-        margin: 0 1rem;
-
-        .image-search-content {
-            padding: 1rem;
-        }
-    }
-
-    .upload-area {
-        padding: 2rem 1rem;
-    }
-
-    .preview-actions {
-        flex-direction: column;
-        align-items: center;
-
-        button {
-            width: 100%;
-            justify-content: center;
-        }
-    }
 }

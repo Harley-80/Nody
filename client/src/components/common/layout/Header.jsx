@@ -1,6 +1,9 @@
+// Importation des dépendances nécessaires
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+// Importation des icônes nécessaires
 import {
     faSearch,
     faUser,
@@ -16,33 +19,61 @@ import {
     faBars,
     faList,
     faTimes,
-    faImage,
-    faUpload,
-    faCamera,
-    faPaste,
+    faGlobe,
+    faMoneyBill,
 } from '@fortawesome/free-solid-svg-icons';
-import logoNody from '../../../assets/logo/neos-brands-solid.svg';
-import { useCart } from '../../../contexts/CartContext';
-import { useAuth } from '../../../contexts/AuthContext';
+import logoNody from '@/assets/logo/neos-brands-solid.svg';
+import { useTranslation } from 'react-i18next';
+import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useProduits } from '@/contexts/ProduitsContext';
+import imageSearchIcon from '@/assets/icons/recherche.png';
+import ImageSearch from './ImageSearch';
+import DeviseSelector from '../DeviseSelector';
+import LangueSelector from './LangueSelector';
 import './Header.scss';
 
+/**
+ * Composant Header : Barre de navigation principale de l'application
+ * @returns {JSX.Element} - Élément JSX représentant le header
+ */
 export default function Header() {
+    // Initialisation des hooks
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const { panier } = useCart();
+    const { devise, setDevise } = useProduits();
     const { user, logout } = useAuth();
+
+    // Calcul du nombre total d'articles dans le panier
     const cartCount = panier.reduce((total, p) => total + p.quantite, 0);
-    const [selectedCurrency, setSelectedCurrency] = useState(() => {
-        return localStorage.getItem('nodyCurrency') || 'XOF';
-    });
+
+    // États locaux pour la gestion de l'interface
     const [searchQuery, setSearchQuery] = useState('');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [imageSearchOpen, setImageSearchOpen] = useState(false);
-    const [imagePreview, setImagePreview] = useState(null);
-    const [dragOver, setDragOver] = useState(false);
-    const fileInputRef = useRef(null);
-    const searchInputRef = useRef(null);
+    const [configDropdownOpen, setConfigDropdownOpen] = useState(false);
 
+    // Références pour les éléments DOM
+    const searchInputRef = useRef(null);
+    const configDropdownRef = useRef(null);
+
+    /**
+     * Effet pour définir la devise et la langue par défaut
+     */
+    useEffect(() => {
+        if (!devise) {
+            setDevise('XOF');
+        }
+        if (!localStorage.getItem('i18nextLng')) {
+            i18n.changeLanguage('fr');
+        }
+    }, [devise, setDevise, i18n]);
+
+    /**
+     * Effet pour gérer le défilement de la page
+     */
     useEffect(() => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 50);
@@ -51,11 +82,26 @@ export default function Header() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    /**
+     * Effet pour fermer les dropdowns en cliquant à l'extérieur
+     */
     useEffect(() => {
-        localStorage.setItem('nodyCurrency', selectedCurrency);
-    }, [selectedCurrency]);
+        const handleClickOutside = event => {
+            if (
+                configDropdownRef.current &&
+                !configDropdownRef.current.contains(event.target)
+            ) {
+                setConfigDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () =>
+            document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
-    // Gérer le collage d'image avec Ctrl+V
+    /**
+     * Effet pour gérer le collage d'image avec Ctrl+V
+     */
     useEffect(() => {
         const handlePaste = e => {
             if (
@@ -67,20 +113,21 @@ export default function Header() {
                     for (let i = 0; i < items.length; i++) {
                         if (items[i].type.indexOf('image') !== -1) {
                             const blob = items[i].getAsFile();
-                            const url = URL.createObjectURL(blob);
-                            setImagePreview(url);
-                            setImageSearchOpen(true);
+                            handleImageSearch(blob);
                             break;
                         }
                     }
                 }
             }
         };
-
         document.addEventListener('paste', handlePaste);
         return () => document.removeEventListener('paste', handlePaste);
     }, []);
 
+    /**
+     * Gère la soumission du formulaire de recherche
+     * @param {Event} e - Événement de soumission du formulaire
+     */
     const handleSearchSubmit = e => {
         e.preventDefault();
         if (searchQuery.trim().length >= 2) {
@@ -92,53 +139,42 @@ export default function Header() {
         }
     };
 
-    const handleImageSearchSubmit = e => {
-        e.preventDefault();
-        if (imagePreview) {
-            // Ici, vous enverriez normalement l'image à votre API de recherche
-            // Pour l'exemple, nous allons simplement naviguer vers une page de résultats
-            navigate(`/produits?imageSearch=true`);
-            setImageSearchOpen(false);
-            setImagePreview(null);
-            closeMobile();
-        }
+    /**
+     * Gère la recherche par image
+     * @param {File} imageFile - Fichier image à rechercher
+     */
+    const handleImageSearch = imageFile => {
+        const formData = new FormData();
+        formData.append('image', imageFile);
+        console.log("Envoi de l'image pour recherche:", imageFile);
+        navigate(`/produits?imageSearch=true&timestamp=${Date.now()}`);
+        setImageSearchOpen(false);
+        closeMobile();
     };
 
-    const handleFileSelect = e => {
-        const file = e.target.files[0];
-        if (file && file.type.match('image.*')) {
-            const url = URL.createObjectURL(file);
-            setImagePreview(url);
-            setImageSearchOpen(true);
-        }
+    /**
+     * Gère le changement de devise
+     * @param {String} newDevise - Nouvelle devise sélectionnée
+     */
+    const handleDeviseChange = newDevise => {
+        setDevise(newDevise);
+        setConfigDropdownOpen(false);
+        closeMobile();
     };
 
-    const handleDragOver = e => {
-        e.preventDefault();
-        setDragOver(true);
+    /**
+     * Gère le changement de langue
+     * @param {String} lang - Nouvelle langue sélectionnée
+     */
+    const handleLangChange = lang => {
+        i18n.changeLanguage(lang);
+        setConfigDropdownOpen(false);
+        closeMobile();
     };
 
-    const handleDragLeave = e => {
-        e.preventDefault();
-        setDragOver(false);
-    };
-
-    const handleDrop = e => {
-        e.preventDefault();
-        setDragOver(false);
-
-        const files = e.dataTransfer.files;
-        if (files.length > 0 && files[0].type.match('image.*')) {
-            const url = URL.createObjectURL(files[0]);
-            setImagePreview(url);
-            setImageSearchOpen(true);
-        }
-    };
-
-    const openFileDialog = () => {
-        fileInputRef.current?.click();
-    };
-
+    /**
+     * Gère la déconnexion de l'utilisateur
+     */
     const handleLogout = () => {
         logout();
         localStorage.removeItem('userToken');
@@ -147,35 +183,77 @@ export default function Header() {
         navigate('/');
     };
 
-    const closeMobile = () => setMobileMenuOpen(false);
+    /**
+     * Ferme le menu mobile
+     */
+    const closeMobile = () => {
+        setMobileMenuOpen(false);
+        setConfigDropdownOpen(false);
+    };
 
+    /**
+     * Ouvre/Ferme le dropdown de configuration
+     */
+    const toggleConfigDropdown = () => {
+        setConfigDropdownOpen(!configDropdownOpen);
+    };
+
+    /**
+     * Retourne le nom complet d'une devise
+     * @param {String} currency - Code de la devise
+     * @returns {String} - Nom complet de la devise
+     */
+    const getCurrencyName = currency => {
+        const currencyNames = {
+            XOF: 'Franc CFA (XOF)',
+            XAF: 'Franc CFA (XAF)',
+            EUR: 'Euro (EUR)',
+            USD: 'Dollar US (USD)',
+        };
+        return currencyNames[currency] || currency;
+    };
+
+    /**
+     * Retourne le nom complet d'une langue
+     * @param {String} lang - Code de la langue
+     * @returns {String} - Nom complet de la langue
+     */
+    const getLanguageName = lang => {
+        const languageNames = {
+            fr: 'Français',
+            en: 'English',
+        };
+        return languageNames[lang] || lang;
+    };
+
+    // Rendu du composant
     return (
         <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
-            {/* Top Bar */}
+            {/* Barre supérieure */}
             <div className="top-bar">
                 <div className="container">
                     <div className="top-bar-content">
-                        <span>Livraison partout dans Dakar.</span>
+                        <span>{t('header.delivery')}</span>
                         <div className="top-links">
                             <Link to="/contact" onClick={closeMobile}>
-                                Contact
+                                {t('header.contact')}
                             </Link>
                             <Link to="/faq" onClick={closeMobile}>
-                                FAQ
+                                {t('header.faq')}
                             </Link>
                             <Link to="/blog" onClick={closeMobile}>
-                                Blog
+                                {t('header.blog')}
                             </Link>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Main Navigation */}
+            {/* Navigation principale */}
             <nav className="main-nav">
                 <div className="container">
                     <div className="nav-content">
-                        {/* Logo and Mobile Toggle */}
+                        {/* Logo et bouton de menu mobile */}
                         <div className="nav-brand">
                             <button
                                 className="mobile-toggle"
@@ -199,7 +277,7 @@ export default function Header() {
                             </Link>
                         </div>
 
-                        {/* Search Form with Image Search */}
+                        {/* Barre de recherche */}
                         <div className="search-container">
                             <form
                                 className="search-form"
@@ -207,7 +285,7 @@ export default function Header() {
                             >
                                 <input
                                     type="text"
-                                    placeholder="Rechercher un produit..."
+                                    placeholder={t('header.search_placeholder')}
                                     value={searchQuery}
                                     onChange={e =>
                                         setSearchQuery(e.target.value)
@@ -225,147 +303,258 @@ export default function Header() {
                                     }
                                     aria-label="Recherche par image"
                                 >
-                                    <FontAwesomeIcon icon={faImage} />
+                                    <img
+                                        src={imageSearchIcon}
+                                        alt="Recherche par image"
+                                        className="image-search-icon"
+                                    />
                                 </button>
                             </form>
-
-                            {/* Image Search Panel */}
+                            {/* Panneau de recherche par image */}
                             {imageSearchOpen && (
-                                <div className="image-search-panel">
-                                    <div className="panel-header">
-                                        <h3>Recherche par image</h3>
-                                        <button
-                                            onClick={() => {
-                                                setImageSearchOpen(false);
-                                                setImagePreview(null);
-                                            }}
-                                            aria-label="Fermer"
-                                        >
-                                            <FontAwesomeIcon icon={faTimes} />
-                                        </button>
-                                    </div>
-
-                                    <div className="panel-content">
-                                        {imagePreview ? (
-                                            <div className="image-preview">
-                                                <img
-                                                    src={imagePreview}
-                                                    alt="Preview"
-                                                />
-                                                <div className="preview-actions">
-                                                    <button
-                                                        onClick={openFileDialog}
-                                                    >
-                                                        <FontAwesomeIcon
-                                                            icon={faImage}
-                                                        />{' '}
-                                                        Changer l'image
-                                                    </button>
-                                                    <button
-                                                        onClick={
-                                                            handleImageSearchSubmit
-                                                        }
-                                                        className="search-btn"
-                                                    >
-                                                        <FontAwesomeIcon
-                                                            icon={faSearch}
-                                                        />{' '}
-                                                        Lancer la recherche
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div
-                                                className={`upload-area ${dragOver ? 'drag-over' : ''}`}
-                                                onDragOver={handleDragOver}
-                                                onDragLeave={handleDragLeave}
-                                                onDrop={handleDrop}
-                                                onClick={openFileDialog}
-                                            >
-                                                <div className="upload-content">
-                                                    <FontAwesomeIcon
-                                                        icon={faUpload}
-                                                        size="3x"
-                                                    />
-                                                    <p>
-                                                        Glissez-déposez une
-                                                        image ici ou cliquez
-                                                        pour parcourir
-                                                    </p>
-                                                    <p className="hint">
-                                                        <FontAwesomeIcon
-                                                            icon={faPaste}
-                                                        />
-                                                        Vous pouvez aussi coller
-                                                        une image (Ctrl+V) dans
-                                                        la barre de recherche
-                                                    </p>
-                                                    <button className="camera-btn">
-                                                        <FontAwesomeIcon
-                                                            icon={faCamera}
-                                                        />{' '}
-                                                        Prendre une photo
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        onChange={handleFileSelect}
-                                        accept="image/*"
-                                        style={{ display: 'none' }}
-                                    />
-                                </div>
+                                <ImageSearch
+                                    onClose={() => setImageSearchOpen(false)}
+                                    onSearch={handleImageSearch}
+                                />
                             )}
                         </div>
 
-                        {/* Mobile Menu Content */}
+                        {/* Sélecteur de configuration (devise et langue) pour desktop */}
+                        <div className="desktop-config" ref={configDropdownRef}>
+                            <div className="config-dropdown">
+                                <button
+                                    className="config-toggle"
+                                    onClick={toggleConfigDropdown}
+                                    aria-label="Paramètres de langue et devise"
+                                >
+                                    <FontAwesomeIcon
+                                        icon={faGlobe}
+                                        className="config-icon"
+                                    />
+                                    <span className="config-text">
+                                        {i18n.language.toUpperCase()} / {devise}
+                                    </span>
+                                    <FontAwesomeIcon
+                                        icon={faChevronDown}
+                                        className="chevron-icon"
+                                    />
+                                </button>
+                                {configDropdownOpen && (
+                                    <div className="config-dropdown-menu">
+                                        {/* Section pour la langue */}
+                                        <div className="config-section">
+                                            <h4 className="config-section-title">
+                                                <FontAwesomeIcon
+                                                    icon={faGlobe}
+                                                />
+                                                {t('Langue')}
+                                            </h4>
+                                            <div className="config-options">
+                                                {[
+                                                    {
+                                                        code: 'fr',
+                                                        name: 'Français',
+                                                        flag: '🇫🇷',
+                                                    },
+                                                    {
+                                                        code: 'en',
+                                                        name: 'English',
+                                                        flag: '🇺🇸',
+                                                    },
+                                                ].map(lang => (
+                                                    <button
+                                                        key={lang.code}
+                                                        className={`config-option ${i18n.language === lang.code ? 'active' : ''}`}
+                                                        onClick={() =>
+                                                            handleLangChange(
+                                                                lang.code
+                                                            )
+                                                        }
+                                                    >
+                                                        <span className="flag">
+                                                            {lang.flag}
+                                                        </span>
+                                                        <span className="option-text">
+                                                            {lang.name}
+                                                        </span>
+                                                        {i18n.language ===
+                                                            lang.code && (
+                                                            <FontAwesomeIcon
+                                                                icon={faCheck}
+                                                                className="check-icon"
+                                                            />
+                                                        )}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        {/* Séparateur */}
+                                        <div className="config-divider"></div>
+                                        {/* Section pour la devise */}
+                                        <div className="config-section">
+                                            <h4 className="config-section-title">
+                                                <FontAwesomeIcon
+                                                    icon={faMoneyBill}
+                                                />
+                                                {t('Devise')}
+                                            </h4>
+                                            <div className="config-options">
+                                                {[
+                                                    'XOF',
+                                                    'XAF',
+                                                    'EUR',
+                                                    'USD',
+                                                ].map(currency => (
+                                                    <button
+                                                        key={currency}
+                                                        className={`config-option ${devise === currency ? 'active' : ''}`}
+                                                        onClick={() =>
+                                                            handleDeviseChange(
+                                                                currency
+                                                            )
+                                                        }
+                                                    >
+                                                        <span className="currency-symbol">
+                                                            {currency ===
+                                                                'XOF' ||
+                                                            currency === 'XAF'
+                                                                ? 'CFA'
+                                                                : currency ===
+                                                                    'EUR'
+                                                                    ? '€'
+                                                                    : currency ===
+                                                                        'USD'
+                                                                    ? '$'
+                                                                    : currency}
+                                                        </span>
+                                                        <span className="option-text">
+                                                            {getCurrencyName(
+                                                                currency
+                                                            )}
+                                                        </span>
+                                                        {devise ===
+                                                            currency && (
+                                                            <FontAwesomeIcon
+                                                                icon={faCheck}
+                                                                className="check-icon"
+                                                            />
+                                                        )}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Menu mobile */}
                         <div
                             className={`nav-menu ${mobileMenuOpen ? 'open' : ''}`}
                         >
-                            {/* Navigation Links */}
-                            <ul className="nav-links">
-                                <li className="nav-item dropdown">
-                                    <button className="nav-link">
-                                        {selectedCurrency}
-                                        <FontAwesomeIcon icon={faChevronDown} />
-                                    </button>
-                                    <div className="dropdown-menu">
-                                        {['XOF', 'XAF', 'EUR'].map(devise => (
+                            {/* Configuration pour mobile */}
+                            <div className="mobile-config">
+                                <div className="config-section">
+                                    <h4 className="config-section-title">
+                                        <FontAwesomeIcon icon={faGlobe} />
+                                        {t('header.language')}
+                                    </h4>
+                                    <div className="config-options">
+                                        {[
+                                            {
+                                                code: 'fr',
+                                                name: 'Français',
+                                                flag: '🇫🇷',
+                                            },
+                                            {
+                                                code: 'en',
+                                                name: 'English',
+                                                flag: '🇺🇸',
+                                            },
+                                        ].map(lang => (
                                             <button
-                                                key={devise}
-                                                className={`dropdown-item ${selectedCurrency === devise ? 'active' : ''}`}
-                                                onClick={() => {
-                                                    setSelectedCurrency(devise);
-                                                    closeMobile();
-                                                }}
+                                                key={lang.code}
+                                                className={`config-option ${i18n.language === lang.code ? 'active' : ''}`}
+                                                onClick={() =>
+                                                    handleLangChange(lang.code)
+                                                }
                                             >
-                                                {devise}
-                                                {selectedCurrency ===
-                                                    devise && (
+                                                <span className="flag">
+                                                    {lang.flag}
+                                                </span>
+                                                <span className="option-text">
+                                                    {lang.name}
+                                                </span>
+                                                {i18n.language ===
+                                                    lang.code && (
                                                     <FontAwesomeIcon
                                                         icon={faCheck}
+                                                        className="check-icon"
                                                     />
                                                 )}
                                             </button>
                                         ))}
                                     </div>
-                                </li>
+                                </div>
+                                <div className="config-divider"></div>
+                                <div className="config-section">
+                                    <h4 className="config-section-title">
+                                        <FontAwesomeIcon icon={faMoneyBill} />
+                                        {t('header.currency')}
+                                    </h4>
+                                    <div className="config-options">
+                                        {['XOF', 'XAF', 'EUR', 'USD'].map(
+                                            currency => (
+                                                <button
+                                                    key={currency}
+                                                    className={`config-option ${devise === currency ? 'active' : ''}`}
+                                                    onClick={() =>
+                                                        handleDeviseChange(
+                                                            currency
+                                                        )
+                                                    }
+                                                >
+                                                    <span className="currency-symbol">
+                                                        {currency === 'XOF' ||
+                                                        currency === 'XAF'
+                                                            ? 'CFA'
+                                                            : currency === 'EUR'
+                                                                ? '€'
+                                                                : currency ===
+                                                                    'USD'
+                                                                ? '$'
+                                                                : currency}
+                                                    </span>
+                                                    <span className="option-text">
+                                                        {getCurrencyName(
+                                                            currency
+                                                        )}
+                                                    </span>
+                                                    {devise === currency && (
+                                                        <FontAwesomeIcon
+                                                            icon={faCheck}
+                                                            className="check-icon"
+                                                        />
+                                                    )}
+                                                </button>
+                                            )
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
 
+                            {/* Liens de navigation */}
+                            <ul className="nav-links">
                                 <li className="nav-item">
                                     <Link
                                         to="/produits"
                                         className="nav-link"
                                         onClick={closeMobile}
                                     >
-                                        <FontAwesomeIcon icon={faTags} />{' '}
-                                        Produits
+                                        <FontAwesomeIcon icon={faTags} />
+                                        {t('header.products')}
                                     </Link>
                                 </li>
-
                                 <li className="nav-item">
                                     <Link
                                         to="/panier"
@@ -374,8 +563,8 @@ export default function Header() {
                                     >
                                         <FontAwesomeIcon
                                             icon={faShoppingCart}
-                                        />{' '}
-                                        Panier
+                                        />
+                                        {t('header.cart')}
                                         {cartCount > 0 && (
                                             <span className="cart-badge">
                                                 {cartCount}
@@ -383,20 +572,19 @@ export default function Header() {
                                         )}
                                     </Link>
                                 </li>
-
                                 <li className="nav-item">
                                     <Link
                                         to="/categories"
                                         className="nav-link"
                                         onClick={closeMobile}
                                     >
-                                        <FontAwesomeIcon icon={faList} />{' '}
-                                        Catégories
+                                        <FontAwesomeIcon icon={faList} />
+                                        {t('header.categories')}
                                     </Link>
                                 </li>
                             </ul>
 
-                            {/* User Actions */}
+                            {/* Actions utilisateur */}
                             <div className="user-actions">
                                 {user?.isAdmin ? (
                                     <>
@@ -407,8 +595,8 @@ export default function Header() {
                                         >
                                             <FontAwesomeIcon
                                                 icon={faUserShield}
-                                            />{' '}
-                                            Admin
+                                            />
+                                            {t('header.admin')}
                                         </Link>
                                         <button
                                             className="nav-link"
@@ -416,8 +604,8 @@ export default function Header() {
                                         >
                                             <FontAwesomeIcon
                                                 icon={faSignOutAlt}
-                                            />{' '}
-                                            Déconnexion
+                                            />
+                                            {t('header.logout')}
                                         </button>
                                     </>
                                 ) : user ? (
@@ -427,7 +615,8 @@ export default function Header() {
                                                 icon={faUserCircle}
                                             />
                                             <span className="user-name">
-                                                {user.name || 'Mon compte'}
+                                                {user.name ||
+                                                    t('header.my_account')}
                                             </span>
                                         </button>
                                         <div className="dropdown-menu">
@@ -438,16 +627,16 @@ export default function Header() {
                                             >
                                                 <FontAwesomeIcon
                                                     icon={faUser}
-                                                />{' '}
-                                                Profil
+                                                />
+                                                {t('header.profile')}
                                             </Link>
                                             <Link
                                                 to="/mes-commandes"
                                                 className="dropdown-item"
                                                 onClick={closeMobile}
                                             >
-                                                <FontAwesomeIcon icon={faBox} />{' '}
-                                                Commandes
+                                                <FontAwesomeIcon icon={faBox} />
+                                                {t('header.orders')}
                                             </Link>
                                             <div className="dropdown-divider"></div>
                                             <button
@@ -456,8 +645,8 @@ export default function Header() {
                                             >
                                                 <FontAwesomeIcon
                                                     icon={faSignOutAlt}
-                                                />{' '}
-                                                Déconnexion
+                                                />
+                                                {t('header.logout')}
                                             </button>
                                         </div>
                                     </div>
@@ -467,8 +656,8 @@ export default function Header() {
                                         className="login-btn"
                                         onClick={closeMobile}
                                     >
-                                        <FontAwesomeIcon icon={faSignInAlt} />{' '}
-                                        Connexion
+                                        <FontAwesomeIcon icon={faSignInAlt} />
+                                        {t('header.login')}
                                     </Link>
                                 )}
                             </div>

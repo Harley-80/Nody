@@ -1,0 +1,18 @@
+{
+    "header": {
+        "delivery": "Livraison partout dans Dakar.",
+        "contact": "Contact",
+        "faq": "FAQ",
+        "blog": "Blog",
+        "search_placeholder": "Rechercher un produit...",
+        "products": "Produits",
+        "cart": "Panier",
+        "categories": "Catégories",
+        "admin": "Admin",
+        "logout": "Déconnexion",
+        "my_account": "Mon compte",
+        "profile": "Profil",
+        "orders": "Commandes",
+        "login": "Connexion"
+    }
+}

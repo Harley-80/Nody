@@ -33,6 +33,8 @@ export default function Paiement() {
     const showLoginToast = useCallback(() => {
         addToast({
             type: 'info',
+
+            type: 'info', //
             title: t('payment.loginRequiredTitle'),
             message: t('payment.loginRequiredMessage'),
         });
@@ -101,15 +103,16 @@ export default function Paiement() {
 
         if (missingFields.length > 0) {
             addToast({
-                type: 'error',
+
+                type: 'error', //
                 title: t('payment.missingFieldsTitle'),
                 message: `${t('payment.missingFieldsMessage')} ${missingFields.join(', ')}.`,
             });
             return;
         }
         if (panier.length === 0) {
-            addToast({
-                type: 'error',
+
+                type: 'error', //
                 title: t('payment.emptyCartTitle'),
                 message: t('payment.emptyCartMessage'),
             });
@@ -176,7 +179,8 @@ export default function Paiement() {
 
             viderPanier();
             addToast({
-                type: 'success',
+
+                type: 'success', //
                 title: t('payment.orderConfirmedTitle'),
                 message: t('payment.orderConfirmedMessage', { name: form.nom }),
             });
@@ -184,13 +188,15 @@ export default function Paiement() {
             // REDIRECTION VERS LA PAGE DE CONFIRMATION AVEC LE STATE
             navigate('/confirmation', {
                 state: {
-                    type: 'success',
+                    type: 'success', // Type de message (succès, erreur, info)
+                    title: 'Commande confirmée 🛍️', // Titre du message
+                    message: `Merci ${form.nom} ! Votre commande a été enregistrée.`, // Message principal
+                    buttonLabel: 'Voir mes commandes', // Texte du bouton d'action
                     title: t('payment.confirmation.title'), // Titre du message
-                    message: t('payment.confirmation.message', {
-                        name: form.nom,
-                    }), // Message principal
+                    message: t('payment.confirmation.message', { name: form.nom }), // Message principal
                     buttonLabel: t('payment.confirmation.buttonLabel'), // Texte du bouton d'action
                     redirectTo: '/mes-commandes', // Redirect to user's orders page
+                    delay: 5000, // Délai avant redirection automatique (si implémenté dans le composant confirmation)
                     delay: 5000,
                 },
             });
@@ -198,7 +204,7 @@ export default function Paiement() {
             console.error('Erreur lors de la commande:', err);
             setError(err.message);
             addToast({
-                type: 'error',
+
                 title: t('errors.genericTitle'),
                 message: err.message || t('payment.orderErrorMessage'),
             });
@@ -211,7 +217,8 @@ export default function Paiement() {
         // On ne garde que la vérification du panier vide
         return (
             <div className="container py-5 text-center">
-                {/* Votre panier est vide. <Link to="/produits">Parcourir les produits</Link> */}
+                Votre panier est vide.{' '}
+                <Link to="/produits">Parcourir les produits</Link>
                 {t('payment.emptyCartInfo')}{' '}
                 <Link to="/produits">{t('payment.browseProducts')}</Link>
             </div>
@@ -220,12 +227,14 @@ export default function Paiement() {
 
     return (
         <div className="container py-5">
+            <h2 className="mb-4">Finaliser ma commande</h2>
             <h2 className="mb-4">{t('payment.title')}</h2>
             {error && <div className="alert alert-danger">{error}</div>}
             <div className="row">
                 <div className="col-md-6">
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">
+                            <label className="form-label">Nom complet</label>
                             <label className="form-label">
                                 {t('payment.form.fullName')}
                             </label>
@@ -239,6 +248,7 @@ export default function Paiement() {
                             />
                         </div>
                         <div className="mb-3">
+                            <label className="form-label">Email</label>
                             <label className="form-label">
                                 {t('payment.form.email')}
                             </label>
@@ -252,6 +262,7 @@ export default function Paiement() {
                             />
                         </div>
                         <div className="mb-3">
+                            <label className="form-label">Téléphone</label>
                             <label className="form-label">
                                 {t('payment.form.phone')}
                             </label>
@@ -266,6 +277,7 @@ export default function Paiement() {
                         </div>
                         <div className="mb-3">
                             <label className="form-label">
+                                Adresse de livraison
                                 {t('payment.form.shippingAddress')}
                             </label>
                             <textarea
@@ -278,6 +290,7 @@ export default function Paiement() {
                             />
                         </div>
                         <div className="mb-3">
+                            <label className="form-label">Ville</label>
                             <label className="form-label">
                                 {t('payment.form.city')}
                             </label>
@@ -291,6 +304,7 @@ export default function Paiement() {
                             />
                         </div>
                         <div className="mb-3">
+                            <label className="form-label">Pays</label>
                             <label className="form-label">
                                 {t('payment.form.country')}
                             </label>
@@ -304,6 +318,7 @@ export default function Paiement() {
                             />
                         </div>
                         <div className="mb-3">
+                            <label className="form-label">Code Postal</label>
                             <label className="form-label">
                                 {t('payment.form.postalCode')}
                             </label>
@@ -318,6 +333,7 @@ export default function Paiement() {
                         </div>
 
                         <div className="mb-3">
+                            <label className="form-label">Devise</label>
                             <label className="form-label">
                                 {t('payment.form.currency')}
                             </label>
@@ -329,19 +345,21 @@ export default function Paiement() {
                                 required
                             >
                                 <option value="XOF">
+                                    XOF (Afrique de l'Ouest)
                                     {t('currencies.XOF')}
                                 </option>
                                 <option value="XAF">
+                                    XAF (Afrique Centrale)
                                     {t('currencies.XAF')}
                                 </option>
-                                <option value="EUR">
-                                    {t('currencies.EUR')}
-                                </option>
+                                <option value="EUR">EUR (Euro)</option>
+                                <option value="EUR">{t('currencies.EUR')}</option>
                             </select>
                         </div>
 
                         <div className="mb-3">
                             <label className="form-label">
+                                Méthode de Paiement
                                 {t('payment.form.paymentMethod')}
                             </label>
                             <div>
@@ -360,6 +378,7 @@ export default function Paiement() {
                                         className="form-check-label"
                                         htmlFor="wave"
                                     >
+                                        Wave
                                         {t('paymentMethods.wave')}
                                     </label>
                                 </div>
@@ -380,6 +399,7 @@ export default function Paiement() {
                                         className="form-check-label"
                                         htmlFor="orange_money"
                                     >
+                                        Orange Money
                                         {t('paymentMethods.orange_money')}
                                     </label>
                                 </div>
@@ -400,6 +420,7 @@ export default function Paiement() {
                                         className="form-check-label"
                                         htmlFor="airtel_money"
                                     >
+                                        Airtel Money
                                         {t('paymentMethods.airtel_money')}
                                     </label>
                                 </div>
@@ -418,6 +439,7 @@ export default function Paiement() {
                                         className="form-check-label"
                                         htmlFor="mobicash"
                                     >
+                                        MobiCash
                                         {t('paymentMethods.mobicash')}
                                     </label>
                                 </div>
@@ -438,6 +460,7 @@ export default function Paiement() {
                                         className="form-check-label"
                                         htmlFor="carte_credit"
                                     >
+                                        Carte de Crédit
                                         {t('paymentMethods.carte_credit')}
                                     </label>
                                 </div>
@@ -459,6 +482,7 @@ export default function Paiement() {
                                         className="form-check-label"
                                         htmlFor="paiement_livraison"
                                     >
+                                        Paiement à la livraison
                                         {t('paymentMethods.paiement_livraison')}
                                     </label>
                                 </div>
@@ -473,16 +497,22 @@ export default function Paiement() {
                                         role="status"
                                         aria-hidden="true"
                                     ></span>
+                                    Traitement...
                                     {t('payment.processing')}
                                 </>
                             ) : (
-                                <>{t('payment.confirmOrder')}</>
+                                <>
+                                    <i className="fas fa-check me-2"></i>{' '}
+                                    Confirmer la commande
+                                    {t('payment.confirmOrder')}
+                                </>
                             )}
                         </button>
                     </form>
                 </div>
 
                 <div className="col-md-6">
+                    <h4 className="mb-3">Récapitulatif</h4>
                     <h4 className="mb-3">{t('payment.summary.title')}</h4>
                     <ul className="list-group mb-3">
                         {panier.map((item, index) => (
@@ -493,8 +523,8 @@ export default function Paiement() {
                                 <div>
                                     <strong>{item.nom}</strong>
                                     <div className="small text-muted">
-                                        {t('payment.summary.quantity')}:{' '}
-                                        {item.quantite}
+                                        Quantité : {item.quantite}
+                                        {t('payment.summary.quantity')}: {item.quantite}
                                         {item.options &&
                                             Object.entries(item.options).map(
                                                 ([key, val]) => (
@@ -515,9 +545,8 @@ export default function Paiement() {
                             </li>
                         ))}
                         <li className="list-group-item d-flex justify-content-between">
-                            <span className="fw-bold">
-                                {t('payment.summary.total')}
-                            </span>
+                            <span className="fw-bold">Total</span>
+                            <span className="fw-bold">{t('payment.summary.total')}</span>
                             <span className="fw-bold text-success">
                                 {totalPanier.toLocaleString()} {devise}
                             </span>

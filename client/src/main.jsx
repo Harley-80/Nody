@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import { BrowserRouter } from 'react-router-dom';
 import { CartProvider } from './contexts/CartContext';
+import './i18n'; // Importer la configuration i18next
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ProduitsProvider } from './contexts/ProduitsContext';
 

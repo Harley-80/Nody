@@ -118,6 +118,7 @@ const Connexion = () => {
                             type="email"
                             className="form-control"
                             value={email}
+                            autoComplete="email"
                             onChange={e => setEmail(e.target.value)}
                             required
                         />
@@ -133,6 +134,7 @@ const Connexion = () => {
                                 type={showPassword ? 'text' : 'password'}
                                 className="form-control"
                                 value={motDePasse}
+                                autoComplete="current-password"
                                 onChange={e => setPassword(e.target.value)}
                                 required
                             />

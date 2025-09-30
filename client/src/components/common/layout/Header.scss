@@ -1,4 +1,6 @@
-// Variables
+// VARIABLES ET MIXINS
+
+// Variables de couleurs
 $top-bar-bg: #0f0f23;
 $main-nav-bg: #16213e;
 $primary-color: #2c3e50;
@@ -10,103 +12,158 @@ $text-color: #333;
 $text-light: #777;
 $white: #fff;
 $black: #000;
+
+// Variables de style
 $transition: all 0.3s ease;
 $box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-$border-radius: 4px;
+$border-radius: 8px;
+$mobile-breakpoint: 992px;
 
 // Importation du module de couleur de Sass
-@use "sass:color";
+@use 'sass:color';
 
-// Mixins
+// Mixins utilitaires
 @mixin flex-center {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
+@mixin flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 @mixin hover-effect($color: $secondary-color, $initial-color: inherit) {
     transition: $transition;
     color: $initial-color;
+
     &:hover {
         color: $color;
+        transform: translateY(-1px);
     }
 }
 
-// Styles des composants
+@mixin mobile {
+    @media (max-width: #{$mobile-breakpoint}) {
+        @content;
+    }
+}
+
+// STYLES DU HEADER
+
 .header {
     position: sticky;
     top: 0;
     z-index: 1000;
     box-shadow: $box-shadow;
     transition: $transition;
+    background: $main-nav-bg;
 
     &.scrolled {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 
         .main-nav {
-            padding: 0.5rem 0;
-        }
-    }
-}
+            padding: 0.8rem 0;
 
-// Top Bar
-.top-bar {
-    background-color: $top-bar-bg;
-    color: $light-color;
-    padding: 0.7rem 0;
-    font-size: 1rem;
-
-    .top-bar-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 1rem;
-
-        @media (max-width: 576px) {
-            flex-direction: column;
-            gap: 0.5rem;
-            text-align: center;
-        }
-    }
-
-    .top-links {
-        display: flex;
-        gap: 1.5rem;
-
-        a {
-            color: $light-color;
-            text-decoration: none;
-            @include hover-effect($secondary-color, $light-color);
-
-            @media (max-width: 576px) {
-                font-size: 0.9rem;
+            @include mobile {
+                padding: 1rem 0;
             }
         }
     }
 }
 
-// Main Navigation
-.main-nav {
-    background-color: $main-nav-bg;
-    color: $white;
-    padding: 1.2rem 0;
-    transition: $transition;
+// STYLES DE LA BARRE SUPÉRIEURE
 
-    .container {
+.top-bar {
+    background: linear-gradient(135deg, $top-bar-bg 0%, color.scale($top-bar-bg, $lightness: 10%) 100%);
+    color: $light-color;
+    padding: 0.6rem 0;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba($white, 0.1);
+
+    .top-bar-content {
+        @include flex-between;
         padding: 0 1rem;
+
+        @include mobile {
+            flex-direction: column;
+            gap: 0.5rem;
+            text-align: center;
+            padding: 0.5rem;
+        }
     }
 
-    .nav-content {
+    .top-links {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        gap: 1.8rem;
+
+        a {
+            color: $light-color;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.3rem 0;
+            position: relative;
+            @include hover-effect($secondary-color, $light-color);
+
+            &::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: $secondary-color;
+                transition: $transition;
+            }
+
+            &:hover::after {
+                width: 100%;
+            }
+
+            @include mobile {
+                font-size: 0.85rem;
+                padding: 0.5rem;
+            }
+        }
     }
 }
 
-// Brand
+// STYLES DE LA NAVIGATION PRINCIPALE
+
+.main-nav {
+    background: $main-nav-bg;
+    color: $white;
+    padding: 1rem 0;
+    transition: $transition;
+    position: relative;
+
+    .container {
+        padding: 0 1.5rem;
+
+        @include mobile {
+            padding: 0 1rem;
+        }
+    }
+
+    .nav-content {
+        @include flex-between;
+        gap: 2rem;
+
+        @include mobile {
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+    }
+}
+
+// STYLES DU LOGO ET DU MENU MOBILE
+
 .nav-brand {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
 
     .mobile-toggle {
         display: none;
@@ -116,8 +173,15 @@ $border-radius: 4px;
         margin-right: 1rem;
         cursor: pointer;
         color: $white;
+        border-radius: 4px;
+        transition: $transition;
 
-        @media (max-width: 992px) {
+        &:hover {
+            background: rgba($white, 0.1);
+            transform: scale(1.05);
+        }
+
+        @include mobile {
             display: block;
         }
     }
@@ -128,37 +192,151 @@ $border-radius: 4px;
         color: $white;
         font-weight: 700;
         font-size: 1.8rem;
-        gap: 0.5rem;
+        gap: 0.6rem;
+        padding: 0.5rem;
+        border-radius: $border-radius;
         @include hover-effect($secondary-color, $white);
 
         img {
             transition: $transition;
+            filter: brightness(0) invert(1);
         }
 
         &:hover img {
-            transform: rotate(15deg);
+            transform: rotate(15deg) scale(1.1);
+        }
+
+        @include mobile {
+            font-size: 1.6rem;
+
+            img {
+                width: 30px;
+                height: 30px;
+            }
         }
     }
 }
 
-// Menu de navigation principal
+// STYLES DE LA RECHERCHE
+
+.search-container {
+    position: relative;
+    display: flex;
+    flex-grow: 1;
+    max-width: 600px;
+    margin: 0 2rem;
+
+    @include mobile {
+        order: 3;
+        width: 100%;
+        max-width: none;
+        margin: 1rem 0 0 0;
+    }
+}
+
+.search-form {
+    display: flex;
+    width: 100%;
+    position: relative;
+    background: rgba($white, 0.08);
+    border-radius: 50px;
+    border: 2px solid transparent;
+    transition: $transition;
+    overflow: hidden;
+
+    &:focus-within {
+        border-color: $accent-color;
+        background: rgba($white, 0.12);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba($accent-color, 0.2);
+    }
+
+    input {
+        width: 100%;
+        padding: 0.9rem 5rem 0.9rem 1.5rem;
+        border: none;
+        background: transparent;
+        color: $white;
+        font-size: 1rem;
+        outline: none;
+        transition: $transition;
+
+        &::placeholder {
+            color: rgba($white, 0.7);
+        }
+
+        @include mobile {
+            padding: 0.8rem 4rem 0.8rem 1.2rem;
+            font-size: 16px;
+        }
+    }
+
+    button[type="submit"] {
+        position: absolute;
+        right: 3.2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: rgba($white, 0.8);
+        cursor: pointer;
+        padding: 0.6rem;
+        border-radius: 50%;
+        transition: $transition;
+
+        &:hover {
+            color: $white;
+            background: rgba($white, 0.1);
+            transform: translateY(-50%) scale(1.1);
+        }
+    }
+
+    .image-search-toggle {
+        position: absolute;
+        right: 0.7rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: rgba($white, 0.8);
+        cursor: pointer;
+        padding: 0.6rem;
+        border-radius: 50%;
+        transition: $transition;
+
+        &:hover {
+            color: $accent-color;
+            background: rgba($accent-color, 0.1);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .image-search-icon {
+            width: 20px;
+            height: 20px;
+            filter: invert(1);
+            transition: $transition;
+        }
+    }
+}
+
+// STYLES DU MENU MOBILE
+
 .nav-menu {
     display: flex;
     flex-grow: 1;
     justify-content: space-between;
     align-items: center;
 
-    @media (max-width: 992px) {
+    @include mobile {
         position: fixed;
         top: 0;
         left: -100%;
-        width: 80%;
+        width: 85%;
         height: 100vh;
-        background-color: $main-nav-bg;
-        color: $white;
+        background: linear-gradient(135deg, $main-nav-bg 0%, color.scale($main-nav-bg, $lightness: -10%) 100%);
         flex-direction: column;
-        padding: 2rem;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        padding: 2rem 1.5rem;
+        box-shadow: 2px 0 20px rgba(0, 0, 0, 0.4);
         z-index: 1001;
         transition: $transition;
         overflow-y: auto;
@@ -169,246 +347,24 @@ $border-radius: 4px;
     }
 }
 
-// Styles pour la recherche par image
-.search-container {
-  position: relative;
-  display: flex;
-  flex-grow: 1;
-  max-width: 550px;
-  margin: 0 2rem;
-
-  @media (max-width: 1200px) {
-    margin: 0 1rem;
-  }
-
-  @media (max-width: 992px) {
-    width: 100%;
-    max-width: none;
-    margin: 1rem 0;
-  }
-}
-
-.search-form {
-  display: flex;
-  width: 100%;
-  position: relative;
-
-  input {
-    width: 100%;
-    padding: 0.8rem 4rem 0.8rem 1.2rem;
-    border: 1px solid rgba($white, 0.5);
-    background-color: color.scale($main-nav-bg, $lightness: 10%);
-    color: $white;
-    border-radius: $border-radius;
-    font-size: 1.1rem;
-    outline: none;
-    transition: $transition;
-
-    &::placeholder {
-      color: rgba($white, 0.7);
-    }
-
-    &:focus {
-      border-color: $accent-color;
-      background-color: color.scale($main-nav-bg, $lightness: 15%);
-    }
-  }
-
-  button[type="submit"] {
-    position: absolute;
-    right: 2.8rem;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: rgba($white, 0.7);
-    cursor: pointer;
-    padding: 0.5rem;
-    transition: $transition;
-
-    &:hover {
-      color: $white;
-    }
-  }
-
-  .image-search-toggle {
-    position: absolute;
-    right: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: rgba($white, 0.7);
-    cursor: pointer;
-    padding: 0.5rem;
-    transition: $transition;
-
-    &:hover {
-      color: $accent-color;
-    }
-  }
-}
-
-.image-search-panel {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: $white;
-  border-radius: $border-radius;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  margin-top: 0.5rem;
-  overflow: hidden;
-
-  .panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid #eee;
-    background: #f8f9fa;
-
-    h3 {
-      margin: 0;
-      font-size: 1.1rem;
-      color: $primary-color;
-    }
-
-    button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: $text-light;
-      padding: 0.25rem;
-
-      &:hover {
-        color: $secondary-color;
-      }
-    }
-  }
-
-  .panel-content {
-    padding: 1.5rem;
-  }
-}
-
-.upload-area {
-  border: 2px dashed #ddd;
-  border-radius: $border-radius;
-  padding: 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: $transition;
-
-  &.drag-over {
-    border-color: $accent-color;
-    background-color: rgba($accent-color, 0.05);
-  }
-
-  &:hover {
-    border-color: $accent-color;
-  }
-
-  .upload-content {
-    color: $text-light;
-
-    p {
-      margin: 1rem 0;
-    }
-
-    .hint {
-      font-size: 0.85rem;
-      margin-top: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-  }
-
-  .camera-btn {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    background: $accent-color;
-    color: $white;
-    border: none;
-    border-radius: $border-radius;
-    cursor: pointer;
-    transition: $transition;
-
-    &:hover {
-      background: color.scale($accent-color, $lightness: -10%);
-    }
-  }
-}
-
-.image-preview {
-  text-align: center;
-
-  img {
-    max-width: 100%;
-    max-height: 200px;
-    border-radius: $border-radius;
-    margin-bottom: 1rem;
-  }
-
-  .preview-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-
-    button {
-      padding: 0.5rem 1rem;
-      border: 1px solid #ddd;
-      background: $white;
-      border-radius: $border-radius;
-      cursor: pointer;
-      transition: $transition;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-
-      &:hover {
-        background: #f8f9fa;
-        border-color: #ccc;
-      }
-
-      &.search-btn {
-        background: $accent-color;
-        color: $white;
-        border-color: $accent-color;
-
-        &:hover {
-          background: color.scale($accent-color, $lightness: -10%);
-        }
-      }
-    }
-  }
-}
-
-// Liens de navigation
 .nav-links {
     display: flex;
     list-style: none;
     margin: 0;
     padding: 0;
-    gap: 1.5rem;
+    gap: 1.2rem;
 
-    @media (max-width: 1200px) {
-        gap: 1rem;
-    }
-
-    @media (max-width: 992px) {
+    @include mobile {
         flex-direction: column;
         width: 100%;
         gap: 0;
+        margin-bottom: 2rem;
     }
 
     .nav-item {
         position: relative;
 
-        @media (max-width: 992px) {
+        @include mobile {
             width: 100%;
             border-bottom: 1px solid rgba($white, 0.1);
         }
@@ -416,106 +372,106 @@ $border-radius: 4px;
         .nav-link {
             display: flex;
             align-items: center;
-            padding: 0.6rem 1rem;
+            padding: 0.7rem 1.2rem;
             color: $white;
             text-decoration: none;
-            font-weight: 500;
-            font-size: 1.1rem;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 25px;
             @include hover-effect($secondary-color, $white);
             gap: 0.5rem;
+            transition: $transition;
+            position: relative;
+            overflow: hidden;
 
-            @media (max-width: 992px) {
+            &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba($white, 0.1), transparent);
+                transition: $transition;
+            }
+
+            &:hover::before {
+                left: 100%;
+            }
+
+            @include mobile {
                 padding: 1.2rem 0;
-                font-size: 1.2rem;
+                font-size: 1.1rem;
+                border-radius: 0;
+                justify-content: space-between;
             }
         }
 
         .cart-badge {
-            background-color: $secondary-color;
+            background: linear-gradient(135deg, $secondary-color 0%, color.scale($secondary-color, $lightness: -15%) 100%);
             color: $white;
             position: absolute;
-            top: -10px;
-            right: -10px;
+            top: -5px;
+            right: -5px;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             @include flex-center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: bold;
-        }
+            box-shadow: 0 2px 8px rgba($secondary-color, 0.4);
+            animation: pulse 2s infinite;
 
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background-color: $white;
-            color: $text-color;
-            min-width: 220px;
-            box-shadow: $box-shadow;
-            border-radius: $border-radius;
-            padding: 0.5rem 0;
-            opacity: 0;
-            visibility: hidden;
-            transition: $transition;
-            z-index: 100;
-
-            @media (max-width: 992px) {
+            @include mobile {
                 position: static;
-                display: none;
-                box-shadow: none;
-                padding-left: 1rem;
-                background-color: transparent;
-            }
-
-            .dropdown-item {
-                display: block;
-                padding: 0.7rem 1.5rem;
-                color: $text-color;
-                text-decoration: none;
-                transition: $transition;
-                font-size: 1rem;
-
-                &:hover {
-                    background-color: $light-color;
-                    color: $secondary-color;
-                }
-
-                &.active {
-                    color: $secondary-color;
-                    font-weight: 500;
-                    background-color: transparent;
-                }
-            }
-        }
-
-        &:hover .dropdown-menu {
-            opacity: 1;
-            visibility: visible;
-
-            @media (max-width: 992px) {
-                display: block;
+                margin-left: auto;
+                margin-right: 1rem;
             }
         }
     }
 }
 
-// Actions utilisateur
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+// STYLES DES ACTIONS UTILISATEUR
+
 .user-actions {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1rem;
 
-    @media (max-width: 992px) {
+    @include mobile {
         width: 100%;
         justify-content: center;
-        margin-top: 1rem;
+        margin-top: auto;
         flex-wrap: wrap;
+        padding-top: 2rem;
+        border-top: 1px solid rgba($white, 0.1);
     }
 
     .nav-link, .login-btn, .dropdown-toggle {
         color: $white;
         @include hover-effect($secondary-color, $white);
-        font-size: 1.1rem;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .login-btn {
+        text-decoration: none;
+        padding: 0.7rem 1.5rem;
+        border: 2px solid rgba($white, 0.3);
+        border-radius: 25px;
+        transition: $transition;
+
+        &:hover {
+            border-color: $secondary-color;
+            background: rgba($secondary-color, 0.1);
+            transform: translateY(-2px);
+        }
     }
 
     .dropdown {
@@ -524,16 +480,29 @@ $border-radius: 4px;
         .dropdown-toggle {
             @include flex-center;
             gap: 0.5rem;
-            background: none;
+            background: rgba($white, 0.1);
             border: none;
             cursor: pointer;
-            font-weight: 500;
-            padding: 0.6rem 1rem;
-            border-radius: $border-radius;
+            font-weight: 600;
+            padding: 0.7rem 1.2rem;
+            border-radius: 25px;
             transition: $transition;
+            backdrop-filter: blur(10px);
 
             &:hover {
-                background-color: rgba($white, 0.1);
+                background: rgba($white, 0.2);
+                transform: translateY(-2px);
+            }
+
+            .user-name {
+                max-width: 120px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+
+                @include mobile {
+                    max-width: 100px;
+                }
             }
         }
 
@@ -541,29 +510,32 @@ $border-radius: 4px;
             position: absolute;
             top: 100%;
             right: 0;
-            background-color: $white;
+            background: $white;
             min-width: 220px;
-            box-shadow: $box-shadow;
-            border-radius: $border-radius;
-            padding: 0.5rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            padding: 0.8rem 0;
             opacity: 0;
             visibility: hidden;
             transition: $transition;
             z-index: 100;
+            transform: translateY(-10px);
 
-            @media (max-width: 992px) {
+            @include mobile {
                 right: auto;
                 left: 50%;
-                transform: translateX(-50%);
+                transform: translateX(-50%) translateY(-10px);
                 position: static;
-                background-color: transparent;
+                background: transparent;
                 color: $white;
+                box-shadow: none;
+                margin-top: 1rem;
             }
 
             .dropdown-item {
                 display: flex;
                 align-items: center;
-                padding: 0.7rem 1.5rem;
+                padding: 0.8rem 1.5rem;
                 color: $text-color;
                 text-decoration: none;
                 transition: $transition;
@@ -571,58 +543,576 @@ $border-radius: 4px;
                 text-align: left;
                 background: none;
                 border: none;
-                font-size: 1rem;
+                font-size: 0.95rem;
+                gap: 0.7rem;
 
                 &:hover {
-                    background-color: $light-color;
-                    color: $secondary-color;
+                    background: rgba($accent-color, 0.08);
+                    color: $accent-color;
+                    padding-left: 2rem;
                 }
 
-                &.active {
-                    color: $secondary-color;
-                    font-weight: 500;
+                @include mobile {
+                    color: $white;
+                    padding: 1rem 0;
+
+                    &:hover {
+                        background: rgba($white, 0.1);
+                        color: $secondary-color;
+                    }
                 }
             }
 
             .dropdown-divider {
                 height: 1px;
-                background-color: rgba(0, 0, 0, 0.1);
+                background: rgba(0, 0, 0, 0.1);
                 margin: 0.5rem 0;
+
+                @include mobile {
+                    background: rgba($white, 0.2);
+                }
             }
         }
 
         &:hover .dropdown-menu {
             opacity: 1;
             visibility: visible;
+            transform: translateY(0);
+
+            @include mobile {
+                transform: translateX(-50%) translateY(0);
+            }
         }
     }
 }
 
-// Adaptation pour mobile
-@media (max-width: 992px) {
-  .search-container {
-    order: -1;
-    margin: 1rem 0;
-  }
+// STYLES DU DROPDOWN DE CONFIGURATION
 
-  .image-search-panel {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 400px;
-    z-index: 1002;
-  }
+.desktop-config {
+    position: relative;
+    flex-shrink: 0;
+
+    .config-dropdown {
+        position: relative;
+    }
+
+    .config-toggle {
+        @include flex-center;
+        gap: 0.5rem;
+        background: rgba($white, 0.1);
+        border: 1px solid rgba($white, 0.2);
+        color: $white;
+        padding: 0.7rem 1rem;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: $transition;
+        font-weight: 600;
+        font-size: 0.9rem;
+        backdrop-filter: blur(10px);
+
+        &:hover {
+            background: rgba($white, 0.15);
+            border-color: rgba($white, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .config-icon {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .config-text {
+            margin: 0 0.3rem;
+            font-weight: 500;
+        }
+
+        .chevron-icon {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            transition: $transition;
+        }
+
+        &.open .chevron-icon {
+            transform: rotate(180deg);
+        }
+    }
+
+    .config-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: $white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        padding: 1rem;
+        min-width: 280px;
+        z-index: 1000;
+        margin-top: 0.5rem;
+        animation: slideDown 0.2s ease;
+
+        @include mobile {
+            position: static;
+            box-shadow: none;
+            background: transparent;
+            color: $white;
+            padding: 0;
+            min-width: auto;
+        }
+    }
 }
 
-// Overlay pour le panneau de recherche mobile
+.config-section {
+    margin-bottom: 1rem;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    .config-section-title {
+        @include flex-center;
+        gap: 0.5rem;
+        margin: 0 0 0.8rem 0;
+        font-size: 0.9rem;
+        color: $text-color;
+        font-weight: 600;
+
+        @include mobile {
+            color: $white;
+            justify-content: flex-start;
+            font-size: 1rem;
+        }
+    }
+}
+
+.config-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.config-option {
+    @include flex-between;
+    padding: 0.7rem 1rem;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: $transition;
+    text-align: left;
+    width: 100%;
+
+    &:hover {
+        background: rgba($accent-color, 0.08);
+    }
+
+    &.active {
+        background: rgba($accent-color, 0.12);
+        color: $accent-color;
+        font-weight: 600;
+    }
+
+    .flag, .currency-symbol {
+        font-size: 1.1rem;
+        min-width: 30px;
+    }
+
+    .option-text {
+        flex: 1;
+        font-size: 0.9rem;
+    }
+
+    .check-icon {
+        color: $accent-color;
+        font-size: 0.8rem;
+    }
+
+    @include mobile {
+        color: $white;
+        padding: 0.8rem 0;
+
+        &:hover {
+            background: rgba($white, 0.1);
+        }
+
+        &.active {
+            background: rgba($white, 0.15);
+            color: $secondary-color;
+        }
+    }
+}
+
+.config-divider {
+    height: 1px;
+    background: rgba(0, 0, 0, 0.1);
+    margin: 1rem 0;
+
+    @include mobile {
+        background: rgba($white, 0.2);
+    }
+}
+
+// STYLES POUR LA RECHERCHE PAR IMAGE
+
 .image-search-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1001;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1001;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease;
+
+    @include mobile {
+        background: rgba(0, 0, 0, 0.8);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.image-search-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: $white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 1002;
+    margin-top: 0.8rem;
+    overflow: hidden;
+    animation: slideDown 0.3s ease;
+
+    @include mobile {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 95%;
+        max-width: 450px;
+        max-height: 85vh;
+        overflow-y: auto;
+        margin-top: 0;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.panel-header {
+    @include flex-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+
+    h3 {
+        margin: 0;
+        font-size: 1.3rem;
+        color: $primary-color;
+        font-weight: 600;
+    }
+
+    .close-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: $text-light;
+        padding: 0.5rem;
+        border-radius: 50%;
+        transition: $transition;
+        width: 40px;
+        height: 40px;
+        @include flex-center;
+
+        &:hover {
+            color: $secondary-color;
+            background: rgba($secondary-color, 0.1);
+            transform: rotate(90deg);
+        }
+    }
+}
+
+.panel-content {
+    padding: 2rem;
+
+    @include mobile {
+        padding: 1.5rem;
+    }
+}
+
+.upload-area {
+    border: 3px dashed #e0e0e0;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #fafbfc;
+    position: relative;
+
+    &.drag-over {
+        border-color: $accent-color;
+        background: rgba($accent-color, 0.03);
+        transform: scale(1.02);
+        box-shadow: 0 0 0 3px rgba($accent-color, 0.1);
+    }
+
+    &:hover:not(.drag-over) {
+        border-color: $accent-color;
+        background: rgba($accent-color, 0.02);
+    }
+
+    .upload-content {
+        color: $text-light;
+        pointer-events: none;
+
+        .upload-icon {
+            color: #d0d0d0;
+            margin-bottom: 1.5rem;
+            transition: $transition;
+        }
+
+        .upload-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: $primary-color;
+        }
+
+        .upload-description {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .upload-hint {
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: #999;
+            font-style: italic;
+            background: rgba($accent-color, 0.05);
+            padding: 0.8rem;
+            border-radius: 8px;
+            border-left: 3px solid $accent-color;
+        }
+    }
+
+    .camera-button {
+        margin-top: 1.5rem;
+        padding: 0.8rem 1.5rem;
+        background: linear-gradient(135deg, $accent-color 0%, color.scale($accent-color, $lightness: -10%) 100%);
+        color: $white;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: $transition;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba($accent-color, 0.3);
+        pointer-events: auto;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba($accent-color, 0.4);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+}
+
+.image-preview {
+    text-align: center;
+
+    .preview-container {
+        position: relative;
+        display: inline-block;
+        max-width: 100%;
+        margin-bottom: 2rem;
+    }
+
+    .preview-image {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        border: 2px solid #f0f0f0;
+    }
+
+    .preview-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+
+        @include mobile {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .action-button {
+            padding: 0.8rem 1.5rem;
+            border: 2px solid #e9ecef;
+            background: $white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: $transition;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            min-width: 160px;
+            justify-content: center;
+            font-size: 0.9rem;
+
+            &:hover {
+                background: #f8f9fa;
+                border-color: #dee2e6;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
+            &.primary {
+                background: linear-gradient(135deg, $accent-color 0%, color.scale($accent-color, $lightness: -10%) 100%);
+                color: $white;
+                border-color: $accent-color;
+                box-shadow: 0 4px 15px rgba($accent-color, 0.3);
+
+                &:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba($accent-color, 0.4);
+                }
+            }
+
+            @include mobile {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+    }
+}
+
+.image-search-loading {
+    @include flex-center;
+    flex-direction: column;
+    padding: 3rem 2rem;
+    text-align: center;
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #f0f0f0;
+        border-top: 3px solid $accent-color;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 1.5rem;
+    }
+
+    .loading-text {
+        color: $text-light;
+        font-size: 1rem;
+        margin: 0;
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.image-search-error {
+    @include flex-center;
+    flex-direction: column;
+    padding: 2rem;
+    text-align: center;
+    color: $secondary-color;
+
+    .error-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.7;
+    }
+
+    .error-message {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .retry-button {
+        padding: 0.7rem 1.5rem;
+        background: $secondary-color;
+        color: $white;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: $transition;
+        font-weight: 600;
+
+        &:hover {
+            background: color.scale($secondary-color, $lightness: -10%);
+            transform: translateY(-2px);
+        }
+    }
+}
+
+
+// STYLES POUR LES OPTIMISATIONS MOBILES
+
+@include mobile {
+    .nav-menu.open ~ .image-search-overlay {
+        display: block;
+    }
+
+    .search-form {
+        background: rgba($white, 0.12);
+
+        &:focus-within {
+            background: rgba($white, 0.18);
+        }
+    }
+
+    .desktop-config {
+        display: none;
+    }
+}
+
+@media (min-width: #{$mobile-breakpoint + 1}) {
+    .mobile-config {
+        display: none;
+    }
+}
+
+// STYLES DE LA BARRE DE DÉFILEMENT
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
