@@ -1,68 +1,91 @@
+// Importation des modules nécessaires
 import nodemailer from 'nodemailer';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import config from '../config/env.js';
 import logger from '../utils/logger.js';
 
-// NOTE: Cette implémentation est basique. Pour la production,
-// il est recommandé d'utiliser un moteur de templates (ex: Pug, EJS)
-// pour générer le HTML des e-mails à partir des modèles.
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * Envoie un e-mail en utilisant Nodemailer.
- * @param {Object} options - Options de l'e-mail.
- * @param {string} options.a - L'adresse e-mail du destinataire.
- * @param {string} options.sujet - Le sujet de l'e-mail.
- * @param {string} options.modele - Le nom du modèle d'e-mail (utilisé ici pour générer un texte simple).
- * @param {Object} options.contexte - Les données à injecter dans le modèle.
+ * Configuration du transporteur pour l'envoi d'emails
  */
-const envoyerEmail = async options => {
-    // 1. Créer un transporteur (transporter)
-    // Utilise les informations du fichier de configuration
-    const transporter = nodemailer.createTransport({
-        host: config.emailHost, // ex: 'smtp.gmail.com'
-        port: config.emailPort, // ex: 587
-        secure: config.emailPort == 465, // true pour le port 465, false pour les autres
-        auth: {
-            user: config.emailUser,
-            pass: config.emailPass,
-        },
-    });
+const transporteur = nodemailer.createTransport({
+    service: config.emailService,
+    auth: {
+        user: config.emailUser,
+        pass: config.emailPass,
+    },
+});
 
-    // 2. Définir les options de l'e-mail
-    const mailOptions = {
-        from: `Nody <${config.emailUser}>`,
-        to: options.a,
-        subject: options.sujet,
-        // Pour l'instant, un simple texte. Idéalement, utiliser un moteur de templates.
-        text: `Bonjour ${
-            options.contexte?.nom || ''
-        }, voici votre message. Jeton: ${
-            options.contexte?.jetonVerification ||
-            options.contexte?.jetonReinitialisation ||
-            ''
-        }`,
-        html: `<h4>Bonjour ${
-            options.contexte?.nom || ''
-        },</h4><p>Ceci est un message de Nody.</p><p>Votre jeton est : <strong>${
-            options.contexte?.jetonVerification ||
-            options.contexte?.jetonReinitialisation ||
-            ''
-        }</strong></p>`,
-    };
-
-    // 3. Envoyer l'e-mail
+/**
+ * Charge un template d'email à partir du dossier des vues
+ * @param {String} nomTemplate - Nom du template à charger
+ * @param {Object} contexte - Variables à injecter dans le template
+ * @returns {String} Contenu HTML du template
+ */
+const chargerTemplate = (nomTemplate, contexte = {}) => {
     try {
-        const info = await transporter.sendMail(mailOptions);
-        logger.info(
-            `E-mail envoyé avec succès à ${options.a}: ${info.messageId}`
+        let cheminTemplate = path.join(
+            __dirname,
+            '../views/emails',
+            `${nomTemplate}.html`
         );
-    } catch (error) {
-        logger.error(
-            `Erreur lors de l'envoi de l'e-mail à ${options.a}:`,
-            error
-        );
-        // Propager l'erreur pour que le contrôleur puisse la gérer
-        throw new Error("Impossible d'envoyer l'e-mail.");
+
+        if (!fs.existsSync(cheminTemplate)) {
+            cheminTemplate = path.join(
+                __dirname,
+                '../views/emails',
+                'parDefaut.html'
+            );
+        }
+        let template = fs.readFileSync(cheminTemplate, 'utf8');
+
+        // Remplacer les variables dans le template
+        Object.keys(contexte).forEach(cle => {
+            const regex = new RegExp(`{{${cle}}}`, 'g');
+            template = template.replace(regex, contexte[cle]);
+        });
+        return template;
+    } catch (erreur) {
+        logger.error('Erreur lors du chargement du template email:', erreur);
+        return null;
     }
 };
 
+/**
+ * Service d'envoi d'email
+ * @param {Object} options - Options pour l'envoi de l'email
+ * @param {String} options.a - Destinataire
+ * @param {String} options.sujet - Sujet de l'email
+ * @param {String} options.modele - Nom du template à utiliser
+ * @param {Object} options.contexte - Variables pour le template
+ * @param {Array} options.piecesJointes - Pièces jointes
+ * @returns {Object} Résultat de l'envoi
+ */
+const envoyerEmail = async ({ a, sujet, modele, contexte, piecesJointes }) => {
+    try {
+        const html = chargerTemplate(modele, contexte);
+        if (!html) {
+            throw new Error('Template non trouvé');
+        }
+        const optionsEmail = {
+            from: `"Nody Mode" <${config.emailUser}>`,
+            to: a,
+            subject: sujet,
+            html,
+            attachments: piecesJointes,
+        };
+        const info = await transporteur.sendMail(optionsEmail);
+        logger.info(`Email envoyé à ${a}: ${info.messageId}`);
+
+        return info;
+    } catch (erreur) {
+        logger.error("Erreur lors de l'envoi de l'email:", erreur);
+        throw erreur;
+    }
+};
+
+// Exportation des fonctions
 export default envoyerEmail;

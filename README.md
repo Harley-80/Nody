@@ -117,6 +117,10 @@ Intégration avec les modèles Mongoose
 Sécurisation des données utilisateur
 Système de pagination et filtres
 
-## (Étape 7) : Création des Routes API et mise à jour de app.js
+# (Étape 7) : Création des Routes API et mise à jour de app.js
 
 Créer les routes API pour exposer les fonctionnalités de l'application.
+
+# (Étape 8) : Création des Services et Utilitaires
+
+Créer les services et utilitaires pour l'envoi d'emails, les paiements, et la gestion des fichiers.
