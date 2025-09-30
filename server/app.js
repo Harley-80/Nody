@@ -9,7 +9,10 @@ import redis from 'redis';
 
 import config from './config/env.js'; // Correction du nom de fichier
 import connectDatabase from './config/database.js'; // Correction du nom de fichier
-import errorHandler from './middleware/errorMiddleware.js';
+import {
+    gestionnaireErreurs as errorHandler,
+    nonTrouve,
+} from './middleware/errorMiddleware.js';
 import logger from './utils/logger.js';
 
 // Importation des routes de l'API
@@ -144,12 +147,7 @@ const initializeApp = async () => {
         });
 
         // Gestion de la route 404 (non trouvée)
-        app.use((req, res) => {
-            res.status(404).json({
-                erreur: 'Route non trouvée',
-                message: `L'itinéraire demandé '${req.originalUrl}' n'existe pas sur ce serveur.`,
-            });
-        });
+        app.use(nonTrouve);
 
         // Middleware de gestion des erreurs, à placer en dernier
         app.use(errorHandler);
