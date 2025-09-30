@@ -4,7 +4,7 @@ import asyncHandler from 'express-async-handler';
 import Utilisateur from '../models/utilisateurModel.js';
 import logger from '../utils/logger.js';
 import config from '../config/env.js';
-import { envoyerEmail } from '../services/emailService.js';
+import envoyerEmail from '../services/emailService.js';
 
 /**
  * Génère un token JWT pour un utilisateur

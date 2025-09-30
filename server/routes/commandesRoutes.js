@@ -1,12 +1,57 @@
+// Importation des modules nécessaires
 import express from 'express';
+import {
+    creerCommande,
+    obtenirMesCommandes,
+    obtenirCommande,
+    mettreAJourStatutCommande,
+    annulerCommande,
+    obtenirToutesCommandes,
+} from '../controllers/commandesController.js';
+import {
+    proteger,
+    autoriser,
+    verifierPropriete,
+} from '../middleware/authMiddleware.js';
+import {
+    validerObjectId,
+    validerCommande,
+} from '../middleware/validationMiddleware.js';
+import Commande from '../models/commandeModel.js';
 
-const router = express.Router();
+const routeur = express.Router();
 
-// @route   GET /api/orders
-// @desc    Route de test pour les commandes
-// @access  Public
-router.get('/', (req, res) => {
-    res.json({ message: 'La route des commandes fonctionne !' });
-});
+// Toutes les routes sont protégées
+routeur.use(proteger);
 
-export default router;
+// Routes utilisateur
+routeur
+    .route('/')
+    .post(validerCommande, creerCommande)
+    .get(obtenirMesCommandes);
+
+routeur
+    .route('/:id')
+    .get(
+        validerObjectId('id'),
+        verifierPropriete(Commande, 'id'),
+        obtenirCommande
+    );
+
+routeur
+    .route('/:id/annuler')
+    .put(
+        validerObjectId('id'),
+        verifierPropriete(Commande, 'id'),
+        annulerCommande
+    );
+
+// Routes admin
+routeur.route('/admin/toutes').get(autoriser('admin'), obtenirToutesCommandes);
+
+routeur
+    .route('/admin/:id/statut')
+    .put(autoriser('admin'), validerObjectId('id'), mettreAJourStatutCommande);
+
+// Exportation du routeur
+export default routeur;

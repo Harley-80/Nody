@@ -1,43 +1,59 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faSearch, faUser, faShoppingCart, faTags, faSignInAlt, faSignOutAlt, faUserShield, faUserCircle, faBox,
-    faCheck, faChevronDown, faBars, faList, faTimes, faImage, faUpload, faCamera, faPaste,
-} from '@fortawesome/free-solid-svg-icons'
-import logoNody from '../../../assets/logo/neos-brands-solid.svg'
-import { useCart } from '../../../contexts/CartContext'
-import { useAuth } from '../../../contexts/AuthContext'
-import './Header.scss'
+    faSearch,
+    faUser,
+    faShoppingCart,
+    faTags,
+    faSignInAlt,
+    faSignOutAlt,
+    faUserShield,
+    faUserCircle,
+    faBox,
+    faCheck,
+    faChevronDown,
+    faBars,
+    faList,
+    faTimes,
+    faImage,
+    faUpload,
+    faCamera,
+    faPaste,
+} from '@fortawesome/free-solid-svg-icons';
+import logoNody from '../../../assets/logo/neos-brands-solid.svg';
+import { useCart } from '../../../contexts/CartContext';
+import { useAuth } from '../../../contexts/AuthContext';
+import './Header.scss';
 
 export default function Header() {
-    const navigate = useNavigate()
-    const { panier } = useCart()
-    const { user, logout } = useAuth()
-    const cartCount = panier.reduce((total, p) => total + p.quantite, 0)
+    const navigate = useNavigate();
+    const { panier } = useCart();
+    const { user, logout } = useAuth();
+    const cartCount = panier.reduce((total, p) => total + p.quantite, 0);
     const [selectedCurrency, setSelectedCurrency] = useState(() => {
-        return localStorage.getItem('nodyCurrency') || 'XOF'
-    })
-    const [searchQuery, setSearchQuery] = useState('')
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-    const [isScrolled, setIsScrolled] = useState(false)
-    const [imageSearchOpen, setImageSearchOpen] = useState(false)
-    const [imagePreview, setImagePreview] = useState(null)
-    const [dragOver, setDragOver] = useState(false)
-    const fileInputRef = useRef(null)
-    const searchInputRef = useRef(null)
+        return localStorage.getItem('nodyCurrency') || 'XOF';
+    });
+    const [searchQuery, setSearchQuery] = useState('');
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [imageSearchOpen, setImageSearchOpen] = useState(false);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [dragOver, setDragOver] = useState(false);
+    const fileInputRef = useRef(null);
+    const searchInputRef = useRef(null);
 
     useEffect(() => {
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 50)
-        }
-        window.addEventListener('scroll', handleScroll)
-        return () => window.removeEventListener('scroll', handleScroll)
-    }, [])
+            setIsScrolled(window.scrollY > 50);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     useEffect(() => {
-        localStorage.setItem('nodyCurrency', selectedCurrency)
-    }, [selectedCurrency])
+        localStorage.setItem('nodyCurrency', selectedCurrency);
+    }, [selectedCurrency]);
 
     // Gérer le collage d'image avec Ctrl+V
     useEffect(() => {
@@ -46,92 +62,92 @@ export default function Header() {
                 searchInputRef.current &&
                 document.activeElement === searchInputRef.current
             ) {
-                const items = e.clipboardData?.items
+                const items = e.clipboardData?.items;
                 if (items) {
                     for (let i = 0; i < items.length; i++) {
                         if (items[i].type.indexOf('image') !== -1) {
-                            const blob = items[i].getAsFile()
-                            const url = URL.createObjectURL(blob)
-                            setImagePreview(url)
-                            setImageSearchOpen(true)
-                            break
+                            const blob = items[i].getAsFile();
+                            const url = URL.createObjectURL(blob);
+                            setImagePreview(url);
+                            setImageSearchOpen(true);
+                            break;
                         }
                     }
                 }
             }
-        }
+        };
 
-        document.addEventListener('paste', handlePaste)
-        return () => document.removeEventListener('paste', handlePaste)
-    }, [])
+        document.addEventListener('paste', handlePaste);
+        return () => document.removeEventListener('paste', handlePaste);
+    }, []);
 
     const handleSearchSubmit = e => {
-        e.preventDefault()
+        e.preventDefault();
         if (searchQuery.trim().length >= 2) {
             navigate(
                 `/produits?search=${encodeURIComponent(searchQuery.trim())}`
-            )
-            setSearchQuery('')
-            closeMobile()
+            );
+            setSearchQuery('');
+            closeMobile();
         }
-    }
+    };
 
     const handleImageSearchSubmit = e => {
-        e.preventDefault()
+        e.preventDefault();
         if (imagePreview) {
             // Ici, vous enverriez normalement l'image à votre API de recherche
             // Pour l'exemple, nous allons simplement naviguer vers une page de résultats
-            navigate(`/produits?imageSearch=true`)
-            setImageSearchOpen(false)
-            setImagePreview(null)
-            closeMobile()
+            navigate(`/produits?imageSearch=true`);
+            setImageSearchOpen(false);
+            setImagePreview(null);
+            closeMobile();
         }
-    }
+    };
 
     const handleFileSelect = e => {
-        const file = e.target.files[0]
+        const file = e.target.files[0];
         if (file && file.type.match('image.*')) {
-            const url = URL.createObjectURL(file)
-            setImagePreview(url)
-            setImageSearchOpen(true)
+            const url = URL.createObjectURL(file);
+            setImagePreview(url);
+            setImageSearchOpen(true);
         }
-    }
+    };
 
     const handleDragOver = e => {
-        e.preventDefault()
-        setDragOver(true)
-    }
+        e.preventDefault();
+        setDragOver(true);
+    };
 
     const handleDragLeave = e => {
-        e.preventDefault()
-        setDragOver(false)
-    }
+        e.preventDefault();
+        setDragOver(false);
+    };
 
     const handleDrop = e => {
-        e.preventDefault()
-        setDragOver(false)
+        e.preventDefault();
+        setDragOver(false);
 
-        const files = e.dataTransfer.files
+        const files = e.dataTransfer.files;
         if (files.length > 0 && files[0].type.match('image.*')) {
-            const url = URL.createObjectURL(files[0])
-            setImagePreview(url)
-            setImageSearchOpen(true)
+            const url = URL.createObjectURL(files[0]);
+            setImagePreview(url);
+            setImageSearchOpen(true);
         }
-    }
+    };
 
     const openFileDialog = () => {
-        fileInputRef.current?.click()
-    }
+        fileInputRef.current?.click();
+    };
 
     const handleLogout = () => {
-        logout()
-        localStorage.removeItem('userToken')
-        localStorage.removeItem('userData')
-        closeMobile()
-        navigate('/')
-    }
+        logout();
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('userData');
+        closeMobile();
+        navigate('/');
+    };
 
-    const closeMobile = () => setMobileMenuOpen(false)
+    const closeMobile = () => setMobileMenuOpen(false);
 
     return (
         <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
@@ -220,8 +236,8 @@ export default function Header() {
                                         <h3>Recherche par image</h3>
                                         <button
                                             onClick={() => {
-                                                setImageSearchOpen(false)
-                                                setImagePreview(null)
+                                                setImageSearchOpen(false);
+                                                setImagePreview(null);
                                             }}
                                             aria-label="Fermer"
                                         >
@@ -323,8 +339,8 @@ export default function Header() {
                                                 key={devise}
                                                 className={`dropdown-item ${selectedCurrency === devise ? 'active' : ''}`}
                                                 onClick={() => {
-                                                    setSelectedCurrency(devise)
-                                                    closeMobile()
+                                                    setSelectedCurrency(devise);
+                                                    closeMobile();
                                                 }}
                                             >
                                                 {devise}
@@ -426,7 +442,7 @@ export default function Header() {
                                                 Profil
                                             </Link>
                                             <Link
-                                                to="/commandes"
+                                                to="/mes-commandes"
                                                 className="dropdown-item"
                                                 onClick={closeMobile}
                                             >
@@ -461,5 +477,5 @@ export default function Header() {
                 </div>
             </nav>
         </header>
-    )
+    );
 }

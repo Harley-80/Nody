@@ -1,12 +1,33 @@
+// Importation des modules nécessaires
 import express from 'express';
+import {
+    creerIntentPaiement,
+    confirmerPaiement,
+    gererWebhook,
+    demanderRemboursement,
+} from '../controllers/paiementsController.js';
+import { proteger, autoriser } from '../middleware/authMiddleware.js';
+import { validerObjectId } from '../middleware/validationMiddleware.js';
+import Commande from '../models/commandeModel.js';
 
-const router = express.Router();
+const routeur = express.Router();
 
-// @route   GET /api/payments
-// @desc    Route de test pour les paiements
-// @access  Public
-router.get('/', (req, res) => {
-    res.json({ message: 'La route des paiements fonctionne !' });
-});
+// Webhook Stripe (doit être public pour que Stripe puisse y accéder)
+routeur.post('/webhook', gererWebhook);
 
-export default router;
+// Routes protégées
+routeur.use(proteger);
+
+routeur.post('/creer-intent', creerIntentPaiement);
+routeur.post('/confirmer', confirmerPaiement);
+
+// Routes admin pour les remboursements
+routeur.post(
+    '/:commandeId/remboursement',
+    autoriser('admin'),
+    validerObjectId('commandeId'),
+    demanderRemboursement
+);
+
+// Exportation du routeur
+export default routeur;

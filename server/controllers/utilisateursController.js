@@ -14,7 +14,7 @@ const obtenirUtilisateurs = asyncHandler(async (req, res) => {
     const sauter = (page - 1) * limite;
     const utilisateurs = await Utilisateur.find()
         .select('-motDePasse')
-        .sort({ creeLe: -1 })
+        .sort({ createdAt: -1 })
         .skip(sauter)
         .limit(limite);
     const total = await Utilisateur.countDocuments();

@@ -2,6 +2,7 @@
 import asyncHandler from 'express-async-handler';
 import Stripe from 'stripe';
 import Commande from '../models/commandeModel.js';
+import Utilisateur from '../models/utilisateurModel.js';
 import Paiement from '../models/paiementModel.js';
 import config from '../config/env.js';
 const stripe = new Stripe(config.stripeSecretKey);
@@ -80,29 +81,41 @@ const confirmerPaiement = asyncHandler(async (req, res) => {
     commande.statut = 'confirme';
     await commande.save();
     // Créer un enregistrement de paiement
-    const paiement = await Paiement.create({
-        commande: commande._id,
-        client: commande.client,
-        montant: commande.total,
-        devise: commande.devise,
-        methodePaiement: 'stripe',
-        passerellePaiement: 'stripe',
-        statut: 'termine',
-        idTransaction: idIntentPaiement,
-        detailsFacturation: {
-            prenom: commande.adresseFacturation.prenom,
-            nom: commande.adresseFacturation.nom,
-            email: req.utilisateur.email,
-            adresse: {
-                rue: commande.adresseFacturation.rue,
-                ville: commande.adresseFacturation.ville,
-                etat: commande.adresseFacturation.etat,
-                pays: commande.adresseFacturation.pays,
-                codePostal: commande.adresseFacturation.codePostal,
+    let paiement;
+    try {
+        paiement = await Paiement.create({
+            commande: commande._id,
+            client: commande.client,
+            montant: commande.total,
+            devise: commande.devise,
+            methodePaiement: 'stripe',
+            passerellePaiement: 'stripe',
+            statut: 'termine',
+            idTransaction: idIntentPaiement,
+            detailsFacturation: {
+                prenom: commande.adresseFacturation.prenom,
+                nom: commande.adresseFacturation.nom,
+                email: req.utilisateur.email,
+                adresse: {
+                    rue: commande.adresseFacturation.rue,
+                    ville: commande.adresseFacturation.ville,
+                    etat: commande.adresseFacturation.etat,
+                    pays: commande.adresseFacturation.pays,
+                    codePostal: commande.adresseFacturation.codePostal,
+                },
             },
-        },
-        reponsePasserelle: intentPaiement,
-    });
+            reponsePasserelle: intentPaiement,
+        });
+    } catch (error) {
+        // Si le paiement existe déjà (créé par le webhook), on le récupère simplement.
+        if (error.code === 11000) {
+            paiement = await Paiement.findOne({
+                idTransaction: idIntentPaiement,
+            });
+        } else {
+            throw error;
+        }
+    }
     // Ajouter des points de fidélité
     const pointsFidelite = Math.floor(commande.total);
     await Utilisateur.findByIdAndUpdate(commande.client, {

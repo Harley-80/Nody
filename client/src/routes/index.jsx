@@ -1,23 +1,22 @@
-import { Routes, Route } from 'react-router-dom'
-import Accueil from '../pages/accueil.jsx'
-import Connexion from '../pages/auth/connexion.jsx'
-import Inscription from '../pages/auth/inscription.jsx'
-import PageDetailProduit from '../pages/PageDetailProduit.jsx'
-import Panier from '../pages/panier.jsx'
-import Paiement from '../pages/paiement.jsx'
-import Profil from '../pages/profil.jsx'
-import Produit from '../pages/produit.jsx'
-import AuthAdmin from '../pages/auth/AuthAdmin.jsx'
-import ProtectedRoute from '../contexts/ProtectedRoute'
-import Categories from '../pages/Categories.jsx'
-import MesCommandes from '../pages/commande.jsx'
-import CommandeDetail from '../pages/CommandeDetail.jsx'
-import Confirmation from '../pages/Confirmation.jsx'
-import AdminLayout from '../components/common/layout/AdminLayout.jsx'
-import AdminDashboard from '../pages/admin/Dashboard.jsx'
-import AdminProduits from '../pages/admin/Produits.jsx'
-import Boutique from '../pages/Boutique.jsx' // Import ajouté
-import Nouveautes from '../pages/Nouveautes.jsx' // Import ajouté
+import { Routes, Route } from 'react-router-dom';
+import Accueil from '../pages/accueil.jsx';
+import Connexion from '../pages/auth/connexion.jsx';
+import Inscription from '../pages/auth/inscription.jsx';
+import PageDetailProduit from '../pages/PageDetailProduit.jsx';
+import Panier from '../pages/panier.jsx';
+import Paiement from '../pages/paiement.jsx';
+import Produit from '../pages/produit.jsx';
+import AuthAdmin from '../pages/auth/AuthAdmin.jsx';
+import ProtectedRoute from '../contexts/ProtectedRoute';
+import Categories from '../pages/Categories.jsx';
+import MesCommandes from '../pages/MesCommandes.jsx';
+import CommandeDetail from '../pages/CommandeDetail.jsx';
+import Confirmation from '../pages/Confirmation.jsx';
+import AdminLayout from '../components/common/layout/AdminLayout.jsx';
+import AdminDashboard from '../pages/admin/Dashboard.jsx';
+import AdminProduits from '../pages/admin/Produits.jsx';
+import Boutique from '../pages/Boutique.jsx'; // Import ajouté
+import Nouveautes from '../pages/Nouveautes.jsx'; // Import ajouté
 
 export default function AppRoutes() {
     return (
@@ -36,15 +35,6 @@ export default function AppRoutes() {
             <Route path="/categories" element={<Categories />} />
             <Route path="/confirmation" element={<Confirmation />} />
             <Route path="/admin-login" element={<AuthAdmin />} />
-            {/* Routes protégées */}
-            <Route
-                path="/profil"
-                element={
-                    <ProtectedRoute>
-                        <Profil />
-                    </ProtectedRoute>
-                }
-            />
             <Route
                 path="/paiement"
                 element={
@@ -82,5 +72,5 @@ export default function AppRoutes() {
                 <Route path="produits" element={<AdminProduits />} />
             </Route>
         </Routes>
-    )
+    );
 }

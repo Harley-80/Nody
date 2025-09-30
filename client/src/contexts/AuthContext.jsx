@@ -5,8 +5,8 @@ import { api } from '../services/api';
 const AuthContext = createContext();
 
 // Hook personnalisé pour accéder au contexte
-export function useAuth() { 
-    return useContext(AuthContext); 
+export function useAuth() {
+    return useContext(AuthContext);
 }
 
 export function AuthProvider({ children }) {
@@ -17,6 +17,7 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const loadUser = () => {
             try {
+                // Le nom de la clé dans localStorage doit être cohérent
                 const saved = localStorage.getItem('nodyUser');
                 if (saved) setUser(JSON.parse(saved));
             } catch (error) {
@@ -26,32 +27,44 @@ export function AuthProvider({ children }) {
         loadUser();
     }, []);
 
+    // Fonction pour mettre à jour l'état de l'utilisateur et le localStorage
+    const handleAuthResponse = responseData => {
+        // Le serveur renvoie les données dans `donnees`
+        const userData = responseData.donnees;
+        // Ajout d'un nom complet pour un accès facile
+        userData.nomComplet = `${userData.prenom} ${userData.nom}`;
+        setUser(userData);
+        localStorage.setItem('nodyUser', JSON.stringify(userData));
+    };
+
     /**
      * Connexion standard utilisateur
-     * @param {string} email 
-     * @param {string} password 
+     * @param {string} email
+     * @param {string} password
      */
-    const login = async (email, password) => {
+    const login = async (email, motDePasse) => {
         try {
-            const res = await api.post('/auth/login', { email, password });
-            setUser(res.data.user);
-            localStorage.setItem('nodyUser', JSON.stringify(res.data.user));
+            const reponse = await api.post('/auth/connexion', {
+                email,
+                motDePasse,
+            });
+            // Utiliser la fonction centralisée pour traiter la réponse
+            handleAuthResponse(reponse.data);
         } catch (error) {
-            console.error("Erreur de connexion:", error);
+            console.error('Erreur de connexion:', error);
             throw error;
         }
     };
 
     /**
      * Inscription d'un nouvel utilisateur
-     * @param {Object} data - Données d'inscription 
+     * @param {Object} data - Données d'inscription
      */
-    const register = async (data) => {
+    const register = async data => {
         try {
-            const res = await api.post('/auth/register', data);
-            setUser(res.data.user);
-            localStorage.setItem('nodyUser', JSON.stringify(res.data.user));
-            return res.data;
+            const reponse = await api.post('/auth/inscription', data);
+            handleAuthResponse(reponse.data);
+            return reponse.data;
         } catch (error) {
             console.error("Erreur d'inscription:", error);
             throw error;
@@ -62,11 +75,11 @@ export function AuthProvider({ children }) {
      * Connexion en tant qu'admin (mock pour développement)
      */
     const loginAsAdmin = () => {
-        const mockUser = { 
-            name: 'Admin', 
+        const mockUser = {
+            nomComplet: 'Admin',
             isAdmin: true,
             email: 'admin@nody.sn',
-            id: 'admin-mock-id'
+            id: 'admin-mock-id',
         };
         setUser(mockUser);
         localStorage.setItem('nodyUser', JSON.stringify(mockUser));
@@ -86,12 +99,10 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout,
-        loginAsAdmin // Bien inclus dans les valeurs fournies
+        loginAsAdmin, // Bien inclus dans les valeurs fournies
     };
 
     return (
-        <AuthContext.Provider value={value}>
-            {children}
-        </AuthContext.Provider>
+        <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
     );
 }

@@ -62,7 +62,61 @@ Créer la base du projet serveur avec ES6 et installer les dépendances essentie
     utils/logger.js
 
 ## (Étape 4) : Créer les modèles Mongoose pour les catégories, produits, utilisateurs, commandes et paiements.
+
 Installation de Chocolatey v2.5.1 pour Redis redis-64 3.1.0
 
 ## (Étape 5) : Middlewares
+
 Créer les middlewares essentiels pour l'authentification, la validation et la gestion d'erreurs.
+
+## (Étape 6) : Contrôleurs
+
+# Étapes réalisées :
+
+# 1. Création des contrôleurs d'authentification :
+
+Inscription, connexion, déconnexion
+Gestion des tokens JWT
+Réinitialisation de mot de passe
+Vérification d'email
+
+# 2. Création des contrôleurs utilisateurs :
+
+Gestion des profils utilisateurs
+Gestion du panier et de la wishlist
+Gestion des adresses
+
+# 3. Création des contrôleurs produits :
+
+CRUD des produits
+Gestion des images et variantes
+Système de reviews et ratings
+
+# 4. Création des contrôleurs catégories :
+
+Gestion hiérarchique des catégories
+Arbre de catégories avec sous-catégories
+
+# 5. Création des contrôleurs commandes :
+
+Création et gestion des commandes
+Suivi des statuts
+Historique des commandes
+
+# 6. Création des contrôleurs paiements :
+
+Intégration avec Stripe
+Gestion des transactions
+Système de remboursements
+
+# Fonctionnalités implémentées :
+
+Logique métier complète pour toutes les entités
+Gestion des erreurs et validation
+Intégration avec les modèles Mongoose
+Sécurisation des données utilisateur
+Système de pagination et filtres
+
+## (Étape 7) : Création des Routes API et mise à jour de app.js
+
+Créer les routes API pour exposer les fonctionnalités de l'application.

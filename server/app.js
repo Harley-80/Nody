@@ -131,11 +131,11 @@ const initializeApp = async () => {
 
         // --- Définition des routes de l'API (placées ici pour qu'elles aient accès à la session) ---
         app.use('/api/auth', authRoutes);
-        app.use('/api/users', utilisateursRoutes);
-        app.use('/api/products', produitsRoutes);
+        app.use('/api/utilisateurs', utilisateursRoutes); // Standardisation en français
+        app.use('/api/produits', produitsRoutes); // Standardisation en français
         app.use('/api/categories', categorieRoutes);
-        app.use('/api/orders', commandesRoutes);
-        app.use('/api/payments', paiementRoutes);
+        app.use('/api/commandes', commandesRoutes); // Standardisation en français
+        app.use('/api/paiements', paiementRoutes); // Standardisation en français
 
         // Point de contrôle de l'état du serveur (health check)
         app.get('/api/health', (req, res) => {
