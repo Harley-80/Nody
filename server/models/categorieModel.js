@@ -8,7 +8,6 @@ const categorieSchema = new mongoose.Schema(
             type: String,
             required: [true, 'Le nom de la catégorie est requis'],
             trim: true,
-            unique: true,
             maxlength: [100, 'Le nom ne peut pas dépasser 100 caractères'],
         },
         parent: {
@@ -18,7 +17,6 @@ const categorieSchema = new mongoose.Schema(
         },
         slug: {
             type: String,
-            unique: true,
             lowercase: true,
         },
         description: {
@@ -78,7 +76,7 @@ categorieSchema.pre('save', function (next) {
 });
 
 // Index pour améliorer les performances des requêtes
-categorieSchema.index({ nom: 1 });
+categorieSchema.index({ nom: 1, parent: 1 }, { unique: true });
 categorieSchema.index({ parent: 1 });
 categorieSchema.index({ slug: 1 });
 categorieSchema.index({ estActif: 1 });

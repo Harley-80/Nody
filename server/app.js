@@ -6,9 +6,11 @@ import rateLimit from 'express-rate-limit';
 import session from 'express-session';
 import { RedisStore } from 'connect-redis';
 import redis from 'redis';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-import config from './config/env.js'; // Correction du nom de fichier
-import connectDatabase from './config/database.js'; // Correction du nom de fichier
+import config from './config/env.js';
+import connectDatabase from './config/database.js';
 import {
     gestionnaireErreurs as errorHandler,
     nonTrouve,
@@ -23,10 +25,18 @@ import categorieRoutes from './routes/categorieRoutes.js';
 import commandesRoutes from './routes/commandesRoutes.js';
 import paiementRoutes from './routes/paiementRoutes.js';
 
+// --- Déclaration des constantes de chemin ---
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Création de l'application Express
 const app = express();
 
 // --- Middlewares de sécurité et de configuration ---
+
+// Servir les fichiers statiques du dossier 'public'
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Active Helmet pour sécuriser les en-têtes HTTP
 app.use(helmet());
 

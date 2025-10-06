@@ -124,3 +124,9 @@ Créer les routes API pour exposer les fonctionnalités de l'application.
 # (Étape 8) : Création des Services et Utilitaires
 
 Créer les services et utilitaires pour l'envoi d'emails, les paiements, et la gestion des fichiers.
+
+# (Étape 9) : Révision du code client
+
+# (Étape 10) : Création du Seeder de Données
+
+Créer un seeder pour peupler la base de données avec des données initiales pour le développement et les différents tests.

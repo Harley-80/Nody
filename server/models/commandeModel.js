@@ -6,7 +6,6 @@ const commandeSchema = new mongoose.Schema(
     {
         numeroCommande: {
             type: String,
-            unique: true,
             required: true,
         },
         client: {
@@ -240,8 +239,8 @@ commandeSchema.virtual('estPaye').get(function () {
     );
 });
 
-// Middleware pour générer le numéro de commande avant la sauvegarde
-commandeSchema.pre('save', async function (next) {
+// Middleware pour générer le numéro de commande avant la validation
+commandeSchema.pre('validate', async function (next) {
     if (this.isNew && !this.numeroCommande) {
         const count = await mongoose.model('Commande').countDocuments();
         const date = new Date();

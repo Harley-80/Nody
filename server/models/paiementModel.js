@@ -70,8 +70,6 @@ const paiementSchema = new mongoose.Schema(
         },
         idTransaction: {
             type: String,
-            unique: true,
-            sparse: true,
         },
         reponsePasserelle: mongoose.Schema.Types.Mixed,
         remboursements: [
@@ -163,7 +161,7 @@ paiementSchema.virtual('estEntierementRembourse').get(function () {
 });
 
 // Index pour les recherches
-paiementSchema.index({ idTransaction: 1 });
+paiementSchema.index({ idTransaction: 1 }, { sparse: true });
 paiementSchema.index({ commande: 1 });
 paiementSchema.index({ client: 1 });
 paiementSchema.index({ statut: 1 });
