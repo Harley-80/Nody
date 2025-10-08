@@ -1,7 +1,29 @@
-// Importation de mongoose pour la gestion de la base de données MongoDB
+// models/produitModel.js
 import mongoose from 'mongoose';
+import slugify from 'slugify';
+const avisSchema = new mongoose.Schema(
+    {
+        utilisateur: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Utilisateur',
+            required: true,
+        },
+        note: {
+            type: Number,
+            required: true,
+            min: 1,
+            max: 5,
+        },
+        commentaire: String,
+        images: [String],
+        estVerifie: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    { timestamps: { createdAt: 'creeLe', updatedAt: false } }
+);
 
-// Définition du schéma pour les produits
 const produitSchema = new mongoose.Schema(
     {
         nom: {
@@ -9,6 +31,10 @@ const produitSchema = new mongoose.Schema(
             required: [true, 'Le nom du produit est requis'],
             trim: true,
             maxlength: [200, 'Le nom ne peut pas dépasser 200 caractères'],
+        },
+        slug: {
+            type: String,
+            lowercase: true,
         },
         description: {
             type: String,
@@ -30,6 +56,16 @@ const produitSchema = new mongoose.Schema(
         cout: {
             type: Number,
             min: [0, 'Le coût ne peut pas être négatif'],
+            validate: {
+                validator: function (value) {
+                    return (
+                        value === null ||
+                        value === undefined ||
+                        value <= this.prix
+                    );
+                },
+                message: 'Le coût ne peut pas être supérieur au prix.',
+            },
         },
         sku: {
             type: String,
@@ -126,30 +162,7 @@ const produitSchema = new mongoose.Schema(
                 default: 0,
             },
         },
-        avis: [
-            {
-                utilisateur: {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: 'Utilisateur',
-                },
-                note: {
-                    type: Number,
-                    required: true,
-                    min: 1,
-                    max: 5,
-                },
-                commentaire: String,
-                images: [String],
-                estVerifie: {
-                    type: Boolean,
-                    default: false,
-                },
-                creeLe: {
-                    type: Date,
-                    default: Date.now,
-                },
-            },
-        ],
+        avis: [avisSchema],
         seo: {
             titre: String,
             description: String,
@@ -179,21 +192,6 @@ const produitSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
-        slug: {
-            type: String,
-            lowercase: true,
-        },
-        meta: {
-            creeLe: {
-                type: Date,
-                default: Date.now,
-            },
-            misAJourLe: {
-                type: Date,
-                default: Date.now,
-            },
-            publieLe: Date,
-        },
     },
     {
         timestamps: true,
@@ -219,37 +217,56 @@ produitSchema.virtual('pourcentageRemise').get(function () {
     return 0;
 });
 
-// Middleware pour générer le slug
-produitSchema.pre('save', function (next) {
-    if (this.isModified('nom')) {
-        this.slug = this.nom
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)+/g, '');
+// Middleware pour générer un slug unique
+produitSchema.pre('save', async function (next) {
+    try {
+        if (this.isModified('nom')) {
+            const baseSlug = slugify(this.nom, {
+                lower: true,
+                strict: true,
+                locale: 'fr',
+            });
+            let slug = baseSlug;
+            let suffix = 0;
+            while (
+                await this.constructor.exists({ slug, _id: { $ne: this._id } })
+            ) {
+                suffix += 1;
+                slug = `${baseSlug}-${suffix}`;
+            }
+            this.slug = slug;
+        }
+        next();
+    } catch (err) {
+        next(err);
     }
-    next();
 });
 
 // Middleware pour mettre à jour la note moyenne
-produitSchema.pre('save', function (next) {
+produitSchema.methods.recalculerNoteMoyenne = function () {
     if (this.avis && this.avis.length > 0) {
         const total = this.avis.reduce((sum, avis) => sum + avis.note, 0);
         this.evaluations.moyenne = total / this.avis.length;
         this.evaluations.nombre = this.avis.length;
+    } else {
+        this.evaluations.moyenne = 0;
+        this.evaluations.nombre = 0;
     }
-    next();
-});
+};
 
-// Index pour les recherches
-produitSchema.index({ nom: 'text', description: 'text', etiquettes: 'text' });
+// Déclaration des index (uniquement ici)
+produitSchema.index({
+    nom: 'text',
+    description: 'text',
+    etiquettes: 'text',
+    marque: 'text',
+});
 produitSchema.index({ categorie: 1, estActif: 1 });
-produitSchema.index({ prix: 1 });
+produitSchema.index({ prix: 1, estActif: 1 });
 produitSchema.index({ 'evaluations.moyenne': -1 });
-produitSchema.index({ nombreVentes: -1 });
-produitSchema.index({ creeLe: -1 });
-produitSchema.index({ slug: 1 });
+produitSchema.index({ nombreVentes: -1, estActif: 1 });
+produitSchema.index({ createdAt: -1 });
+produitSchema.index({ slug: 1 }, { unique: true }); // Index unique pour le slug
 
 // Création du modèle Produit
 const Produit = mongoose.model('Produit', produitSchema);

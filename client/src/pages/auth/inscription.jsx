@@ -21,7 +21,9 @@ const Inscription = () => {
         prenom: '',
         email: '',
         motDePasse: '',
+        telephone: '',
     });
+    // ...code existant a revoir...
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -44,18 +46,19 @@ const Inscription = () => {
             });
             navigate('/profil');
         } catch (err) {
+            let msg = 'Inscription échouée. Veuillez réessayer.';
+            if (err.response?.data?.message) {
+                msg = err.response.data.message;
+            } else if (err.message) {
+                msg = err.message;
+            }
             console.error("Erreur d'inscription:", err);
             addToast({
                 type: 'error',
                 title: "Erreur d'inscription",
-                message:
-                    err.response?.data?.message ||
-                    'Impossible de créer le compte. Veuillez vérifier vos informations.',
+                message: msg,
             });
-            setError(
-                err.response?.data?.message ||
-                    'Inscription échouée. Veuillez réessayer.'
-            );
+            setError(msg);
         } finally {
             setIsLoading(false);
         }
@@ -150,6 +153,21 @@ const Inscription = () => {
                     </div>
 
                     <div className="mb-3">
+                        <label className="form-label">Téléphone</label>
+                        <input
+                            type="tel"
+                            name="telephone"
+                            className="form-control"
+                            autoComplete="tel"
+                            value={form.telephone}
+                            onChange={handleChange}
+                            required={false}
+                            pattern="^\+?[0-9\s\-().]{7,20}$"
+                            placeholder="Ex: +1 (783) 931-2351"
+                        />
+                    </div>
+
+                    <div className="mb-3">
                         <label className="form-label">
                             <FaEnvelope className="me-2" />
                             Votre e-mail
@@ -158,7 +176,7 @@ const Inscription = () => {
                             type="email"
                             name="email"
                             className="form-control"
-                                autoComplete="email"
+                            autoComplete="email"
                             value={form.email}
                             onChange={handleChange}
                             required

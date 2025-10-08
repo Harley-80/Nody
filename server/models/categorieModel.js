@@ -1,7 +1,7 @@
-// Importation de mongoose pour la gestion de la base de données MongoDB
+// models/categorieModel.js
 import mongoose from 'mongoose';
+import slugify from 'slugify';
 
-// Définition du schéma pour les catégories
 const categorieSchema = new mongoose.Schema(
     {
         nom: {
@@ -10,79 +10,76 @@ const categorieSchema = new mongoose.Schema(
             trim: true,
             maxlength: [100, 'Le nom ne peut pas dépasser 100 caractères'],
         },
-        parent: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Categorie',
-            default: null,
-        },
         slug: {
             type: String,
             lowercase: true,
         },
         description: {
             type: String,
+            trim: true,
             maxlength: [
                 500,
                 'La description ne peut pas dépasser 500 caractères',
             ],
         },
-        image: {
-            type: String,
-            default: '',
+        parent: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Categorie',
+            default: null,
         },
-        estActif: {
-            type: Boolean,
-            default: true,
-        },
-        ordre: {
+        ancetres: [
+            {
+                _id: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'Categorie',
+                },
+                nom: String,
+                slug: String,
+            },
+        ],
+        niveau: {
             type: Number,
+            required: true,
             default: 0,
-        },
-        enVedette: {
-            type: Boolean,
-            default: false,
+            min: 0,
         },
     },
     {
         timestamps: true,
-        toJSON: { virtuals: true },
-        toObject: { virtuals: true },
     }
 );
 
-// Virtual pour les sous-catégories
-categorieSchema.virtual('sousCategories', {
-    ref: 'Categorie',
-    localField: '_id',
-    foreignField: 'parent',
-});
-
-// Virtual pour le chemin complet de la catégorie
-categorieSchema.virtual('chemin').get(function () {
-    return this.parent ? `${this.parent.chemin} > ${this.nom}` : this.nom;
-});
-
-// Middleware pour générer le slug avant la sauvegarde
-categorieSchema.pre('save', function (next) {
-    if (this.isModified('nom')) {
-        this.slug = this.nom
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)+/g, '');
+// Génération automatique du slug avant sauvegarde
+categorieSchema.pre('save', async function (next) {
+    try {
+        if (this.isModified('nom') || !this.slug) {
+            const baseSlug = slugify(this.nom, {
+                lower: true,
+                strict: true,
+                locale: 'fr',
+            });
+            let slug = baseSlug;
+            let suffix = 0;
+            // Assure un slug unique
+            while (
+                await this.constructor.exists({ slug, _id: { $ne: this._id } })
+            ) {
+                suffix++;
+                slug = `${baseSlug}-${suffix}`;
+            }
+            this.slug = slug;
+        }
+        next();
+    } catch (err) {
+        next(err);
     }
-    next();
 });
 
-// Index pour améliorer les performances des requêtes
-categorieSchema.index({ nom: 1, parent: 1 }, { unique: true });
+// Index pour optimiser les recherches par parent et niveau
+categorieSchema.index({ slug: 1 }, { unique: true }); // Slug doit être globalement unique
 categorieSchema.index({ parent: 1 });
-categorieSchema.index({ slug: 1 });
-categorieSchema.index({ estActif: 1 });
+categorieSchema.index({ niveau: 1 });
 
-// Création du modèle Categorie
 const Categorie = mongoose.model('Categorie', categorieSchema);
 
-// Exportation du modèle
 export default Categorie;

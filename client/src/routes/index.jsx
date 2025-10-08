@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import Accueil from '../pages/accueil.jsx';
 import Connexion from '../pages/auth/connexion.jsx';
 import Inscription from '../pages/auth/inscription.jsx';
+import MotDePasseOublie from '../pages/auth/MotDePasseOublie.jsx';
 import PageDetailProduit from '../pages/PageDetailProduit.jsx';
 import Panier from '../pages/panier.jsx';
 import Paiement from '../pages/paiement.jsx';
@@ -31,6 +32,10 @@ export default function AppRoutes() {
             <Route path="/connexion" element={<Connexion />} />
             <Route path="/inscription" element={<Inscription />} />
             <Route path="/panier" element={<Panier />} />
+            <Route
+                path="/auth/MotDePasseOublie"
+                element={<MotDePasseOublie />}
+            />
             <Route path="/produits" element={<Produit />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/confirmation" element={<Confirmation />} />

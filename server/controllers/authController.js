@@ -223,7 +223,7 @@ const motDePasseOublie = asyncHandler(async (req, res) => {
         await envoyerEmail({
             a: utilisateur.email,
             sujet: 'Réinitialisation de votre mot de passe Nody',
-            modele: 'reinitialiser-mot-de-passe',
+            modele: 'resetPassword',
             contexte: {
                 nom: utilisateur.prenom,
                 jetonReinitialisation,

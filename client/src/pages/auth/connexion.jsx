@@ -15,11 +15,16 @@ const Connexion = () => {
     const { login } = useAuth();
     const { addToast } = useToast();
     const navigate = useNavigate();
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState(
+        () => localStorage.getItem('nodyRememberEmail') || ''
+    );
     const [motDePasse, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [remember, setRemember] = useState(
+        !!localStorage.getItem('nodyRememberEmail')
+    );
 
     const handleSubmit = async e => {
         e.preventDefault();
@@ -28,6 +33,11 @@ const Connexion = () => {
 
         try {
             await login(email, motDePasse);
+            if (remember) {
+                localStorage.setItem('nodyRememberEmail', email);
+            } else {
+                localStorage.removeItem('nodyRememberEmail');
+            }
             addToast({
                 type: 'success',
                 title: 'Connexion réussie',
@@ -35,18 +45,19 @@ const Connexion = () => {
             });
             navigate('/profil');
         } catch (err) {
+            let msg = 'Connexion échouée. Veuillez vérifier vos informations.';
+            if (err.response?.data?.message) {
+                msg = err.response.data.message;
+            } else if (err.message) {
+                msg = err.message;
+            }
             console.error('Erreur de connexion:', err);
             addToast({
                 type: 'error',
                 title: 'Erreur de connexion',
-                message:
-                    err.response?.data?.message ||
-                    'Vérifiez vos identifiants ou réessayez plus tard.',
+                message: msg,
             });
-            setError(
-                err.response?.data?.message ||
-                    'Connexion échouée. Veuillez vérifier vos informations.'
-            );
+            setError(msg);
         } finally {
             setIsLoading(false);
         }
@@ -154,6 +165,8 @@ const Connexion = () => {
                                 type="checkbox"
                                 className="form-check-input"
                                 id="remember"
+                                checked={remember}
+                                onChange={e => setRemember(e.target.checked)}
                             />
                             <label
                                 className="form-check-label"
@@ -163,7 +176,7 @@ const Connexion = () => {
                             </label>
                         </div>
                         <Link
-                            to="/mot-de-passe-oublie"
+                            to="/auth/MotDePasseOublie"
                             className="text-decoration-none"
                         >
                             Mot de passe oublié ?
