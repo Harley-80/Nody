@@ -1,31 +1,15 @@
-//Importation des modules
-import mongoose from 'mongoose';
-import { faker } from '@faker-js/faker';
-
-// Importation des modèles
-import Utilisateur from './models/utilisateurModel.js';
-import Categorie from './models/categorieModel.js';
-import Produit from './models/produitModel.js';
-import Commande from './models/commandeModel.js';
-import Paiement from './models/paiementModel.js';
-
-// Importation des données de test
-import utilisateurs from './data/utilisateurs.js';
-import produits from './data/produits.js';
-
-// Données brutes des catégories
-
-const rawCategories = [
+// Données brutes des catégories pour le peuplement
+const categoriesData = [
     // Catégories racines
-    { name: 'Vêtements homme', parent: null },
-    { name: 'Vêtements femme', parent: null },
-    { name: 'Enfants', parent: null },
-    { name: 'Chaussures', parent: null },
-    { name: 'Accessoires', parent: null },
-    { name: 'Sacs, bagages', parent: null },
-    { name: 'Bijouterie', parent: null },
-    { name: 'Extensions, perruques', parent: null },
-    { name: 'Sous-vêtements, vêtements de détente', parent: null },
+    { nom: 'Vêtements homme', parent: null },
+    { nom: 'Vêtements femme', parent: null },
+    { nom: 'Enfants', parent: null },
+    { nom: 'Chaussures', parent: null },
+    { nom: 'Accessoires', parent: null },
+    { nom: 'Sacs, bagages', parent: null },
+    { nom: 'Bijouterie', parent: null },
+    { nom: 'Extensions, perruques', parent: null },
+    { nom: 'Sous-vêtements, vêtements de détente', parent: null },
 
     // Vêtements homme
     { name: 'Pantalons', parent: 'Vêtements homme' },
@@ -592,162 +576,4 @@ const rawCategories = [
     { name: 'Meilleures ventes', parent: "Plus d'options d'achats" },
 ];
 
-// Connexion à MongoDB
-const connectDB = async () => {
-    try {
-        // Les options useNewUrlParser et useUnifiedTopology sont obsolètes.
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log('✅ MongoDB connecté avec succès.');
-    } catch (error) {
-        console.error('❌ Erreur de connexion MongoDB :', error.message);
-        process.exit(1);
-    }
-};
-
-/**
- * Construit l'arbre hiérarchique des catégories de manière récursive.
- * @param {Array} categories - Le tableau de toutes les catégories créées.
- * @param {Map} categoryMap - Une map des catégories par leur ID.
- */
-const buildCategoryTree = async (categories, categoryMap) => {
-    for (const category of categories) {
-        if (category.parent) {
-            const parentCategory = categoryMap.get(category.parent.toString());
-            if (parentCategory) {
-                category.niveau = parentCategory.niveau + 1;
-                category.ancetres = [
-                    ...parentCategory.ancetres,
-                    {
-                        _id: parentCategory._id,
-                        nom: parentCategory.nom,
-                        slug: parentCategory.slug,
-                    },
-                ];
-                await category.save();
-            }
-        }
-    }
-};
-
-/**
- * Fonction principale pour importer toutes les données.
- */
-const importData = async () => {
-    try {
-        // 1. Nettoyage de la base de données
-        await Commande.deleteMany();
-        await Paiement.deleteMany();
-        await Produit.deleteMany();
-        await Utilisateur.deleteMany();
-        await Categorie.deleteMany();
-        console.log('🧹 Anciennes données supprimées.');
-
-        // 2. Insertion des utilisateurs
-        const createdUsers = await Utilisateur.insertMany(utilisateurs);
-        const adminUser = createdUsers.find(user => user.role === 'admin');
-        console.log('✅ Utilisateurs insérés.');
-
-        // 3. Création et liaison des catégories
-        const categoriesMap = new Map(); // Stocke les catégories créées par leur nom
-
-        // Créer d'abord toutes les catégories racines
-        for (const catData of rawCategories) {
-            if (!catData.parent) {
-                const newCat = await Categorie.create({ nom: catData.name });
-                categoriesMap.set(catData.name, newCat);
-            }
-        }
-
-        // Créer ensuite les catégories enfants et les lier à leur parent
-        for (const catData of rawCategories) {
-            if (catData.parent) {
-                const parentCategory = categoriesMap.get(catData.parent);
-                if (parentCategory) {
-                    // On vérifie si une catégorie avec le même nom et le même parent existe déjà
-                    // pour éviter les doublons causés par la structure de rawCategories
-                    const existingCat = await Categorie.findOne({
-                        nom: catData.name,
-                        parent: parentCategory._id,
-                    });
-                    if (!existingCat) {
-                        const newCat = await Categorie.create({
-                            nom: catData.name,
-                            parent: parentCategory._id,
-                        });
-                        // On ne stocke pas les enfants dans la map pour éviter les conflits de noms
-                    }
-                } else {
-                    console.warn(
-                        `⚠️ Parent '${catData.parent}' non trouvé pour la catégorie '${catData.name}'.`
-                    );
-                }
-            }
-        }
-
-        // 5. Construction de l'arbre hiérarchique (ancêtres et niveau)
-        const allCategories = await Categorie.find();
-        const categoryIdMap = new Map(
-            allCategories.map(cat => [cat._id.toString(), cat])
-        );
-        await buildCategoryTree(allCategories, categoryIdMap);
-        console.log('🌳 Arbre des catégories construit.');
-
-        // 6. Préparation et insertion des produits
-        const sampleProducts = produits.map(product => {
-            // Attribue une catégorie aléatoire au produit
-            const randomCategory =
-                allCategories[Math.floor(Math.random() * allCategories.length)];
-            return {
-                ...product,
-                vendeur: adminUser._id,
-                categorie: randomCategory._id,
-            };
-        });
-
-        await Produit.insertMany(sampleProducts);
-        console.log('📦 Produits insérés.');
-
-        console.log(
-            '\n🎉 Peuplement de la base de données terminé avec succès !'
-        );
-        process.exit(0);
-    } catch (error) {
-        console.error('❌ Erreur lors du peuplement des données :', error);
-        process.exit(1);
-    }
-};
-
-/**
- * Fonction pour détruire toutes les données.
- */
-const destroyData = async () => {
-    try {
-        await Commande.deleteMany();
-        await Paiement.deleteMany();
-        await Produit.deleteMany();
-        await Utilisateur.deleteMany();
-        await Categorie.deleteMany();
-
-        console.log('🗑️ Toutes les données ont été détruites.');
-        process.exit(0);
-    } catch (error) {
-        console.error('❌ Erreur lors de la destruction des données :', error);
-        process.exit(1);
-    }
-};
-
-// 🚀 Exécution du script
-const run = async () => {
-    await connectDB();
-
-    if (process.argv.includes('--destroy')) {
-        await destroyData();
-    } else if (process.argv.includes('--import')) {
-        await importData();
-    } else {
-        console.log('Veuillez spécifier une action : --import ou --destroy');
-        process.exit(1);
-    }
-};
-
-run();
+export default categoriesData;

@@ -8,18 +8,18 @@ import Categorie from '../models/categorieModel.js';
  * @access  Public
  */
 const obtenirCategories = asyncHandler(async (req, res) => {
-    const categories = await Categorie.find({ estActif: true })
+    const categories = await Categorie.find({})
         .populate('sousCategories')
         .sort({ ordre: 1, nom: 1 });
     // Organiser en arbre hiérarchique
     const construireArbre = (categories, parentId = null) => {
         return categories
-            .filter(
-                categorie =>
-                    (parentId === null && categorie.parent === null) ||
-                    (categorie.parent &&
-                        categorie.parent.toString() === parentId)
-            )
+            .filter(categorie => {
+                const categorieParentId = categorie.parent
+                    ? categorie.parent.toString()
+                    : null;
+                return categorieParentId === parentId;
+            })
             .map(categorie => ({
                 ...categorie.toObject(),
                 sousCategories: construireArbre(

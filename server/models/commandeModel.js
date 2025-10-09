@@ -108,6 +108,7 @@ const commandeSchema = new mongoose.Schema(
                     'orange_money',
                     'airtel_money',
                     'mobicash',
+                    'cheque',
                 ],
                 required: [true, 'La méthode de paiement est requise'],
             },
