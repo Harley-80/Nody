@@ -14,7 +14,7 @@ const creerClient = async utilisateur => {
     try {
         const client = await stripe.customers.create({
             email: utilisateur.email,
-            name: `${utilisateur.prenom} ${utilisateur.nom}`,
+            name: `${utilisateur.nom} ${utilisateur.prenom}`,
             metadata: {
                 utilisateurId: utilisateur._id.toString(),
             },

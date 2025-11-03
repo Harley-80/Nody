@@ -1,6 +1,8 @@
 // Importation des modules nécessaires pour la validation
 import { body, param, query, validationResult } from 'express-validator';
 import { isValidObjectId } from 'mongoose';
+import crypto from 'crypto'; // Nécessaire pour hacher les jetons si cela se fait ici
+import { validerTelephone } from '../utils/validationTelephone.js'; // Importation nécessaire
 
 /**
  * Middleware pour gérer les erreurs de validation
@@ -26,6 +28,8 @@ const gererErreursValidation = (req, res, next) => {
     next();
 };
 
+// --- Fonctions Utilitaires ---
+
 /**
  * Validation des ObjectId MongoDB
  * @param {String} paramName - Nom du paramètre à valider
@@ -43,19 +47,9 @@ const validerObjectId = paramName => {
     ];
 };
 
-// Validations pour l'authentification
-const validerConnexion = [
-    body('email')
-        .isEmail()
-        .normalizeEmail()
-        .withMessage('Veuillez fournir un email valide'),
-    body('motDePasse')
-        .isLength({ min: 6 })
-        .withMessage('Le mot de passe doit contenir au moins 6 caractères'),
-    gererErreursValidation,
-];
+// --- Validations d'Authentification (Auth) ---
 
-// Validations pour l'inscription
+// Validations pour l'inscription (avec complexité du mot de passe, genre, et téléphone)
 const validerInscription = [
     body('prenom')
         .trim()
@@ -76,8 +70,111 @@ const validerInscription = [
         .withMessage(
             'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre'
         ),
+    body('genre')
+        .isIn(['Homme', 'Femme'])
+        .withMessage('Le genre doit être Homme ou Femme'),
+    body('telephone')
+        .optional({ checkFalsy: true }) // Permet que le champ soit null ou vide
+        .custom((value) => {
+            if (!value) return true;
+            const validation = validerTelephone(value);
+            if (!validation.valide) {
+                throw new Error(validation.erreur);
+            }
+            return true;
+        }),
     gererErreursValidation,
 ];
+
+// Validations pour la connexion
+const validerConnexion = [
+    body('email')
+        .isEmail()
+        .normalizeEmail()
+        .withMessage('Veuillez fournir un email valide'),
+    body('motDePasse')
+        .isLength({ min: 6 })
+        .withMessage('Le mot de passe doit contenir au moins 6 caractères'),
+    gererErreursValidation,
+];
+
+// Validations pour changer le mot de passe
+const validerChangerMotDePasse = [
+    body('motDePasseActuel')
+        .isLength({ min: 6 })
+        .withMessage('Le mot de passe actuel doit contenir au moins 6 caractères'),
+    body('nouveauMotDePasse')
+        .isLength({ min: 6 })
+        .withMessage('Le nouveau mot de passe doit contenir au moins 6 caractères')
+        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+        .withMessage(
+            'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre'
+        ),
+    gererErreursValidation,
+];
+
+// Validations pour la demande de réinitialisation de mot de passe (Mot de passe oublié)
+const validerMotDePasseOublie = [
+    body('email')
+        .isEmail()
+        .normalizeEmail()
+        .withMessage('Veuillez fournir un email valide'),
+    gererErreursValidation,
+];
+
+// Validations pour la réinitialisation du mot de passe
+const validerReinitialiserMotDePasse = [
+    param('resetToken')
+        .notEmpty()
+        .withMessage('Le jeton de réinitialisation est requis'),
+    body('motDePasse')
+        .isLength({ min: 6 })
+        .withMessage('Le nouveau mot de passe doit contenir au moins 6 caractères')
+        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+        .withMessage(
+            'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre'
+        ),
+    gererErreursValidation,
+];
+
+// Validations pour la mise à jour du profil (Moi)
+const validerMiseAJourMoi = [
+    body('prenom')
+        .optional({ checkFalsy: true })
+        .trim()
+        .isLength({ min: 2, max: 50 })
+        .withMessage('Le prénom doit contenir entre 2 et 50 caractères'),
+    body('nom')
+        .optional({ checkFalsy: true })
+        .trim()
+        .isLength({ min: 2, max: 50 })
+        .withMessage('Le nom doit contenir entre 2 et 50 caractères'),
+    body('genre')
+        .optional({ checkFalsy: true })
+        .isIn(['Homme', 'Femme'])
+        .withMessage('Le genre doit être Homme ou Femme'),
+    body('telephone')
+        .optional({ checkFalsy: true })
+        .custom((value) => {
+            if (!value) return true;
+            const validation = validerTelephone(value);
+            if (!validation.valide) {
+                throw new Error(validation.erreur);
+            }
+            return true;
+        }),
+    body('dateNaissance')
+        .optional({ checkFalsy: true })
+        .isISO8601('yyyy-mm-dd')
+        .toDate()
+        .withMessage('La date de naissance doit être au format AAAA-MM-JJ valide'),
+    // Empêcher l'email ou le mot de passe d'être mis à jour ici
+    body('email').not().exists().withMessage("L'email ne peut pas être mis à jour via cette route"),
+    body('motDePasse').not().exists().withMessage('Le mot de passe ne peut pas être mis à jour via cette route'),
+    gererErreursValidation,
+];
+
+// --- Validations de Ressources (Produits, Commandes, etc.) ---
 
 // Validations pour les produits
 const validerProduit = [
@@ -164,6 +261,10 @@ export {
     validerObjectId,
     validerConnexion,
     validerInscription,
+    validerChangerMotDePasse,
+    validerMotDePasseOublie,
+    validerReinitialiserMotDePasse,
+    validerMiseAJourMoi,
     validerProduit,
     validerCommande,
     validerPagination,

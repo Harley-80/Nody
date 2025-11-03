@@ -19,11 +19,27 @@ async function startServer() {
             logger.info(
                 `Serveur démarré en mode ${config.nodeEnv} sur le port ${PORT}`
             );
+            // Log supplémentaire pour confirmer le mode de l'environnement
+            logger.info(`URL du serveur: ${config.serverUrl}`);
+            logger.info(`URL du client configurée: ${config.clientUrl}`);
+            logger.info(`Connexion MongoDB: ${config.mongodbUri}`);
+
+            // Log ajouté : affiche l'état de la configuration Redis
+            logger.info(
+                `Configuration Redis: Hôte ${config.redisHost}, Port ${config.redisPort}`
+            );
+
+            // Avertissement visible en mode développement
+            if (config.nodeEnv === 'development') {
+                logger.warn('⚠️ Mode développement actif - Sécurité réduite');
+            }
+
             logger.info(
                 `Documentation de l'API : ${config.serverUrl}/api/health`
             );
         });
     } catch (error) {
+        // Log en cas d'échec critique au démarrage
         logger.error('Échec du démarrage du serveur.', { error });
         process.exit(1);
     }
@@ -59,8 +75,6 @@ const gracefulShutdown = (signal, error) => {
 };
 
 // Écoute les signaux d'arrêt standards (SIGTERM et SIGINT)
-// SIGTERM : signal envoyé par la plupart des gestionnaires de processus (ex: Docker)
-// SIGINT  : signal généré par l'utilisateur (ex: Ctrl+C dans le terminal)
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
@@ -68,11 +82,11 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Gère les rejets de promesses non gérés
 process.on('unhandledRejection', (reason, promise) => {
-    // 'reason' est souvent une erreur, mais peut être autre chose.
+    // Tente de convertir la raison en erreur si ce n'est pas déjà le cas
     const error =
         reason instanceof Error
             ? reason
-            : new Error(`Unhandled Rejection: ${reason}`);
+            : new Error(`Rejet de promesse non géré: ${reason}`);
     logger.error('Rejet de promesse non géré :', { error, promise });
     gracefulShutdown('unhandledRejection', error);
 });
@@ -83,12 +97,7 @@ process.on('uncaughtException', err => {
     gracefulShutdown('uncaughtException', err);
 });
 
-// Point d'entrée de l'application
-// On utilise une IIFE (Immediately Invoked Function Expression) asynchrone
-// pour pouvoir utiliser await au plus haut niveau et bien gérer les erreurs de démarrage.
+// Point d'entrée de l'application (IIFE asynchrone pour l'initialisation)
 (async () => {
     await startServer();
 })();
-
-// Ce fichier est le point d'entrée, il n'a pas besoin d'exporter la variable server.
-// export default server;

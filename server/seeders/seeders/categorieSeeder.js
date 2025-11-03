@@ -1,4 +1,3 @@
-// Seeder pour les catégories
 import Categorie from '../../models/categorieModel.js';
 import { faker } from '@faker-js/faker';
 

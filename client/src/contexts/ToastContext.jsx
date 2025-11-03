@@ -10,18 +10,18 @@ export function useToast() {
 export function ToastProvider({ children }) {
     const [toasts, setToasts] = useState([]);
 
-    const addToast = useCallback(({ 
-        type = 'info', 
-        message, 
-        title, 
-        duration = 5000,
-        action 
-    }) => {
-        const id = Date.now();
-        setToasts(prev => [...prev, { id, type, message, title, duration, action }]);
-    }, []);
+    const addToast = useCallback(
+        ({ type = 'info', message, title, duration = 5000, action }) => {
+            const id = Date.now();
+            setToasts(prev => [
+                ...prev,
+                { id, type, message, title, duration, action },
+            ]);
+        },
+        []
+    );
 
-    const removeToast = useCallback((id) => {
+    const removeToast = useCallback(id => {
         setToasts(prev => prev.filter(toast => toast.id !== id));
     }, []);
 

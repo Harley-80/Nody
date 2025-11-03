@@ -1,105 +1,96 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { api } from '../services/api';
+import { authService } from '../services/authService.js';
 
-// Création du contexte d'authentification
 const AuthContext = createContext();
 
-// Hook personnalisé pour accéder au contexte
 export function useAuth() {
     return useContext(AuthContext);
 }
 
 export function AuthProvider({ children }) {
-    // État pour stocker les informations de l'utilisateur
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    // Effet pour charger l'utilisateur au montage du composant
+    // Charger l'utilisateur au démarrage
     useEffect(() => {
-        const loadUser = () => {
+        const loadUser = async () => {
             try {
-                // Le nom de la clé dans localStorage doit être cohérent
-                const saved = localStorage.getItem('nodyUser');
-                if (saved) setUser(JSON.parse(saved));
+                const savedUser = authService.getCurrentUser();
+                if (savedUser && savedUser.token) {
+                    // Vérifier si le token est encore valide
+                    const userData = await authService.getMe();
+                    setUser(userData.donnees || userData);
+                }
             } catch (error) {
-                console.error("Erreur de chargement de l'utilisateur:", error);
+                console.error('Erreur de chargement utilisateur:', error);
+                localStorage.removeItem('nodyUser');
+            } finally {
+                setLoading(false);
             }
         };
         loadUser();
     }, []);
 
-    // Fonction pour mettre à jour l'état de l'utilisateur et le localStorage
     const handleAuthResponse = responseData => {
-        // Le serveur renvoie les données dans `donnees`
-        const userData = responseData.donnees;
-        // Ajout d'un nom complet pour un accès facile
-        userData.nomComplet = `${userData.prenom} ${userData.nom}`;
+        const userData = responseData.donnees || responseData;
+        userData.nomComplet = `${userData.nom} ${userData.prenom}`;
         setUser(userData);
         localStorage.setItem('nodyUser', JSON.stringify(userData));
     };
 
-    /**
-     * Connexion standard utilisateur
-     * @param {string} email
-     * @param {string} password
-     */
     const login = async (email, motDePasse) => {
         try {
-            const reponse = await api.post('/auth/connexion', {
-                email,
-                motDePasse,
-            });
-            // Utiliser la fonction centralisée pour traiter la réponse
-            handleAuthResponse(reponse.data);
+            const response = await authService.login(email, motDePasse);
+            handleAuthResponse(response);
+            return response;
         } catch (error) {
             console.error('Erreur de connexion:', error);
             throw error;
         }
     };
 
-    /**
-     * Inscription d'un nouvel utilisateur
-     * @param {Object} data - Données d'inscription
-     */
-    const register = async data => {
+    const register = async userData => {
         try {
-            const reponse = await api.post('/auth/inscription', data);
-            handleAuthResponse(reponse.data);
-            return reponse.data;
+            const response = await authService.register(userData);
+            handleAuthResponse(response);
+            return response;
         } catch (error) {
             console.error("Erreur d'inscription:", error);
             throw error;
         }
     };
 
-    /**
-     * Connexion en tant qu'admin (mock pour développement)
-     */
+    const logout = async () => {
+        try {
+            await authService.logout();
+        } catch (error) {
+            console.error('Erreur de déconnexion:', error);
+        } finally {
+            setUser(null);
+            localStorage.removeItem('nodyUser');
+        }
+    };
+
     const loginAsAdmin = () => {
         const mockUser = {
             nomComplet: 'Admin',
             isAdmin: true,
             email: 'admin@nody.sn',
             id: 'admin-mock-id',
+            token: 'mock-token',
         };
         setUser(mockUser);
         localStorage.setItem('nodyUser', JSON.stringify(mockUser));
     };
 
-    /**
-     * Déconnexion de l'utilisateur
-     */
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem('nodyUser');
-    };
-
-    // Valeurs exposées par le contexte
     const value = {
         user,
         login,
         register,
         logout,
-        loginAsAdmin, // Bien inclus dans les valeurs fournies
+        loginAsAdmin,
+        loading,
+        isAuthenticated: !!user,
     };
 
     return (

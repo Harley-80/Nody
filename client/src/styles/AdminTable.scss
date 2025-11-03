@@ -1,31 +1,91 @@
-.admin-table {
+.page-boutique {
+    min-height: 70vh;
 
-    .table {
-        font-size: 0.9rem;
+    .filtres-sidebar {
+        /* background: v.$couleur-fond; */ // REMOVED: Requires 'v' namespace variable
+        /* border-right: 1px solid v.$couleur-bordure; */ // REMOVED: Requires 'v' namespace variable
+        height: 100%;
+        transition: transform 0.3s ease;
 
-        th, td {
-            vertical-align: middle !important;
-            padding: 0.5rem;
-        }
+        /* @include m.media-breakpoint-down(lg) { */ // REMOVED: Requires 'm' namespace mixin
+        /* position: fixed; */
+        /* top: 0; */
+        /* left: 0; */
+        /* bottom: 0; */
+        /* width: 320px; */
+        /* z-index: v.$z-index-modal; */ // REMOVED: Requires 'v' namespace variable
+        /* transform: translateX(-100%); */
 
-        .badge {
-            font-size: 0.75rem;
-            padding: 0.4em 0.6em;
-        }
+        /* &.ouvert { */
+        /* transform: translateX(0); */
+        /* } */
+        /* } */
 
-        select { 
-            min-width: 140px; 
+        /* To prevent a complete style break, replace the mixin block with standard CSS (example): */
+        @media (max-width: 991.98px) { // lg breakpoint is typically 992px
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 320px;
+            /* z-index: 1050; */ // Use a hardcoded value instead of v.$z-index-modal
+            transform: translateX(-100%);
+
+            &.ouvert {
+                transform: translateX(0);
+            }
         }
     }
-    
-    select.form-select-sm {
-        font-size: 0.85rem;
-        padding: 0.2rem 0.4rem;
+
+    .filtres-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        /* z-index: v.$z-index-modal-backdrop; */ // REMOVED: Requires 'v' namespace variable
+        /* To prevent a complete style break, use a hardcoded value instead: */
+        z-index: 1040; 
     }
 
-    @media (max-width: 768px) {
-        .table {
-            font-size: 0.85rem;
+    .boutique-header {
+        /* background: v.$couleur-fond-secondaire !important; */ // REMOVED: Requires 'v' namespace variable
+    }
+
+    .empty-state {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+}
+
+/* --- */
+
+// Pagination personnalisée
+.pagination {
+    .page-item {
+        .page-link {
+            /* color: v.$couleur-primaire; */ // REMOVED: Requires 'v' namespace variable
+            /* border: 1px solid v.$couleur-bordure; */ // REMOVED: Requires 'v' namespace variable
+            margin: 0 2px;
+            /* border-radius: v.$rayon-bordure-md; */ // REMOVED: Requires 'v' namespace variable
+
+            &:hover {
+                /* background: v.$couleur-primaire; */ // REMOVED: Requires 'v' namespace variable
+                color: white;
+                /* border-color: v.$couleur-primaire; */ // REMOVED: Requires 'v' namespace variable
+            }
+        }
+
+        &.active .page-link {
+            /* background: v.$couleur-primaire; */ // REMOVED: Requires 'v' namespace variable
+            /* border-color: v.$couleur-primaire; */ // REMOVED: Requires 'v' namespace variable
+            color: white;
+        }
+
+        &.disabled .page-link {
+            /* color: v.$couleur-texte-tertiaire; */ // REMOVED: Requires 'v' namespace variable
+            /* background: v.$couleur-fond-secondaire; */ // REMOVED: Requires 'v' namespace variable
         }
     }
 }

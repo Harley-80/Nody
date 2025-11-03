@@ -1,0 +1,89 @@
+.champ-telephone {
+    margin-bottom: 1rem;
+
+    &__label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #333;
+    }
+
+    &__groupe {
+        display: flex;
+        gap: 0.5rem;
+        align-items: stretch;
+    }
+
+    &__indicatif {
+        flex: 0 0 200px;
+    }
+
+    &__select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: white;
+        font-size: 14px;
+        
+        &:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+    
+        &:disabled {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+    }
+
+    &__numero {
+        flex: 1;
+    }
+
+    &__input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        
+        &:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+    
+        &:disabled {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+    }
+
+    &__erreur {
+        margin-top: 0.25rem;
+        color: #dc3545;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    &__validation {
+        margin-top: 0.25rem;
+        color: #28a745;
+        font-size: 12px;
+        font-weight: 500;
+    }
+}
+
+@media (max-width: 768px) {
+    .champ-telephone {
+        &__groupe {
+            flex-direction: column;
+        }
+
+        &__indicatif {
+            flex: none;
+        }
+    }
+}

@@ -11,7 +11,9 @@ import {
 } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
+import ChampTelephone from '../../components/common/ChampTelephone';
 
+// Page d'inscription
 const Inscription = () => {
     const { register } = useAuth();
     const { addToast } = useToast();
@@ -21,24 +23,87 @@ const Inscription = () => {
         prenom: '',
         email: '',
         motDePasse: '',
+        confirmerMotDePasse: '',
         telephone: '',
+        genre: '',
     });
-    // ...code existant a revoir...
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [telephoneValide, setTelephoneValide] = useState(false);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-
+    
     const handleChange = e => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
+    const handleTelephoneChange = telephone => {
+        setForm(prev => ({ ...prev, telephone }));
+    };
+
+    // Valider le formulaire
+    const validerFormulaire = () => {
+        // Validation des champs obligatoires
+        if (!form.nom.trim()) {
+            setError('Le nom est obligatoire');
+            return false;
+        }
+        if (!form.prenom.trim()) {
+            setError('Le prénom est obligatoire');
+            return false;
+        }
+        if (!form.email.trim()) {
+            setError("L'email est obligatoire");
+            return false;
+        }
+        if (!form.telephone) {
+            setError('Le téléphone est obligatoire');
+            return false;
+        }
+        if (!telephoneValide) {
+            setError('Le numéro de téléphone est invalide');
+            return false;
+        }
+        if (!form.genre) {
+            setError('Le genre est obligatoire');
+            return false;
+        }
+        if (!form.motDePasse) {
+            setError('Le mot de passe est obligatoire');
+            return false;
+        }
+        if (form.motDePasse.length < 6) {
+            setError('Le mot de passe doit contenir au moins 6 caractères');
+            return false;
+        }
+        if (form.motDePasse !== form.confirmerMotDePasse) {
+            setError('Les mots de passe ne correspondent pas');
+            return false;
+        }
+        return true;
+    };
+
+    // Envoyer le formulaire
     const handleSubmit = async e => {
         e.preventDefault();
         setIsLoading(true);
         setError(null);
 
+        if (!validerFormulaire()) {
+            setIsLoading(false);
+            return;
+        }
+
+        // Envoyer le formulaire
         try {
-            await register(form);
+            await register({
+                nom: form.nom.trim(),
+                prenom: form.prenom.trim(),
+                email: form.email.trim(),
+                telephone: form.telephone,
+                genre: form.genre,
+                motDePasse: form.motDePasse,
+            });
             addToast({
                 type: 'success',
                 title: 'Inscription réussie',
@@ -63,7 +128,7 @@ const Inscription = () => {
             setIsLoading(false);
         }
     };
-
+    
     const handleSocialRegister = provider => {
         console.log(`Inscription avec ${provider}`);
         addToast({
@@ -73,12 +138,13 @@ const Inscription = () => {
         });
     };
 
+    // Affichage de la page d'inscription
     return (
         <div className="container d-flex justify-content-center align-items-center vh-100">
             <div
                 className="card p-4 shadow"
                 style={{
-                    maxWidth: '400px',
+                    maxWidth: '500px',
                     width: '100%',
                     borderRadius: '20px',
                 }}
@@ -125,20 +191,8 @@ const Inscription = () => {
                             <div className="col">
                                 <label className="form-label">
                                     <FaUser className="me-2" />
-                                    Prénom
+                                    Nom
                                 </label>
-                                <input
-                                    type="text"
-                                    name="prenom"
-                                    className="form-control"
-                                    value={form.prenom}
-                                    autoComplete="given-name"
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div className="col">
-                                <label className="form-label">Nom</label>
                                 <input
                                     type="text"
                                     name="nom"
@@ -149,22 +203,19 @@ const Inscription = () => {
                                     required
                                 />
                             </div>
+                            <div className="col">
+                                <label className="form-label">Prénom</label>
+                                <input
+                                    type="text"
+                                    name="prenom"
+                                    className="form-control"
+                                    value={form.prenom}
+                                    autoComplete="given-name"
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
                         </div>
-                    </div>
-
-                    <div className="mb-3">
-                        <label className="form-label">Téléphone</label>
-                        <input
-                            type="tel"
-                            name="telephone"
-                            className="form-control"
-                            autoComplete="tel"
-                            value={form.telephone}
-                            onChange={handleChange}
-                            required={false}
-                            pattern="^\+?[0-9\s\-().]{7,20}$"
-                            placeholder="Ex: +1 (783) 931-2351"
-                        />
                     </div>
 
                     <div className="mb-3">
@@ -184,6 +235,55 @@ const Inscription = () => {
                     </div>
 
                     <div className="mb-3">
+                        <ChampTelephone
+                            value={form.telephone}
+                            onChange={handleTelephoneChange}
+                            onValidation={setTelephoneValide}
+                            required
+                        />
+                    </div>
+
+                    <div className="mb-3">
+                        <label className="form-label">Genre *</label>
+                        <div className="d-flex gap-3">
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    name="genre"
+                                    id="homme"
+                                    value="Homme"
+                                    checked={form.genre === 'Homme'}
+                                    onChange={handleChange}
+                                />
+                                <label
+                                    className="form-check-label"
+                                    htmlFor="homme"
+                                >
+                                    Homme
+                                </label>
+                            </div>
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    name="genre"
+                                    id="femme"
+                                    value="Femme"
+                                    checked={form.genre === 'Femme'}
+                                    onChange={handleChange}
+                                />
+                                <label
+                                    className="form-check-label"
+                                    htmlFor="femme"
+                                >
+                                    Femme
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mb-3">
                         <label className="form-label">
                             <FaLock className="me-2" />
                             Votre mot de passe
@@ -197,6 +297,7 @@ const Inscription = () => {
                                 value={form.motDePasse}
                                 onChange={handleChange}
                                 required
+                                minLength="6"
                             />
                             <button
                                 className="btn btn-outline-secondary"
@@ -206,6 +307,41 @@ const Inscription = () => {
                                 {showPassword ? <FaEyeSlash /> : <FaEye />}
                             </button>
                         </div>
+                        <small className="text-muted">
+                            Minimum 6 caractères
+                        </small>
+                    </div>
+
+                    <div className="mb-3">
+                        <label className="form-label">
+                            <FaLock className="me-2" />
+                            Confirmer le mot de passe
+                        </label>
+                        <div className="input-group">
+                            <input
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                name="confirmerMotDePasse"
+                                className="form-control"
+                                autoComplete="new-password"
+                                value={form.confirmerMotDePasse}
+                                onChange={handleChange}
+                                required
+                                minLength="6"
+                            />
+                            <button
+                                className="btn btn-outline-secondary"
+                                type="button"
+                                onClick={() =>
+                                    setShowConfirmPassword(!showConfirmPassword)
+                                }
+                            >
+                                {showConfirmPassword ? (
+                                    <FaEyeSlash />
+                                ) : (
+                                    <FaEye />
+                                )}
+                            </button>
+                        </div>
                     </div>
 
                     <button
@@ -213,7 +349,17 @@ const Inscription = () => {
                         className="btn btn-primary w-100 py-2"
                         disabled={isLoading}
                     >
-                        {isLoading ? 'Inscription en cours...' : "S'inscrire"}
+                        {isLoading ? (
+                            <>
+                                <span
+                                    className="spinner-border spinner-border-sm me-2"
+                                    role="status"
+                                ></span>
+                                Inscription en cours...
+                            </>
+                        ) : (
+                            "S'inscrire"
+                        )}
                     </button>
                 </form>
 

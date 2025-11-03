@@ -4,7 +4,9 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import session from 'express-session';
+// Importation du store Redis spécifique pour express-session
 import { RedisStore } from 'connect-redis';
+// Importation du client Redis moderne
 import redis from 'redis';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -40,27 +42,55 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Active Helmet pour sécuriser les en-têtes HTTP
 app.use(helmet());
 
-// Configuration de CORS pour autoriser les requêtes depuis le client
+// --- Configuration CORS adaptative pour le développement et la production ---
+// Définit les origines autorisées pour les requêtes CORS.
+const allowedOrigins = [
+    config.frontendProdUrl,
+    // En mode développement, autoriser les URLs locales de Vite et l'URL configurée
+    ...(config.nodeEnv === 'development'
+        ? [config.clientUrl, 'http://127.0.0.1:5173']
+        : []),
+].filter(Boolean);
+
 app.use(
     cors({
-        origin: config.clientUrl,
+        origin: function (origin, callback) {
+            // En développement, autoriser toutes les origines
+            if (config.nodeEnv === 'development') {
+                return callback(null, true);
+            }
+
+            // En production, vérifier les origines autorisées
+            const allowedOrigins = [
+                config.frontendProdUrl,
+                config.clientUrl,
+            ].filter(Boolean);
+
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'), false);
+            }
+        },
         credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     })
 );
 
 // Limitation du débit (rate limiting) pour protéger l'API contre les abus
 const limiteur = rateLimit({
-    windowMs: config.rateLimitWindowMs, // Fenêtre de temps
-    max: config.rateLimitMaxRequests, // Nombre maximum de requêtes
+    windowMs: config.rateLimitWindowMs,
+    max: config.rateLimitMaxRequests,
     message: {
         erreur: 'Trop de requêtes depuis cette adresse IP, veuillez réessayer plus tard.',
     },
-    standardHeaders: true, // Renvoie les en-têtes standard de limitation du débit
-    legacyHeaders: false, // Désactive les en-têtes obsolètes
+    standardHeaders: true,
+    legacyHeaders: false,
 });
 app.use(limiteur);
 
-// Middleware de journalisation (logging) pour les requêtes HTTP
+// Middleware de journalisation (logging) pour les requêtes HTTP (utilise le stream de logger)
 app.use(
     morgan('combined', {
         stream: { write: message => logger.info(message.trim()) },
@@ -68,8 +98,8 @@ app.use(
 );
 
 // Middleware d'analyse du corps des requêtes
-app.use(express.json({ limit: '10mb' })); // Analyse les corps de requête JSON
-app.use(express.urlencoded({ extended: true, limit: '10mb' })); // Analyse les corps de requête encodés en URL
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 /**
  * Initialise l'application de manière asynchrone.
@@ -81,24 +111,30 @@ const initializeApp = async () => {
         // Connexion à la base de données (attend que la connexion soit établie)
         await connectDatabase();
 
-        // --- Configuration de Redis pour les sessions ---
+        // --- Configuration améliorée de Redis pour les sessions ---
         let magasinRedis;
+        // On n'utilise pas Redis pour les tests
         if (config.nodeEnv !== 'test') {
             try {
                 const clientRedis = redis.createClient({
                     url: `redis://${config.redisHost}:${config.redisPort}`,
-                    password: config.redisPassword,
+                    // Gère proprement l'absence de mot de passe en passant 'undefined'
+                    password: config.redisPassword || undefined,
                 });
 
+                // Meilleure gestion des événements Redis avec logging :
+
+                // Journalise toute erreur client Redis (perte de connexion, échec de commande)
                 clientRedis.on('error', erreur => {
-                    // Gère les erreurs qui surviennent APRÈS la connexion initiale
-                    logger.error('Erreur du client Redis :', erreur);
+                    logger.error('Erreur Redis:', erreur);
                 });
 
+                // Confirme le début de la connexion
                 clientRedis.on('connect', () => {
-                    logger.info('Connexion à Redis en cours...');
+                    logger.info('Connexion à Redis établie');
                 });
 
+                // Confirme que le client est prêt à émettre des commandes
                 clientRedis.on('ready', () => {
                     logger.info('Connexion Redis réussie et prête.');
                 });
@@ -106,22 +142,25 @@ const initializeApp = async () => {
                 // Attendre que la connexion soit établie
                 await clientRedis.connect();
 
-                // Initialiser le store de Redis APRÈS la connexion
+                // Initialiser le store de Redis
                 magasinRedis = new RedisStore({
                     client: clientRedis,
                     prefix: 'nody:',
+                    // Désactive l'extension automatique de la durée de vie des sessions (optimisation des performances)
+                    disableTouch: true,
                 });
             } catch (error) {
+                // Fallback : en cas d'échec, le store est mis à undefined.
+                // Le middleware de session utilisera le store mémoire par défaut.
                 logger.error(
-                    "Échec de la connexion à Redis. L'application ne pourra pas gérer les sessions correctement.",
+                    'Échec connexion Redis - Sessions en mémoire uniquement',
                     error
                 );
-                // En production, il serait judicieux de ne pas démarrer si Redis est requis.
-                // Pour le développement, on peut continuer sans sessions persistantes.
+                magasinRedis = undefined;
             }
         }
 
-        // Middleware de gestion des sessions (placé ici pour utiliser magasinRedis)
+        // Middleware de gestion des sessions (avec fallback sur store mémoire si magasinRedis est undefined)
         app.use(
             session({
                 store: magasinRedis,
@@ -129,23 +168,29 @@ const initializeApp = async () => {
                 resave: false,
                 saveUninitialized: false,
                 cookie: {
-                    // En production, le cookie ne sera envoyé que via HTTPS
                     secure: config.nodeEnv === 'production',
-                    // Empêche l'accès au cookie depuis le JavaScript côté client
                     httpOnly: true,
-                    // Durée de vie du cookie (ici, 24 heures)
                     maxAge: 24 * 60 * 60 * 1000,
+                    // Ajout de 'sameSite: lax' pour meilleure sécurité CSRF et compatibilité
+                    sameSite: 'lax',
                 },
             })
         );
 
-        // --- Définition des routes de l'API (placées ici pour qu'elles aient accès à la session) ---
+        // Ajout d'un middleware de logging de débogage pour les requêtes entrantes
+        app.use((req, res, next) => {
+            // Log le type de requête et le chemin (utile pour le débogage fin)
+            logger.debug(`Requête reçue: ${req.method} ${req.path}`);
+            next();
+        });
+
+        // --- Définition des routes de l'API ---
         app.use('/api/auth', authRoutes);
-        app.use('/api/utilisateurs', utilisateursRoutes); // Standardisation en français
-        app.use('/api/produits', produitsRoutes); // Standardisation en français
+        app.use('/api/utilisateurs', utilisateursRoutes);
+        app.use('/api/produits', produitsRoutes);
         app.use('/api/categories', categorieRoutes);
-        app.use('/api/commandes', commandesRoutes); // Standardisation en français
-        app.use('/api/paiements', paiementRoutes); // Standardisation en français
+        app.use('/api/commandes', commandesRoutes);
+        app.use('/api/paiements', paiementRoutes);
 
         // Point de contrôle de l'état du serveur (health check)
         app.get('/api/health', (req, res) => {
@@ -164,11 +209,9 @@ const initializeApp = async () => {
 
         return app;
     } catch (error) {
-        logger.error(
-            "Erreur lors de l'initialisation de l'application:",
-            error
-        );
-        throw error; // Propager l'erreur pour que le serveur puisse la gérer
+        // Log critique si l'initialisation (ex: connexion BD) échoue
+        logger.error("Échec critique de l'initialisation:", error);
+        throw error; // Propager l'erreur pour que le serveur soit arrêté
     }
 };
 

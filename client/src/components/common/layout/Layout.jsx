@@ -9,16 +9,16 @@ export default function Layout({ children }) {
     const [showBackToTop, setShowBackToTop] = useState(false);
     const [isPageLoaded, setIsPageLoaded] = useState(false);
 
-    // Scroll to top on route change
+    // Défilement fluide lors d'un changement d'itinéraire
     useEffect(() => {
         const timer = setTimeout(() => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }, 100);
-        
+
         return () => clearTimeout(timer);
     }, [location.pathname]);
 
-    // Back to top button visibility
+    // Visibilité du bouton « Retour en haut »
     useEffect(() => {
         const handleScroll = () => {
             setShowBackToTop(window.scrollY > 300);
@@ -28,7 +28,7 @@ export default function Layout({ children }) {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Page load detection
+    // Détection du chargement de la page
     useEffect(() => {
         setIsPageLoaded(true);
         return () => setIsPageLoaded(false);
@@ -37,15 +37,15 @@ export default function Layout({ children }) {
     return (
         <div className={`layout-container ${isPageLoaded ? 'loaded' : ''}`}>
             <Header />
-            
+
             <main className="main-content" id="main-content">
                 {children}
             </main>
-            
+
             <Footer />
-            
-            {/* Back to top button with improved accessibility */}
-            <button 
+
+            {/* Bouton « Retour en haut » avec accessibilité  */}
+            <button
                 className={`back-to-top ${showBackToTop ? 'visible' : ''}`}
                 onClick={() => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -54,8 +54,20 @@ export default function Layout({ children }) {
                 aria-label="Retour en haut de la page"
                 aria-hidden={!showBackToTop}
             >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M12 20V4M5 11L12 4L19 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M12 20V4M5 11L12 4L19 11"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
                 </svg>
             </button>
         </div>

@@ -1,0 +1,74 @@
+@use "../styles/variables" as v;
+@use "../styles/mixins" as m;
+
+.page-boutique {
+    min-height: 70vh;
+
+    .filtres-sidebar {
+        background: #ffffff;
+        border-right: 1px solid #dee2e6;
+        height: 100%;
+        @include m.transition(transform, 0.3s);
+
+        @include m.respond-to(medium) {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 320px;
+            z-index: 1050;
+            transform: translateX(-100%);
+
+            &.ouvert {
+                transform: translateX(0);
+            }
+        }
+    }
+
+    .filtres-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1040;
+    }
+
+    .boutique-header {
+        background: #f8f9fa !important;
+    }
+
+    .empty-state {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+}
+
+.pagination {
+    .page-item {
+        .page-link {
+            color: v.$primary-color;
+            border: 1px solid #dee2e6;
+            margin: 0 2px;
+            border-radius: 0.25rem;
+
+            &:hover {
+                background: v.$primary-color;
+                color: white;
+                border-color: v.$primary-color;
+            }
+        }
+
+        &.active .page-link {
+            background: v.$primary-color;
+            border-color: v.$primary-color;
+            color: white;
+        }
+
+        &.disabled .page-link {
+            color: v.$text-color;
+            background: #f8f9fa;
+        }
+    }
+}

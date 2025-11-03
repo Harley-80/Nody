@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
     FaGoogle,
@@ -12,7 +12,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 
 const Connexion = () => {
-    const { login } = useAuth();
+    const { login, user } = useAuth();
     const { addToast } = useToast();
     const navigate = useNavigate();
     const [email, setEmail] = useState(
@@ -26,6 +26,14 @@ const Connexion = () => {
         !!localStorage.getItem('nodyRememberEmail')
     );
 
+    // Rediriger si déjà connecté
+    useEffect(() => {
+        if (user) {
+            navigate('/profil', { replace: true });
+        }
+    }, [user, navigate]);
+
+    // Envoyer le formulaire
     const handleSubmit = async e => {
         e.preventDefault();
         setIsLoading(true);
@@ -43,7 +51,10 @@ const Connexion = () => {
                 title: 'Connexion réussie',
                 message: 'Bienvenue sur Nody !',
             });
-            navigate('/profil');
+            // Redirection après un délai pour voir le message
+            setTimeout(() => {
+                navigate('/profil');
+            }, 1500);
         } catch (err) {
             let msg = 'Connexion échouée. Veuillez vérifier vos informations.';
             if (err.response?.data?.message) {
@@ -63,8 +74,8 @@ const Connexion = () => {
         }
     };
 
+    // Connexion avec un fournisseur
     const handleSocialLogin = provider => {
-        // À implémenter selon votre solution d'authentification sociale
         console.log(`Connexion avec ${provider}`);
         addToast({
             type: 'info',
@@ -73,6 +84,7 @@ const Connexion = () => {
         });
     };
 
+    // Affichage de la page de connexion
     return (
         <div className="container d-flex justify-content-center align-items-center vh-100">
             <div
@@ -188,7 +200,17 @@ const Connexion = () => {
                         className="btn btn-primary w-100 py-2"
                         disabled={isLoading}
                     >
-                        {isLoading ? 'Connexion en cours...' : 'Se connecter'}
+                        {isLoading ? (
+                            <>
+                                <span
+                                    className="spinner-border spinner-border-sm me-2"
+                                    role="status"
+                                ></span>
+                                Connexion en cours...
+                            </>
+                        ) : (
+                            'Se connecter'
+                        )}
                     </button>
                 </form>
 

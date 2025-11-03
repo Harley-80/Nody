@@ -1,0 +1,275 @@
+@use 'sass:color';
+
+// Variables locales
+$primary-color: #2c3e50;
+$secondary-color: #e74c3c;
+$accent-color: #3498db;
+$white: #fff;
+$text-color: #333;
+
+.categories-sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    display: flex;
+    justify-content: flex-end;
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.3s ease;
+
+    @media (max-width: 992px) {
+        justify-content: flex-start;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.categories-sidebar {
+    width: 400px;
+    height: 100vh;
+    background: $white;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    animation: slideInRight 0.3s ease;
+
+    @media (max-width: 992px) {
+        width: 100vw;
+        animation: slideInLeft 0.3s ease;
+    }
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f9fa;
+
+    h3 {
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: $primary-color;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+
+        &:hover {
+            background: #e9ecef;
+            color: $secondary-color;
+        }
+    }
+}
+
+.sidebar-content {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+// Arborescence des catégories
+.category-tree {
+    margin-bottom: 1rem;
+
+    .category-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+
+        .category-main-btn {
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            text-align: left;
+
+            &:hover {
+                background: rgba($accent-color, 0.05);
+                color: $accent-color;
+            }
+
+            .category-icon {
+                font-size: 1.2rem;
+                margin-right: 0.8rem;
+            }
+
+            .category-name {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: $primary-color;
+            }
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background: #e9ecef;
+                color: $primary-color;
+            }
+        }
+    }
+}
+
+.category-item {
+    margin-bottom: 0.3rem;
+
+    .category-line {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .category-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 0.6rem 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            border-radius: 6px;
+
+            &:hover {
+                background: rgba($accent-color, 0.05);
+                color: $accent-color;
+            }
+
+            .category-name {
+                font-size: 0.95rem;
+                color: $text-color;
+            }
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 0.4rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background: #e9ecef;
+                color: $primary-color;
+            }
+        }
+    }
+
+    // Indentation pour les niveaux
+    &.level-1 {
+        margin-left: 1rem;
+    }
+
+    &.level-2 {
+        margin-left: 2rem;
+        
+        .category-btn {
+            padding: 0.5rem 0.8rem;
+            
+            .category-name {
+                font-size: 0.9rem;
+                color: #6c757d;
+            }
+        }
+    }
+
+    &.level-3 {
+        margin-left: 3rem;
+        
+        .category-btn {
+            padding: 0.4rem 0.8rem;
+            
+            .category-name {
+                font-size: 0.85rem;
+                color: #6c757d;
+            }
+        }
+    }
+}
+
+.subcategories {
+    margin-top: 0.5rem;
+    border-left: 2px solid #e9ecef;
+    margin-left: 1rem;
+    padding-left: 0.5rem;
+}
+
+.all-categories {
+    .category-tree {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+// Scrollbar personnalisée
+.sidebar-content {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+}

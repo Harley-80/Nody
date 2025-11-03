@@ -16,18 +16,17 @@ import Confirmation from '../pages/Confirmation.jsx';
 import AdminLayout from '../components/common/layout/AdminLayout.jsx';
 import AdminDashboard from '../pages/admin/Dashboard.jsx';
 import AdminProduits from '../pages/admin/Produits.jsx';
-import Boutique from '../pages/Boutique.jsx'; // Import ajouté
-import Nouveautes from '../pages/Nouveautes.jsx'; // Import ajouté
+import Boutique from '../pages/Boutique.jsx';
+import Nouveautes from '../pages/Nouveautes.jsx';
+import Profil from '../pages/profil';
 
 export default function AppRoutes() {
     return (
         <Routes>
             {/* Routes publiques */}
             <Route path="/" element={<Accueil />} />
-            <Route path="/boutique" element={<Boutique />} />{' '}
-            {/* Route ajoutée */}
-            <Route path="/nouveautes" element={<Nouveautes />} />{' '}
-            {/* Route ajoutée */}
+            <Route path="/boutique" element={<Boutique />} />
+            <Route path="/nouveautes" element={<Nouveautes />} />
             <Route path="/produit/:id" element={<PageDetailProduit />} />
             <Route path="/connexion" element={<Connexion />} />
             <Route path="/inscription" element={<Inscription />} />
@@ -37,9 +36,21 @@ export default function AppRoutes() {
                 element={<MotDePasseOublie />}
             />
             <Route path="/produits" element={<Produit />} />
+            {/* Route catégories avec paramètre optionnel */}
             <Route path="/categories" element={<Categories />} />
+            <Route path="/categories/:categorySlug" element={<Categories />} />
             <Route path="/confirmation" element={<Confirmation />} />
             <Route path="/admin-login" element={<AuthAdmin />} />
+
+            {/* Routes protégées */}
+            <Route
+                path="/profil"
+                element={
+                    <ProtectedRoute>
+                        <Profil />
+                    </ProtectedRoute>
+                }
+            />
             <Route
                 path="/paiement"
                 element={
@@ -57,13 +68,14 @@ export default function AppRoutes() {
                 }
             />
             <Route
-                path="/commande-detail"
+                path="/commande/:id"
                 element={
                     <ProtectedRoute>
                         <CommandeDetail />
                     </ProtectedRoute>
                 }
             />
+
             {/* Section admin imbriquée */}
             <Route
                 path="/admin"
@@ -75,7 +87,22 @@ export default function AppRoutes() {
             >
                 <Route index element={<AdminDashboard />} />
                 <Route path="produits" element={<AdminProduits />} />
+                {/* <Route path="clients" element={<Clients />} /> */}
             </Route>
+
+            {/* Route 404 - Doit être la dernière */}
+            <Route
+                path="*"
+                element={
+                    <div className="container text-center py-5">
+                        <h2>Page non trouvée</h2>
+                        <p>La page que vous recherchez n'existe pas.</p>
+                        <a href="/" className="btn btn-primary">
+                            Retour à l'accueil
+                        </a>
+                    </div>
+                }
+            />
         </Routes>
     );
 }

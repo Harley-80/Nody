@@ -51,8 +51,34 @@ $mobile-breakpoint: 992px;
     }
 }
 
-// STYLES DU HEADER
+// Mixin pour les boutons du header avec effet au survol
+@mixin header-button {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 1.1rem;
+    color: $white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: $transition;
+    white-space: nowrap;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    cursor: pointer;
 
+    &:hover {
+        background: rgba($white, 0.1);
+        border: 1px solid rgba($white, 0.2);
+        backdrop-filter: blur(10px);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        color: $secondary-color;
+    }
+}
+
+// STYLES DU HEADER
 .header {
     position: sticky;
     top: 0;
@@ -65,77 +91,20 @@ $mobile-breakpoint: 992px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 
         .main-nav {
-            padding: 0.8rem 0;
+            padding: 0.6rem 0;
 
             @include mobile {
-                padding: 1rem 0;
+                padding: 0.8rem 0;
             }
         }
     }
 }
 
-// STYLES DE LA BARRE SUPÉRIEURE
-
-.top-bar {
-    background: linear-gradient(135deg, $top-bar-bg 0%, color.scale($top-bar-bg, $lightness: 10%) 100%);
-    color: $light-color;
-    padding: 0.6rem 0;
-    font-size: 0.9rem;
-    border-bottom: 1px solid rgba($white, 0.1);
-
-    .top-bar-content {
-        @include flex-between;
-        padding: 0 1rem;
-
-        @include mobile {
-            flex-direction: column;
-            gap: 0.5rem;
-            text-align: center;
-            padding: 0.5rem;
-        }
-    }
-
-    .top-links {
-        display: flex;
-        gap: 1.8rem;
-
-        a {
-            color: $light-color;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.3rem 0;
-            position: relative;
-            @include hover-effect($secondary-color, $light-color);
-
-            &::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                width: 0;
-                height: 2px;
-                background: $secondary-color;
-                transition: $transition;
-            }
-
-            &:hover::after {
-                width: 100%;
-            }
-
-            @include mobile {
-                font-size: 0.85rem;
-                padding: 0.5rem;
-            }
-        }
-    }
-}
-
-// STYLES DE LA NAVIGATION PRINCIPALE
-
+// PREMIÈRE LIGNE - NAVIGATION PRINCIPALE
 .main-nav {
     background: $main-nav-bg;
     color: $white;
-    padding: 1rem 0;
+    padding: 0.8rem 0;
     transition: $transition;
     position: relative;
 
@@ -148,22 +117,25 @@ $mobile-breakpoint: 992px;
     }
 
     .nav-content {
-        @include flex-between;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
         gap: 2rem;
+        align-items: center;
 
         @include mobile {
+            display: flex;
+            justify-content: space-between;
             gap: 1rem;
-            flex-wrap: wrap;
         }
     }
 }
 
-// STYLES DU LOGO ET DU MENU MOBILE
-
+// Logo - EXTRÊME GAUCHE
 .nav-brand {
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    justify-self: start;
 
     .mobile-toggle {
         display: none;
@@ -191,7 +163,7 @@ $mobile-breakpoint: 992px;
         text-decoration: none;
         color: $white;
         font-weight: 700;
-        font-size: 1.8rem;
+        font-size: 1.5rem;
         gap: 0.6rem;
         padding: 0.5rem;
         border-radius: $border-radius;
@@ -207,7 +179,7 @@ $mobile-breakpoint: 992px;
         }
 
         @include mobile {
-            font-size: 1.6rem;
+            font-size: 1.4rem;
 
             img {
                 width: 30px;
@@ -217,20 +189,17 @@ $mobile-breakpoint: 992px;
     }
 }
 
-// STYLES DE LA RECHERCHE
-
+// Barre de recherche - CENTRE
 .search-container {
     position: relative;
     display: flex;
-    flex-grow: 1;
-    max-width: 600px;
-    margin: 0 2rem;
+    justify-self: center;
+    max-width: 500px;
+    width: 100%;
 
     @include mobile {
-        order: 3;
-        width: 100%;
         max-width: none;
-        margin: 1rem 0 0 0;
+        justify-self: stretch;
     }
 }
 
@@ -253,11 +222,11 @@ $mobile-breakpoint: 992px;
 
     input {
         width: 100%;
-        padding: 0.9rem 5rem 0.9rem 1.5rem;
+        padding: 0.8rem 5rem 0.8rem 1.5rem;
         border: none;
         background: transparent;
         color: $white;
-        font-size: 1rem;
+        font-size: 0.95rem;
         outline: none;
         transition: $transition;
 
@@ -266,7 +235,7 @@ $mobile-breakpoint: 992px;
         }
 
         @include mobile {
-            padding: 0.8rem 4rem 0.8rem 1.2rem;
+            padding: 0.7rem 4rem 0.7rem 1.2rem;
             font-size: 16px;
         }
     }
@@ -311,122 +280,53 @@ $mobile-breakpoint: 992px;
         }
 
         .image-search-icon {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             filter: invert(1);
             transition: $transition;
         }
     }
 }
 
-// STYLES DU MENU MOBILE
-
-.nav-menu {
+// Actions de droite - EXTRÊME DROITE
+.header-actions {
     display: flex;
-    flex-grow: 1;
-    justify-content: space-between;
     align-items: center;
+    gap: 0.7rem;
+    flex-shrink: 0;
+    justify-self: end;
 
     @include mobile {
-        position: fixed;
-        top: 0;
-        left: -100%;
-        width: 85%;
-        height: 100vh;
-        background: linear-gradient(135deg, $main-nav-bg 0%, color.scale($main-nav-bg, $lightness: -10%) 100%);
-        flex-direction: column;
-        padding: 2rem 1.5rem;
-        box-shadow: 2px 0 20px rgba(0, 0, 0, 0.4);
-        z-index: 1001;
-        transition: $transition;
-        overflow-y: auto;
-
-        &.open {
-            left: 0;
-        }
-    }
-}
-
-.nav-links {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    gap: 1.2rem;
-
-    @include mobile {
-        flex-direction: column;
-        width: 100%;
-        gap: 0;
-        margin-bottom: 2rem;
+        display: none;
     }
 
-    .nav-item {
-        position: relative;
+    .header-action-link {
+        @include header-button;
 
-        @include mobile {
-            width: 100%;
-            border-bottom: 1px solid rgba($white, 0.1);
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 0.7rem 1.2rem;
-            color: $white;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            border-radius: 25px;
-            @include hover-effect($secondary-color, $white);
-            gap: 0.5rem;
-            transition: $transition;
+        &.cart-link {
             position: relative;
-            overflow: hidden;
-
-            &::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba($white, 0.1), transparent);
-                transition: $transition;
-            }
-
-            &:hover::before {
-                left: 100%;
-            }
-
-            @include mobile {
-                padding: 1.2rem 0;
-                font-size: 1.1rem;
-                border-radius: 0;
-                justify-content: space-between;
-            }
         }
 
         .cart-badge {
             background: linear-gradient(135deg, $secondary-color 0%, color.scale($secondary-color, $lightness: -15%) 100%);
             color: $white;
-            position: absolute;
-            top: -5px;
-            right: -5px;
             border-radius: 50%;
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             @include flex-center;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: bold;
-            box-shadow: 0 2px 8px rgba($secondary-color, 0.4);
+            margin-left: 0.3rem;
             animation: pulse 2s infinite;
+        }
+    }
 
-            @include mobile {
-                position: static;
-                margin-left: auto;
-                margin-right: 1rem;
-            }
+    .user-profile-link {
+        .user-name {
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
 }
@@ -437,23 +337,313 @@ $mobile-breakpoint: 992px;
     100% { transform: scale(1); }
 }
 
-// STYLES DES ACTIONS UTILISATEUR
+// DROPDOWN DE CONFIGURATION (LANGUE/DEVISE) 
 
+// Conteneur du dropdown pour les écrans de bureau (non visible sur mobile)
+.desktop-config {
+    position: relative; // Positionnement relatif pour le dropdown absolu enfant
+
+    @include mobile {
+        display: none; // Cache le sélecteur sur mobile (il est géré dans le menu mobile)
+    }
+
+    .config-dropdown {
+        position: relative; // Conteneur interne pour le toggle
+    }
+
+    // Bouton pour afficher/masquer le dropdown de configuration
+    .config-toggle {
+        @include header-button; // Hérite des styles de bouton standard
+        border: 1px solid rgba($white, 0.2); // Ajout d'une bordure visible pour l'identifier
+        font-weight: 600;
+
+        .config-icon {
+            font-size: 1rem; // Taille de l'icône
+            opacity: 0.8; // Légère transparence
+        }
+
+        .config-text {
+            font-weight: 500; // Texte affichant la langue/devise actuelle
+        }
+    }
+
+    // Menu déroulant (dropdown) lui-même
+    .config-dropdown-menu {
+        position: absolute; // Positionnement par rapport à .desktop-config
+        top: 100%; // Se place juste sous le bouton
+        right: 0; // Alignement à droite
+        background: $white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); // Ombre prononcée
+        padding: 1rem;
+        min-width: 280px;
+        z-index: 1000;
+        margin-top: 0.5rem;
+        animation: slideDown 0.2s ease; // Animation d'apparition
+    }
+}
+
+// Animation pour faire apparaître le dropdown
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px); // Commence légèrement plus haut
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0); // Termine à sa position normale
+    }
+}
+
+// Section à l'intérieur du dropdown (ex: Langue ou Devise)
+.config-section {
+    margin-bottom: 1rem; // Marge entre les sections
+
+    &:last-child {
+        margin-bottom: 0; // Pas de marge pour la dernière section
+    }
+
+    // Titre de la section (ex: 'Langue' ou 'Devise')
+    .config-section-title {
+        @include flex-center; // Centre le titre et l'icône
+        gap: 0.5rem;
+        margin: 0 0 0.8rem 0;
+        font-size: 0.9rem;
+        color: $text-color;
+        font-weight: 600;
+
+        @include mobile {
+            // Ajustements pour la version mobile (dans .mobile-config)
+            color: $white;
+            justify-content: flex-start;
+            font-size: 1rem;
+        }
+    }
+}
+
+// Conteneur des boutons d'options (Langue, Devise)
+.config-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem; // Petit espacement entre les options
+}
+
+// Style de chaque option (bouton Langue ou Devise)
+.config-option {
+    @include flex-between; // Alignement du texte et de l'icône de validation
+    padding: 0.7rem 1rem;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: $transition;
+    text-align: left;
+    width: 100%;
+
+    &:hover {
+        background: rgba($accent-color, 0.08); // Léger fond bleu au survol
+    }
+
+    &.active {
+        background: rgba($accent-color, 0.12); // Fond bleu pour l'option sélectionnée
+        color: $accent-color; // Couleur d'accentuation pour le texte
+        font-weight: 600;
+    }
+
+    // Styles pour les drapeaux et symboles de devise
+    .flag, .currency-symbol {
+        font-size: 1.1rem;
+        min-width: 30px; // Assure un alignement propre
+    }
+
+    .option-text {
+        flex: 1; // Prend l'espace restant
+        font-size: 0.9rem;
+    }
+
+    .check-icon {
+        color: $accent-color; // Icône de validation en couleur d'accentuation
+        font-size: 0.8rem;
+    }
+
+    @include mobile {
+        // Styles spécifiques pour les options dans le menu mobile
+        color: $white;
+        padding: 0.8rem 0;
+
+        &:hover {
+            background: rgba($white, 0.1);
+        }
+
+        &.active {
+            background: rgba($white, 0.15);
+            color: $secondary-color;
+        }
+    }
+}
+
+// Séparateur entre les options (si utilisé)
+.config-divider {
+    height: 1px;
+    background: rgba(0, 0, 0, 0.1);
+    margin: 1rem 0;
+
+    @include mobile {
+        background: rgba($white, 0.2); // Séparateur plus visible en mobile
+    }
+}
+
+.user-actions-desktop {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+
+    @include mobile {
+        display: none;
+    }
+}
+
+// DEUXIÈME LIGNE - NAVIGATION SECONDAIRE
+.secondary-nav {
+    background: linear-gradient(135deg, color.scale($main-nav-bg, $lightness: 5%) 0%, color.scale($main-nav-bg, $lightness: -5%) 100%);
+    border-top: 1px solid rgba($white, 0.05);
+    padding: 0.5rem 0;
+
+    @include mobile {
+        display: none;
+    }
+
+    .container {
+        padding: 0 1.5rem;
+    }
+
+    .secondary-nav-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+// Bouton "Toutes les catégories" - EXTRÊME GAUCHE
+.categories-dropdown {
+    position: relative;
+}
+
+.categories-button {
+    @include header-button;
+    font-weight: 600;
+    padding: 0.8rem 1.3rem;
+
+    svg {
+        font-size: 1rem;
+    }
+}
+
+// Liens principaux (Accueil, Boutique, Nouveautés) - EXTRÊME DROITE
+.main-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 0.7rem;
+
+    li {
+        .main-link {
+            @include header-button;
+
+            svg {
+                font-size: 1rem;
+            }
+        }
+    }
+}
+
+// MENU MOBILE
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 85%;
+    height: 100vh;
+    background: linear-gradient(135deg, $main-nav-bg 0%, color.scale($main-nav-bg, $lightness: -10%) 100%);
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.4);
+    z-index: 1001;
+    transition: $transition;
+    overflow-y: auto;
+    display: none;
+
+    @include mobile {
+        display: flex;
+    }
+
+    &.open {
+        left: 0;
+    }
+}
+
+// Section mobile contenant le sélecteur de langue/devise 
+.mobile-config {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba($white, 0.1);
+    padding-bottom: 2rem;
+}
+
+.mobile-nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 1;
+
+    li {
+        border-bottom: 1px solid rgba($white, 0.1);
+
+        .mobile-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.2rem 0;
+            color: $white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            @include hover-effect($secondary-color, $white);
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+
+            .cart-badge {
+                background: linear-gradient(135deg, $secondary-color 0%, color.scale($secondary-color, $lightness: -15%) 100%);
+                color: $white;
+                border-radius: 50%;
+                width: 22px;
+                height: 22px;
+                @include flex-center;
+                font-size: 0.75rem;
+                font-weight: bold;
+                margin-left: auto;
+                animation: pulse 2s infinite;
+                border: 2px solid rgba($white, 0.3);
+            }
+        }
+    }
+}
+
+// Actions utilisateur (mobile)
 .user-actions {
     display: flex;
     align-items: center;
     gap: 1rem;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding-top: 2rem;
+    border-top: 1px solid rgba($white, 0.1);
 
-    @include mobile {
-        width: 100%;
-        justify-content: center;
-        margin-top: auto;
-        flex-wrap: wrap;
-        padding-top: 2rem;
-        border-top: 1px solid rgba($white, 0.1);
-    }
-
-    .nav-link, .login-btn, .dropdown-toggle {
+    .nav-link, .login-btn {
         color: $white;
         @include hover-effect($secondary-color, $white);
         font-size: 1rem;
@@ -474,285 +664,33 @@ $mobile-breakpoint: 992px;
         }
     }
 
-    .dropdown {
-        position: relative;
-
-        .dropdown-toggle {
-            @include flex-center;
-            gap: 0.5rem;
-            background: rgba($white, 0.1);
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            padding: 0.7rem 1.2rem;
-            border-radius: 25px;
-            transition: $transition;
-            backdrop-filter: blur(10px);
-
-            &:hover {
-                background: rgba($white, 0.2);
-                transform: translateY(-2px);
-            }
-
-            .user-name {
-                max-width: 120px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-
-                @include mobile {
-                    max-width: 100px;
-                }
-            }
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: $white;
-            min-width: 220px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            border-radius: 12px;
-            padding: 0.8rem 0;
-            opacity: 0;
-            visibility: hidden;
-            transition: $transition;
-            z-index: 100;
-            transform: translateY(-10px);
-
-            @include mobile {
-                right: auto;
-                left: 50%;
-                transform: translateX(-50%) translateY(-10px);
-                position: static;
-                background: transparent;
-                color: $white;
-                box-shadow: none;
-                margin-top: 1rem;
-            }
-
-            .dropdown-item {
-                display: flex;
-                align-items: center;
-                padding: 0.8rem 1.5rem;
-                color: $text-color;
-                text-decoration: none;
-                transition: $transition;
-                width: 100%;
-                text-align: left;
-                background: none;
-                border: none;
-                font-size: 0.95rem;
-                gap: 0.7rem;
-
-                &:hover {
-                    background: rgba($accent-color, 0.08);
-                    color: $accent-color;
-                    padding-left: 2rem;
-                }
-
-                @include mobile {
-                    color: $white;
-                    padding: 1rem 0;
-
-                    &:hover {
-                        background: rgba($white, 0.1);
-                        color: $secondary-color;
-                    }
-                }
-            }
-
-            .dropdown-divider {
-                height: 1px;
-                background: rgba(0, 0, 0, 0.1);
-                margin: 0.5rem 0;
-
-                @include mobile {
-                    background: rgba($white, 0.2);
-                }
-            }
-        }
-
-        &:hover .dropdown-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-
-            @include mobile {
-                transform: translateX(-50%) translateY(0);
-            }
-        }
-    }
-}
-
-// STYLES DU DROPDOWN DE CONFIGURATION
-
-.desktop-config {
-    position: relative;
-    flex-shrink: 0;
-
-    .config-dropdown {
-        position: relative;
-    }
-
-    .config-toggle {
-        @include flex-center;
+    .user-profile-link {
+        display: flex;
+        align-items: center;
         gap: 0.5rem;
+        padding: 0.7rem 1.2rem;
         background: rgba($white, 0.1);
-        border: 1px solid rgba($white, 0.2);
-        color: $white;
-        padding: 0.7rem 1rem;
         border-radius: 25px;
-        cursor: pointer;
-        transition: $transition;
-        font-weight: 600;
-        font-size: 0.9rem;
-        backdrop-filter: blur(10px);
-
-        &:hover {
-            background: rgba($white, 0.15);
-            border-color: rgba($white, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .config-icon {
-            font-size: 1rem;
-            opacity: 0.8;
-        }
-
-        .config-text {
-            margin: 0 0.3rem;
-            font-weight: 500;
-        }
-
-        .chevron-icon {
-            font-size: 0.8rem;
-            opacity: 0.7;
-            transition: $transition;
-        }
-
-        &.open .chevron-icon {
-            transform: rotate(180deg);
-        }
-    }
-
-    .config-dropdown-menu {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background: $white;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-        padding: 1rem;
-        min-width: 280px;
-        z-index: 1000;
-        margin-top: 0.5rem;
-        animation: slideDown 0.2s ease;
-
-        @include mobile {
-            position: static;
-            box-shadow: none;
-            background: transparent;
-            color: $white;
-            padding: 0;
-            min-width: auto;
-        }
-    }
-}
-
-.config-section {
-    margin-bottom: 1rem;
-
-    &:last-child {
-        margin-bottom: 0;
-    }
-
-    .config-section-title {
-        @include flex-center;
-        gap: 0.5rem;
-        margin: 0 0 0.8rem 0;
-        font-size: 0.9rem;
-        color: $text-color;
-        font-weight: 600;
-
-        @include mobile {
-            color: $white;
-            justify-content: flex-start;
-            font-size: 1rem;
-        }
-    }
-}
-
-.config-options {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-}
-
-.config-option {
-    @include flex-between;
-    padding: 0.7rem 1rem;
-    background: none;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: $transition;
-    text-align: left;
-    width: 100%;
-
-    &:hover {
-        background: rgba($accent-color, 0.08);
-    }
-
-    &.active {
-        background: rgba($accent-color, 0.12);
-        color: $accent-color;
-        font-weight: 600;
-    }
-
-    .flag, .currency-symbol {
-        font-size: 1.1rem;
-        min-width: 30px;
-    }
-
-    .option-text {
-        flex: 1;
-        font-size: 0.9rem;
-    }
-
-    .check-icon {
-        color: $accent-color;
-        font-size: 0.8rem;
-    }
-
-    @include mobile {
+        text-decoration: none;
         color: $white;
-        padding: 0.8rem 0;
-
+        transition: $transition;
+        
         &:hover {
-            background: rgba($white, 0.1);
+            background: rgba($white, 0.2);
+            transform: translateY(-2px);
+            color: $white;
         }
-
-        &.active {
-            background: rgba($white, 0.15);
-            color: $secondary-color;
+        
+        .user-name {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
 }
 
-.config-divider {
-    height: 1px;
-    background: rgba(0, 0, 0, 0.1);
-    margin: 1rem 0;
-
-    @include mobile {
-        background: rgba($white, 0.2);
-    }
-}
-
-// STYLES POUR LA RECHERCHE PAR IMAGE
-
+// RECHERCHE PAR IMAGE
 .image-search-overlay {
     position: fixed;
     top: 0;
@@ -797,17 +735,6 @@ $mobile-breakpoint: 992px;
         max-height: 85vh;
         overflow-y: auto;
         margin-top: 0;
-    }
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-15px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
     }
 }
 
@@ -1071,35 +998,7 @@ $mobile-breakpoint: 992px;
     }
 }
 
-
-// STYLES POUR LES OPTIMISATIONS MOBILES
-
-@include mobile {
-    .nav-menu.open ~ .image-search-overlay {
-        display: block;
-    }
-
-    .search-form {
-        background: rgba($white, 0.12);
-
-        &:focus-within {
-            background: rgba($white, 0.18);
-        }
-    }
-
-    .desktop-config {
-        display: none;
-    }
-}
-
-@media (min-width: #{$mobile-breakpoint + 1}) {
-    .mobile-config {
-        display: none;
-    }
-}
-
-// STYLES DE LA BARRE DE DÉFILEMENT
-
+// SCROLLBAR
 ::-webkit-scrollbar {
     width: 6px;
 }

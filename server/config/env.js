@@ -30,9 +30,13 @@ const config = {
     // Port d'écoute du serveur
     port: process.env.PORT || 5000,
     // URL de base du serveur
-    serverUrl: process.env.SERVER_URL || 'http://localhost:5000',
+    serverUrl:
+        process.env.SERVER_URL ||
+        `http://localhost:${process.env.PORT || 5000}`,
     // URL de l'application cliente (frontend)
-    clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
+    clientUrl: process.env.CLIENT_URL || 'http://localhost:5173', // URL par défaut pour le développement (Vite)
+    // URL de production du frontend, utilisée pour la configuration CORS en production
+    frontendProdUrl: process.env.FRONTEND_PROD_URL,
 
     // --- Base de données (MongoDB) ---
     // URI de connexion à la base de données

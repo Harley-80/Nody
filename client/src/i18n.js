@@ -2,25 +2,33 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-import translationEN from './locales/en/translation.json';
+// Import des traductions
 import translationFR from './locales/fr/translation.json';
+import translationEN from './locales/en/translation.json';
 
 const resources = {
-    en: {
-        translation: translationEN,
-    },
     fr: {
         translation: translationFR,
     },
+    en: {
+        translation: translationEN,
+    },
 };
 
-i18n.use(LanguageDetector) // Détecte la langue du navigateur
-    .use(initReactI18next) // Passe l'instance i18n à react-i18next
+i18n.use(LanguageDetector)
+    .use(initReactI18next)
     .init({
         resources,
-        fallbackLng: 'fr', // Langue par défaut si la détection échoue
+        fallbackLng: 'fr',
+        debug: process.env.NODE_ENV === 'development',
+
         interpolation: {
-            escapeValue: false, // React échappe déjà les valeurs
+            escapeValue: false,
+        },
+
+        detection: {
+            order: ['localStorage', 'navigator', 'htmlTag'],
+            caches: ['localStorage'],
         },
     });
 

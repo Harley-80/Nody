@@ -1,4 +1,3 @@
-// Importation des dépendances nécessaires
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,19 +7,20 @@ import {
     faSearch,
     faUser,
     faShoppingCart,
-    faTags,
     faSignInAlt,
     faSignOutAlt,
     faUserShield,
     faUserCircle,
-    faBox,
+    faUserPlus,
     faCheck,
-    faChevronDown,
     faBars,
     faList,
     faTimes,
     faGlobe,
     faMoneyBill,
+    faHome,
+    faShoppingBag,
+    faStar,
 } from '@fortawesome/free-solid-svg-icons';
 import logoNody from '@/assets/logo/neos-brands-solid.svg';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +31,8 @@ import imageSearchIcon from '@/assets/icons/recherche.png';
 import ImageSearch from './ImageSearch';
 import DeviseSelector from '../DeviseSelector';
 import LangueSelector from './LangueSelector';
+import CategoriesMegaMenu from './CategoriesMegaMenu';
+import CategoriesSidebar from './CategoriesSidebar';
 import './Header.scss';
 
 /**
@@ -55,9 +57,15 @@ export default function Header() {
     const [imageSearchOpen, setImageSearchOpen] = useState(false);
     const [configDropdownOpen, setConfigDropdownOpen] = useState(false);
 
+    // États pour les catégories
+    const [megaMenuOpen, setMegaMenuOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+
     // Références pour les éléments DOM
     const searchInputRef = useRef(null);
     const configDropdownRef = useRef(null);
+    const megaMenuRef = useRef(null);
 
     /**
      * Effet pour définir la devise et la langue par défaut
@@ -87,11 +95,21 @@ export default function Header() {
      */
     useEffect(() => {
         const handleClickOutside = event => {
+            // Fermer le dropdown de configuration
             if (
                 configDropdownRef.current &&
                 !configDropdownRef.current.contains(event.target)
             ) {
                 setConfigDropdownOpen(false);
+            }
+
+            // Fermer le mega menu
+            if (
+                megaMenuRef.current &&
+                !megaMenuRef.current.contains(event.target) &&
+                !event.target.closest('.categories-dropdown')
+            ) {
+                setMegaMenuOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -189,6 +207,7 @@ export default function Header() {
     const closeMobile = () => {
         setMobileMenuOpen(false);
         setConfigDropdownOpen(false);
+        setMegaMenuOpen(false);
     };
 
     /**
@@ -196,6 +215,45 @@ export default function Header() {
      */
     const toggleConfigDropdown = () => {
         setConfigDropdownOpen(!configDropdownOpen);
+    };
+
+    /**
+     * Gère l'ouverture/fermeture du mega menu
+     */
+    const handleMegaMenuToggle = () => {
+        setMegaMenuOpen(!megaMenuOpen);
+    };
+
+    /**
+     * Gère l'ouverture du mega menu au survol
+     */
+    const handleMegaMenuEnter = () => {
+        setMegaMenuOpen(true);
+    };
+
+    /**
+     * Gère la fermeture du mega menu
+     */
+    const handleMegaMenuClose = () => {
+        setMegaMenuOpen(false);
+    };
+
+    /**
+     * Ouvre le sidebar des catégories
+     */
+    const handleOpenSidebar = (categorySlug = null) => {
+        setSelectedCategory(categorySlug);
+        setSidebarOpen(true);
+        setMegaMenuOpen(false);
+        setMobileMenuOpen(false);
+    };
+
+    /**
+     * Ferme le sidebar des catégories
+     */
+    const handleCloseSidebar = () => {
+        setSidebarOpen(false);
+        setSelectedCategory(null);
     };
 
     /**
@@ -226,34 +284,29 @@ export default function Header() {
         return languageNames[lang] || lang;
     };
 
+    // Obtenir la langue et devise actuelles pour l'affichage
+    const getCurrentLanguage = () => {
+        const lang = i18n.language;
+        if (lang === 'fr') return 'FR';
+        if (lang === 'en') return 'EN';
+        return lang.toUpperCase();
+    };
+
+    const getCurrentCurrency = () => {
+        if (devise === 'XOF' || devise === 'XAF') return 'CFA';
+        if (devise === 'EUR') return '€';
+        if (devise === 'USD') return '$';
+        return devise;
+    };
+
     // Rendu du composant
     return (
         <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
-            {/* Barre supérieure */}
-            <div className="top-bar">
-                <div className="container">
-                    <div className="top-bar-content">
-                        <span>{t('header.delivery')}</span>
-                        <div className="top-links">
-                            <Link to="/contact" onClick={closeMobile}>
-                                {t('header.contact')}
-                            </Link>
-                            <Link to="/faq" onClick={closeMobile}>
-                                {t('header.faq')}
-                            </Link>
-                            <Link to="/blog" onClick={closeMobile}>
-                                {t('header.blog')}
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Navigation principale */}
+            {/* Navigation principale - PREMIÈRE LIGNE */}
             <nav className="main-nav">
                 <div className="container">
                     <div className="nav-content">
-                        {/* Logo et bouton de menu mobile */}
+                        {/* Logo - EXTRÊME GAUCHE */}
                         <div className="nav-brand">
                             <button
                                 className="mobile-toggle"
@@ -277,7 +330,7 @@ export default function Header() {
                             </Link>
                         </div>
 
-                        {/* Barre de recherche */}
+                        {/* Barre de recherche - CENTRE */}
                         <div className="search-container">
                             <form
                                 className="search-form"
@@ -291,6 +344,23 @@ export default function Header() {
                                         setSearchQuery(e.target.value)
                                     }
                                     ref={searchInputRef}
+                                    onFocus={e => {
+                                        e.target.style.background =
+                                            'rgba(255, 255, 255, 0.15)';
+                                        e.target.style.border =
+                                            '2px solid #3498db';
+                                    }}
+                                    onBlur={e => {
+                                        e.target.style.background =
+                                            'rgba(255, 255, 255, 0.08)';
+                                        e.target.style.border =
+                                            '2px solid transparent';
+                                    }}
+                                    style={{
+                                        background: 'rgba(255, 255, 255, 0.08)',
+                                        border: '2px solid transparent',
+                                        transition: 'all 0.3s ease',
+                                    }}
                                 />
                                 <button type="submit" aria-label="Rechercher">
                                     <FontAwesomeIcon icon={faSearch} />
@@ -319,278 +389,149 @@ export default function Header() {
                             )}
                         </div>
 
-                        {/* Sélecteur de configuration (devise et langue) pour desktop */}
-                        <div className="desktop-config" ref={configDropdownRef}>
-                            <div className="config-dropdown">
-                                <button
-                                    className="config-toggle"
-                                    onClick={toggleConfigDropdown}
-                                    aria-label="Paramètres de langue et devise"
-                                >
-                                    <FontAwesomeIcon
-                                        icon={faGlobe}
-                                        className="config-icon"
-                                    />
-                                    <span className="config-text">
-                                        {i18n.language.toUpperCase()} / {devise}
-                                    </span>
-                                    <FontAwesomeIcon
-                                        icon={faChevronDown}
-                                        className="chevron-icon"
-                                    />
-                                </button>
-                                {configDropdownOpen && (
-                                    <div className="config-dropdown-menu">
-                                        {/* Section pour la langue */}
-                                        <div className="config-section">
-                                            <h4 className="config-section-title">
-                                                <FontAwesomeIcon
-                                                    icon={faGlobe}
-                                                />
-                                                {t('Langue')}
-                                            </h4>
-                                            <div className="config-options">
-                                                {[
-                                                    {
-                                                        code: 'fr',
-                                                        name: 'Français',
-                                                        flag: '🇫🇷',
-                                                    },
-                                                    {
-                                                        code: 'en',
-                                                        name: 'English',
-                                                        flag: '🇺🇸',
-                                                    },
-                                                ].map(lang => (
-                                                    <button
-                                                        key={lang.code}
-                                                        className={`config-option ${i18n.language === lang.code ? 'active' : ''}`}
-                                                        onClick={() =>
-                                                            handleLangChange(
-                                                                lang.code
-                                                            )
-                                                        }
-                                                    >
-                                                        <span className="flag">
-                                                            {lang.flag}
-                                                        </span>
-                                                        <span className="option-text">
-                                                            {lang.name}
-                                                        </span>
-                                                        {i18n.language ===
-                                                            lang.code && (
-                                                            <FontAwesomeIcon
-                                                                icon={faCheck}
-                                                                className="check-icon"
-                                                            />
-                                                        )}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        {/* Séparateur */}
-                                        <div className="config-divider"></div>
-                                        {/* Section pour la devise */}
-                                        <div className="config-section">
-                                            <h4 className="config-section-title">
-                                                <FontAwesomeIcon
-                                                    icon={faMoneyBill}
-                                                />
-                                                {t('Devise')}
-                                            </h4>
-                                            <div className="config-options">
-                                                {[
-                                                    'XOF',
-                                                    'XAF',
-                                                    'EUR',
-                                                    'USD',
-                                                ].map(currency => (
-                                                    <button
-                                                        key={currency}
-                                                        className={`config-option ${devise === currency ? 'active' : ''}`}
-                                                        onClick={() =>
-                                                            handleDeviseChange(
-                                                                currency
-                                                            )
-                                                        }
-                                                    >
-                                                        <span className="currency-symbol">
-                                                            {currency ===
-                                                                'XOF' ||
-                                                            currency === 'XAF'
-                                                                ? 'CFA'
-                                                                : currency ===
-                                                                    'EUR'
-                                                                    ? '€'
-                                                                    : currency ===
-                                                                        'USD'
-                                                                    ? '$'
-                                                                    : currency}
-                                                        </span>
-                                                        <span className="option-text">
-                                                            {getCurrencyName(
-                                                                currency
-                                                            )}
-                                                        </span>
-                                                        {devise ===
-                                                            currency && (
-                                                            <FontAwesomeIcon
-                                                                icon={faCheck}
-                                                                className="check-icon"
-                                                            />
-                                                        )}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Menu mobile */}
-                        <div
-                            className={`nav-menu ${mobileMenuOpen ? 'open' : ''}`}
-                        >
-                            {/* Configuration pour mobile */}
-                            <div className="mobile-config">
-                                <div className="config-section">
-                                    <h4 className="config-section-title">
-                                        <FontAwesomeIcon icon={faGlobe} />
-                                        {t('header.language')}
-                                    </h4>
-                                    <div className="config-options">
-                                        {[
-                                            {
-                                                code: 'fr',
-                                                name: 'Français',
-                                                flag: '🇫🇷',
-                                            },
-                                            {
-                                                code: 'en',
-                                                name: 'English',
-                                                flag: '🇺🇸',
-                                            },
-                                        ].map(lang => (
-                                            <button
-                                                key={lang.code}
-                                                className={`config-option ${i18n.language === lang.code ? 'active' : ''}`}
-                                                onClick={() =>
-                                                    handleLangChange(lang.code)
-                                                }
-                                            >
-                                                <span className="flag">
-                                                    {lang.flag}
-                                                </span>
-                                                <span className="option-text">
-                                                    {lang.name}
-                                                </span>
-                                                {i18n.language ===
-                                                    lang.code && (
-                                                    <FontAwesomeIcon
-                                                        icon={faCheck}
-                                                        className="check-icon"
-                                                    />
-                                                )}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                                <div className="config-divider"></div>
-                                <div className="config-section">
-                                    <h4 className="config-section-title">
-                                        <FontAwesomeIcon icon={faMoneyBill} />
-                                        {t('header.currency')}
-                                    </h4>
-                                    <div className="config-options">
-                                        {['XOF', 'XAF', 'EUR', 'USD'].map(
-                                            currency => (
-                                                <button
-                                                    key={currency}
-                                                    className={`config-option ${devise === currency ? 'active' : ''}`}
-                                                    onClick={() =>
-                                                        handleDeviseChange(
-                                                            currency
-                                                        )
-                                                    }
-                                                >
-                                                    <span className="currency-symbol">
-                                                        {currency === 'XOF' ||
-                                                        currency === 'XAF'
-                                                            ? 'CFA'
-                                                            : currency === 'EUR'
-                                                                ? '€'
-                                                                : currency ===
-                                                                    'USD'
-                                                                ? '$'
-                                                                : currency}
-                                                    </span>
-                                                    <span className="option-text">
-                                                        {getCurrencyName(
-                                                            currency
-                                                        )}
-                                                    </span>
-                                                    {devise === currency && (
-                                                        <FontAwesomeIcon
-                                                            icon={faCheck}
-                                                            className="check-icon"
-                                                        />
-                                                    )}
-                                                </button>
-                                            )
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Liens de navigation */}
-                            <ul className="nav-links">
-                                <li className="nav-item">
-                                    <Link
-                                        to="/produits"
-                                        className="nav-link"
-                                        onClick={closeMobile}
-                                    >
-                                        <FontAwesomeIcon icon={faTags} />
-                                        {t('header.products')}
-                                    </Link>
-                                </li>
-                                <li className="nav-item">
-                                    <Link
-                                        to="/panier"
-                                        className="nav-link"
-                                        onClick={closeMobile}
+                        {/* Actions de droite - EXTRÊME DROITE */}
+                        <div className="header-actions">
+                            {/* Sélecteur de configuration (devise et langue) */}
+                            <div
+                                className="desktop-config"
+                                ref={configDropdownRef}
+                            >
+                                <div className="config-dropdown">
+                                    <button
+                                        className="config-toggle"
+                                        onClick={toggleConfigDropdown}
+                                        aria-label="Paramètres de langue et devise"
                                     >
                                         <FontAwesomeIcon
-                                            icon={faShoppingCart}
+                                            icon={faGlobe}
+                                            className="config-icon"
                                         />
-                                        {t('header.cart')}
-                                        {cartCount > 0 && (
-                                            <span className="cart-badge">
-                                                {cartCount}
-                                            </span>
-                                        )}
-                                    </Link>
-                                </li>
-                                <li className="nav-item">
-                                    <Link
-                                        to="/categories"
-                                        className="nav-link"
-                                        onClick={closeMobile}
-                                    >
-                                        <FontAwesomeIcon icon={faList} />
-                                        {t('header.categories')}
-                                    </Link>
-                                </li>
-                            </ul>
+                                        <span className="config-text">
+                                            {getCurrentLanguage()} /{' '}
+                                            {getCurrentCurrency()}
+                                        </span>
+                                    </button>
+                                    {configDropdownOpen && (
+                                        <div className="config-dropdown-menu">
+                                            {/* Section pour la langue */}
+                                            <div className="config-section">
+                                                <h4 className="config-section-title">
+                                                    <FontAwesomeIcon
+                                                        icon={faGlobe}
+                                                    />
+                                                    {t('Langue')}
+                                                </h4>
+                                                <div className="config-options">
+                                                    {[
+                                                        {
+                                                            code: 'fr',
+                                                            name: 'Français',
+                                                            flag: '🇫🇷',
+                                                        },
+                                                        {
+                                                            code: 'en',
+                                                            name: 'English',
+                                                            flag: '🇺🇸',
+                                                        },
+                                                    ].map(lang => (
+                                                        <button
+                                                            key={lang.code}
+                                                            className={`config-option ${i18n.language === lang.code ? 'active' : ''}`}
+                                                            onClick={() =>
+                                                                handleLangChange(
+                                                                    lang.code
+                                                                )
+                                                            }
+                                                        >
+                                                            <span className="flag">
+                                                                {lang.flag}
+                                                            </span>
+                                                            <span className="option-text">
+                                                                {lang.name}
+                                                            </span>
+                                                            {i18n.language ===
+                                                                lang.code && (
+                                                                <FontAwesomeIcon
+                                                                    icon={
+                                                                        faCheck
+                                                                    }
+                                                                    className="check-icon"
+                                                                />
+                                                            )}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            {/* Séparateur */}
+                                            <div className="config-divider"></div>
+                                            {/* Section pour la devise */}
+                                            <div className="config-section">
+                                                <h4 className="config-section-title">
+                                                    <FontAwesomeIcon
+                                                        icon={faMoneyBill}
+                                                    />
+                                                    {t('Devise')}
+                                                </h4>
+                                                <div className="config-options">
+                                                    {[
+                                                        'XOF',
+                                                        'XAF',
+                                                        'EUR',
+                                                        'USD',
+                                                    ].map(currency => (
+                                                        <button
+                                                            key={currency}
+                                                            className={`config-option ${devise === currency ? 'active' : ''}`}
+                                                            onClick={() =>
+                                                                handleDeviseChange(
+                                                                    currency
+                                                                )
+                                                            }
+                                                        >
+                                                            <span className="currency-symbol">
+                                                                {currency ===
+                                                                    'XOF' ||
+                                                                currency ===
+                                                                    'XAF'
+                                                                    ? 'CFA'
+                                                                    : currency ===
+                                                                        'EUR'
+                                                                      ? '€'
+                                                                      : currency ===
+                                                                          'USD'
+                                                                        ? '$'
+                                                                        : currency}
+                                                            </span>
+                                                            <span className="option-text">
+                                                                {getCurrencyName(
+                                                                    currency
+                                                                )}
+                                                            </span>
+                                                            {devise ===
+                                                                currency && (
+                                                                <FontAwesomeIcon
+                                                                    icon={
+                                                                        faCheck
+                                                                    }
+                                                                    className="check-icon"
+                                                                />
+                                                            )}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
 
-                            {/* Actions utilisateur */}
-                            <div className="user-actions">
+                            {/* Lien Connexion/Profil OU Inscription */}
+                            <div className="user-actions-desktop">
                                 {user?.isAdmin ? (
                                     <>
                                         <Link
                                             to="/admin"
-                                            className="nav-link"
+                                            className="header-action-link"
                                             onClick={closeMobile}
                                         >
                                             <FontAwesomeIcon
@@ -599,7 +540,7 @@ export default function Header() {
                                             {t('header.admin')}
                                         </Link>
                                         <button
-                                            className="nav-link"
+                                            className="header-action-link"
                                             onClick={handleLogout}
                                         >
                                             <FontAwesomeIcon
@@ -609,62 +550,306 @@ export default function Header() {
                                         </button>
                                     </>
                                 ) : user ? (
-                                    <div className="user-dropdown dropdown">
-                                        <button className="dropdown-toggle">
-                                            <FontAwesomeIcon
-                                                icon={faUserCircle}
-                                            />
-                                            <span className="user-name">
-                                                {user.name ||
-                                                    t('header.my_account')}
-                                            </span>
-                                        </button>
-                                        <div className="dropdown-menu">
-                                            <Link
-                                                to="/profil"
-                                                className="dropdown-item"
-                                                onClick={closeMobile}
-                                            >
-                                                <FontAwesomeIcon
-                                                    icon={faUser}
-                                                />
-                                                {t('header.profile')}
-                                            </Link>
-                                            <Link
-                                                to="/mes-commandes"
-                                                className="dropdown-item"
-                                                onClick={closeMobile}
-                                            >
-                                                <FontAwesomeIcon icon={faBox} />
-                                                {t('header.orders')}
-                                            </Link>
-                                            <div className="dropdown-divider"></div>
-                                            <button
-                                                className="dropdown-item"
-                                                onClick={handleLogout}
-                                            >
-                                                <FontAwesomeIcon
-                                                    icon={faSignOutAlt}
-                                                />
-                                                {t('header.logout')}
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
                                     <Link
-                                        to="/connexion"
-                                        className="login-btn"
+                                        to="/profil"
+                                        className="header-action-link user-profile-link"
                                         onClick={closeMobile}
                                     >
-                                        <FontAwesomeIcon icon={faSignInAlt} />
-                                        {t('header.login')}
+                                        <FontAwesomeIcon icon={faUserCircle} />
+                                        <span className="user-name">
+                                            {user.prenom ||
+                                                user.nom ||
+                                                t('header.my_account')}
+                                        </span>
                                     </Link>
+                                ) : (
+                                    <>
+                                        <Link
+                                            to="/connexion"
+                                            className="header-action-link"
+                                            onClick={closeMobile}
+                                        >
+                                            <FontAwesomeIcon
+                                                icon={faSignInAlt}
+                                            />
+                                            Connexion
+                                        </Link>
+                                        <Link
+                                            to="/inscription"
+                                            className="header-action-link"
+                                            onClick={closeMobile}
+                                        >
+                                            <FontAwesomeIcon
+                                                icon={faUserPlus}
+                                            />
+                                            Inscription
+                                        </Link>
+                                    </>
                                 )}
                             </div>
+
+                            {/* Lien Panier */}
+                            <Link
+                                to="/panier"
+                                className="header-action-link cart-link"
+                                onClick={closeMobile}
+                            >
+                                <FontAwesomeIcon icon={faShoppingCart} />
+                                Panier
+                                {cartCount > 0 && (
+                                    <span className="cart-badge">
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </Link>
                         </div>
                     </div>
                 </div>
             </nav>
+
+            {/* Navigation secondaire - DEUXIÈME LIGNE */}
+            <nav className="secondary-nav">
+                <div className="container">
+                    <div className="secondary-nav-content">
+                        {/* Bouton Toutes les catégories - EXTRÊME GAUCHE */}
+                        <div className="categories-dropdown" ref={megaMenuRef}>
+                            <button
+                                className="categories-button"
+                                onClick={handleMegaMenuToggle}
+                                onMouseEnter={handleMegaMenuEnter}
+                            >
+                                <FontAwesomeIcon icon={faBars} />
+                                Toutes les catégories
+                            </button>
+
+                            {/* Mega Menu */}
+                            <CategoriesMegaMenu
+                                isOpen={megaMenuOpen}
+                                onClose={handleMegaMenuClose}
+                            />
+                        </div>
+
+                        {/* Liens de navigation principaux - EXTRÊME DROITE */}
+                        <ul className="main-links">
+                            <li>
+                                <Link
+                                    to="/"
+                                    className="main-link"
+                                    onClick={closeMobile}
+                                >
+                                    <FontAwesomeIcon icon={faHome} />
+                                    Accueil
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/boutique"
+                                    className="main-link"
+                                    onClick={closeMobile}
+                                >
+                                    <FontAwesomeIcon icon={faShoppingBag} />
+                                    Boutique
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/nouveautes"
+                                    className="main-link"
+                                    onClick={closeMobile}
+                                >
+                                    <FontAwesomeIcon icon={faStar} />
+                                    Nouveautés
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            {/* Menu mobile */}
+            <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+                {/* Configuration pour mobile */}
+                <div className="mobile-config">
+                    <div className="config-section">
+                        <h4 className="config-section-title">
+                            <FontAwesomeIcon icon={faGlobe} />
+                            {t('header.language')}
+                        </h4>
+                        <div className="config-options">
+                            {[
+                                {
+                                    code: 'fr',
+                                    name: 'Français',
+                                    flag: '🇫🇷',
+                                },
+                                {
+                                    code: 'en',
+                                    name: 'English',
+                                    flag: '🇺🇸',
+                                },
+                            ].map(lang => (
+                                <button
+                                    key={lang.code}
+                                    className={`config-option ${i18n.language === lang.code ? 'active' : ''}`}
+                                    onClick={() => handleLangChange(lang.code)}
+                                >
+                                    <span className="flag">{lang.flag}</span>
+                                    <span className="option-text">
+                                        {lang.name}
+                                    </span>
+                                    {i18n.language === lang.code && (
+                                        <FontAwesomeIcon
+                                            icon={faCheck}
+                                            className="check-icon"
+                                        />
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="config-divider"></div>
+                    <div className="config-section">
+                        <h4 className="config-section-title">
+                            <FontAwesomeIcon icon={faMoneyBill} />
+                            {t('header.currency')}
+                        </h4>
+                        <div className="config-options">
+                            {['XOF', 'XAF', 'EUR', 'USD'].map(currency => (
+                                <button
+                                    key={currency}
+                                    className={`config-option ${devise === currency ? 'active' : ''}`}
+                                    onClick={() => handleDeviseChange(currency)}
+                                >
+                                    <span className="currency-symbol">
+                                        {currency === 'XOF' ||
+                                        currency === 'XAF'
+                                            ? 'CFA'
+                                            : currency === 'EUR'
+                                              ? '€'
+                                              : currency === 'USD'
+                                                ? '$'
+                                                : currency}
+                                    </span>
+                                    <span className="option-text">
+                                        {getCurrencyName(currency)}
+                                    </span>
+                                    {devise === currency && (
+                                        <FontAwesomeIcon
+                                            icon={faCheck}
+                                            className="check-icon"
+                                        />
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Liens de navigation pour mobile */}
+                <ul className="mobile-nav-links">
+                    <li>
+                        <button
+                            className="mobile-nav-link"
+                            onClick={() => handleOpenSidebar()}
+                        >
+                            <FontAwesomeIcon icon={faList} />
+                            Catégories
+                        </button>
+                    </li>
+                    <li>
+                        <Link
+                            to="/"
+                            className="mobile-nav-link"
+                            onClick={closeMobile}
+                        >
+                            <FontAwesomeIcon icon={faHome} />
+                            Accueil
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            to="/boutique"
+                            className="mobile-nav-link"
+                            onClick={closeMobile}
+                        >
+                            <FontAwesomeIcon icon={faShoppingBag} />
+                            Boutique
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            to="/nouveautes"
+                            className="mobile-nav-link"
+                            onClick={closeMobile}
+                        >
+                            <FontAwesomeIcon icon={faStar} />
+                            Nouveautés
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            to="/panier"
+                            className="mobile-nav-link"
+                            onClick={closeMobile}
+                        >
+                            <FontAwesomeIcon icon={faShoppingCart} />
+                            Panier
+                            {cartCount > 0 && (
+                                <span className="cart-badge">{cartCount}</span>
+                            )}
+                        </Link>
+                    </li>
+                </ul>
+
+                {/* Actions utilisateur */}
+                <div className="user-actions">
+                    {user?.isAdmin ? (
+                        <>
+                            <Link
+                                to="/admin"
+                                className="nav-link"
+                                onClick={closeMobile}
+                            >
+                                <FontAwesomeIcon icon={faUserShield} />
+                                {t('header.admin')}
+                            </Link>
+                            <button className="nav-link" onClick={handleLogout}>
+                                <FontAwesomeIcon icon={faSignOutAlt} />
+                                {t('header.logout')}
+                            </button>
+                        </>
+                    ) : user ? (
+                        <Link
+                            to="/profil"
+                            className="nav-link user-profile-link"
+                            onClick={closeMobile}
+                        >
+                            <FontAwesomeIcon icon={faUserCircle} />
+                            <span className="user-name">
+                                {user.prenom ||
+                                    user.nom ||
+                                    t('header.my_account')}
+                            </span>
+                        </Link>
+                    ) : (
+                        <Link
+                            to="/connexion"
+                            className="login-btn"
+                            onClick={closeMobile}
+                        >
+                            <FontAwesomeIcon icon={faSignInAlt} />
+                            {t('header.login')}
+                        </Link>
+                    )}
+                </div>
+            </div>
+
+            {/* Sidebar des catégories */}
+            <CategoriesSidebar
+                isOpen={sidebarOpen}
+                onClose={handleCloseSidebar}
+                categorySlug={selectedCategory}
+            />
         </header>
     );
 }

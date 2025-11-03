@@ -5,26 +5,24 @@ import bcrypt from 'bcryptjs';
 // Définition du schéma pour les utilisateurs
 const utilisateurSchema = new mongoose.Schema(
     {
+        nom: {
+            type: String,
+            required: [true, 'Le nom est requis'],
+            trim: true,
+            maxlength: [50, 'Le nom ne peut pas dépasser 50 caractères'],
+        },
         prenom: {
             type: String,
             required: [true, 'Le prénom est requis'],
             trim: true,
             maxlength: [50, 'Le prénom ne peut pas dépasser 50 caractères'],
         },
-        nom: {
-            type: String,
-            required: [true, 'Le nom de famille est requis'],
-            trim: true,
-            maxlength: [
-                50,
-                'Le nom de famille ne peut pas dépasser 50 caractères',
-            ],
-        },
         email: {
             type: String,
             required: [true, "L'email est requis"],
             lowercase: true,
             trim: true,
+            unique: true,
             match: [
                 /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
                 'Veuillez entrer un email valide',
@@ -42,10 +40,19 @@ const utilisateurSchema = new mongoose.Schema(
         telephone: {
             type: String,
             trim: true,
-            match: [
-                /^\+?[1-9]\d{1,14}$/,
-                'Veuillez entrer un numéro de téléphone valide',
-            ],
+            validate: {
+                validator: function (v) {
+                    if (!v) return true; // Téléphone optionnel
+                    return /^\+\d{1,15}$/.test(v);
+                },
+                message:
+                    'Le format du téléphone doit être E.164 (ex: +221771234567)',
+            },
+        },
+        genre: {
+            type: String,
+            enum: ['Homme', 'Femme'],
+            required: [true, 'Le genre est requis'],
         },
         avatar: {
             type: String,
@@ -58,11 +65,6 @@ const utilisateurSchema = new mongoose.Schema(
         },
         dateNaissance: {
             type: Date,
-        },
-        genre: {
-            type: String,
-            enum: ['homme', 'femme'],
-            default: '',
         },
         adresses: [
             {
@@ -195,7 +197,7 @@ const utilisateurSchema = new mongoose.Schema(
 utilisateurSchema.index({ email: 1 });
 utilisateurSchema.index({ role: 1 });
 utilisateurSchema.index({ 'adresses.pays': 1 });
-utilisateurSchema.index({ creeLe: -1 });
+utilisateurSchema.index({ createdAt: -1 });
 
 // Middleware pour hacher le mot de passe avant la sauvegarde
 utilisateurSchema.pre('save', async function (next) {
@@ -208,6 +210,15 @@ utilisateurSchema.pre('save', async function (next) {
     } catch (error) {
         next(error);
     }
+});
+
+// Middleware pour nettoyer le téléphone avant sauvegarde
+utilisateurSchema.pre('save', function (next) {
+    if (this.telephone && this.isModified('telephone')) {
+        // Nettoyer le téléphone : retirer espaces, tirets, etc.
+        this.telephone = this.telephone.replace(/[\s\-\(\)\.]/g, '');
+    }
+    next();
 });
 
 // Méthode pour comparer les mots de passe
@@ -226,7 +237,7 @@ utilisateurSchema.methods.incrementerNombreConnexions = function () {
 
 // Virtual pour le nom complet
 utilisateurSchema.virtual('nomComplet').get(function () {
-    return `${this.prenom} ${this.nom}`;
+    return `${this.nom} ${this.prenom}`;
 });
 
 // Création du modèle Utilisateur

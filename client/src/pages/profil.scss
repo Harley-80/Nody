@@ -1,0 +1,692 @@
+@use 'sass:color';
+
+// VARIABLES ET MIXINS
+$primary-color: #2c3e50;
+$secondary-color: #e74c3c;
+$accent-color: #3498db;
+$success-color: #27ae60;
+$warning-color: #f39c12;
+$danger-color: #e74c3c;
+$light-color: #ecf0f1;
+$dark-color: #2c3e50;
+$text-color: #333;
+$text-muted: #6c757d;
+$border-color: #e9ecef;
+$background-light: #f8f9fa;
+$shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+$shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+$border-radius: 12px;
+$transition: all 0.3s ease;
+
+// Couleurs fixes pour remplacer darken/lighten
+$primary-dark: #1a252f;
+$accent-light: #4fa3e3;
+$accent-dark: #2980b9;
+$success-dark: #219653;
+$warning-dark: #e67e22;
+$danger-dark: #c0392b;
+$text-muted-dark: #5a6268;
+
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@mixin card-style {
+    background: white;
+    border-radius: $border-radius;
+    box-shadow: $shadow;
+    border: 1px solid $border-color;
+    transition: $transition;
+    
+    &:hover {
+        box-shadow: $shadow-hover;
+        transform: translateY(-2px);
+    }
+}
+
+@mixin gradient-bg {
+    background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+}
+
+@mixin badge-style($color, $dark-color) {
+    background: linear-gradient(135deg, $color 0%, $dark-color 100%);
+    color: white;
+    border: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+
+// STYLES GÉNÉRAUX DE LA PAGE PROFIL
+.profil-page {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.container.py-5 {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+// EN-TÊTE DU PROFIL
+.profil-header {
+    margin-bottom: 3rem;
+    
+    .welcome-section {
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: $dark-color;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, $primary-color, $accent-color);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .text-muted {
+            font-size: 1.1rem;
+            color: $text-muted;
+            margin-bottom: 2rem;
+        }
+    }
+    
+    .info-card {
+        @include card-style;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+        
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, $accent-color, $primary-color);
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: $primary-color;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            
+            &::before {
+                content: '👤';
+                font-size: 1.2rem;
+            }
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            
+            strong {
+                color: $dark-color;
+                min-width: 140px;
+            }
+            
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+    
+    .actions-section {
+        .d-grid {
+            gap: 1rem;
+            
+            .btn {
+                padding: 1rem 1.5rem;
+                border-radius: $border-radius;
+                font-weight: 600;
+                font-size: 1rem;
+                transition: $transition;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                border: 2px solid transparent;
+                
+                &.btn-outline-primary {
+                    border-color: $accent-color;
+                    color: $accent-color;
+                    
+                    &:hover {
+                        background: $accent-color;
+                        color: white;
+                        transform: translateY(-2px);
+                    }
+                }
+                
+                &.btn-outline-secondary {
+                    border-color: $text-muted;
+                    color: $text-muted;
+                    
+                    &:hover {
+                        background: $text-muted;
+                        color: white;
+                        transform: translateY(-2px);
+                    }
+                }
+                
+                &.btn-outline-danger {
+                    border-color: $danger-color;
+                    color: $danger-color;
+                    
+                    &:hover {
+                        background: $danger-color;
+                        color: white;
+                        transform: translateY(-2px);
+                    }
+                }
+            }
+        }
+    }
+}
+
+// SECTION HISTORIQUE DES COMMANDES
+.commandes-section {
+    h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: $dark-color;
+        margin-bottom: 2rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+        
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, $accent-color, $primary-color);
+            border-radius: 2px;
+        }
+    }
+}
+
+// ÉTAT VIDE DES COMMANDES
+.empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+    @include card-style;
+    
+    .empty-icon {
+        font-size: 4rem;
+        color: $text-muted;
+        margin-bottom: 1.5rem;
+        opacity: 0.7;
+    }
+    
+    h5 {
+        font-size: 1.5rem;
+        color: $text-muted;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    p {
+        color: $text-muted;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+    }
+    
+    .btn {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: $border-radius;
+        background: linear-gradient(135deg, $accent-color, $primary-color);
+        border: none;
+        color: white;
+        transition: $transition;
+        
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: $shadow-hover;
+        }
+    }
+}
+
+// ACCORDÉON DES COMMANDES
+.accordion {
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    
+    .accordion-item {
+        @include card-style;
+        border: none;
+        overflow: hidden;
+        
+        &:hover {
+            transform: translateY(-2px);
+        }
+        
+        .accordion-header {
+            .accordion-button {
+                background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+                border: none;
+                padding: 1.5rem;
+                font-weight: 600;
+                color: $dark-color;
+                transition: $transition;
+                
+                &:not(.collapsed) {
+                    background: linear-gradient(135deg, $accent-color, $accent-light);
+                    color: white;
+                    
+                    .badge {
+                        background: rgba(white, 0.2) !important;
+                        color: white;
+                    }
+                }
+                
+                &::after {
+                    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%232c3e50'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+                }
+                
+                &:not(.collapsed)::after {
+                    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+                }
+                
+                .badge {
+                    @include badge-style($accent-color, $accent-dark);
+                    font-size: 0.9rem;
+                }
+            }
+        }
+        
+        .accordion-collapse {
+            .accordion-body {
+                padding: 2rem;
+                background: #fafbfc;
+                
+                .client-info {
+                    margin-bottom: 1.5rem;
+                    
+                    h6 {
+                        font-size: 1.1rem;
+                        font-weight: 600;
+                        color: $primary-color;
+                        margin-bottom: 1rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        
+                        &::before {
+                            content: '🚚';
+                        }
+                    }
+                    
+                    p {
+                        margin-bottom: 0.5rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        
+                        strong {
+                            min-width: 80px;
+                            color: $dark-color;
+                        }
+                    }
+                }
+                
+                hr {
+                    margin: 1.5rem 0;
+                    border-color: $border-color;
+                    opacity: 0.6;
+                }
+                
+                h6 {
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    color: $primary-color;
+                    margin-bottom: 1rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    
+                    &::before {
+                        content: '📦';
+                    }
+                }
+                
+                .list-group {
+                    .list-group-item {
+                        border: none;
+                        border-left: 3px solid $accent-color;
+                        margin-bottom: 0.5rem;
+                        border-radius: 8px;
+                        padding: 1rem;
+                        background: white;
+                        transition: $transition;
+                        
+                        &:hover {
+                            transform: translateX(5px);
+                            box-shadow: $shadow;
+                        }
+                        
+                        .badge {
+                            @include badge-style($text-muted, $text-muted-dark);
+                            font-size: 0.8rem;
+                        }
+                        
+                        small.text-muted {
+                            font-size: 0.9rem;
+                        }
+                    }
+                }
+                
+                .statut-commande {
+                    margin-top: 1.5rem;
+                    padding-top: 1rem;
+                    border-top: 1px solid $border-color;
+                    
+                    strong {
+                        color: $dark-color;
+                    }
+                    
+                    .badge {
+                        font-size: 0.9rem;
+                        padding: 0.5rem 1rem;
+                        
+                        &.bg-success {
+                            background: linear-gradient(135deg, $success-color, $success-dark) !important;
+                        }
+                        
+                        &.bg-warning {
+                            background: linear-gradient(135deg, $warning-color, $warning-dark) !important;
+                        }
+                        
+                        &.bg-danger {
+                            background: linear-gradient(135deg, $danger-color, $danger-dark) !important;
+                        }
+                        
+                        &.bg-secondary {
+                            background: linear-gradient(135deg, $text-muted, $text-muted-dark) !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// SECTION ACTIONS DU COMPTE
+.actions-compte {
+    margin-top: 3rem;
+    
+    .card {
+        border: none;
+        @include card-style;
+        
+        .card-header {
+            background: linear-gradient(135deg, $warning-color, $warning-dark);
+            color: white;
+            border: none;
+            padding: 1.5rem 2rem;
+            
+            h5 {
+                font-size: 1.3rem;
+                font-weight: 700;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                
+                &::before {
+                    content: '⚙️';
+                }
+            }
+        }
+        
+        .card-body {
+            padding: 2rem;
+            
+            .card-text {
+                font-size: 1.1rem;
+                color: $text-color;
+                margin-bottom: 1.5rem;
+                line-height: 1.6;
+            }
+            
+            .d-flex {
+                gap: 1rem;
+                flex-wrap: wrap;
+                
+                .btn {
+                    padding: 1rem 1.5rem;
+                    font-weight: 600;
+                    border-radius: $border-radius;
+                    transition: $transition;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    border: 2px solid transparent;
+                    
+                    &.btn-outline-warning {
+                        border-color: $warning-color;
+                        color: $warning-color;
+                        
+                        &:hover {
+                            background: $warning-color;
+                            color: white;
+                            transform: translateY(-2px);
+                        }
+                    }
+                    
+                    &.btn-outline-danger {
+                        border-color: $danger-color;
+                        color: $danger-color;
+                        
+                        &:hover {
+                            background: $danger-color;
+                            color: white;
+                            transform: translateY(-2px);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ANIMATIONS ET EFFETS
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+// LOADING STATE
+.loading-state {
+    padding: 4rem 2rem;
+    text-align: center;
+    
+    .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        border-width: 0.3em;
+        color: $accent-color;
+    }
+    
+    p {
+        margin-top: 1rem;
+        color: $text-muted;
+        font-size: 1.1rem;
+    }
+}
+
+// RESPONSIVE DESIGN
+@media (max-width: 768px) {
+    .profil-header {
+        .row {
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .welcome-section {
+            h2 {
+                font-size: 2rem;
+            }
+        }
+        
+        .info-card {
+            padding: 1.5rem;
+        }
+        
+        .actions-section {
+            .d-grid {
+                .btn {
+                    padding: 0.8rem 1rem;
+                    font-size: 0.9rem;
+                }
+            }
+        }
+    }
+    
+    .commandes-section {
+        h3 {
+            font-size: 1.5rem;
+        }
+    }
+    
+    .accordion {
+        .accordion-item {
+            .accordion-header {
+                .accordion-button {
+                    padding: 1rem;
+                    font-size: 0.9rem;
+                    
+                    .d-flex {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 0.5rem;
+                    }
+                }
+            }
+            
+            .accordion-collapse {
+                .accordion-body {
+                    padding: 1.5rem;
+                }
+            }
+        }
+    }
+    
+    .actions-compte {
+        .card {
+            .card-body {
+                padding: 1.5rem;
+                
+                .d-flex {
+                    flex-direction: column;
+                    
+                    .btn {
+                        width: 100%;
+                        justify-content: center;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    .profil-page {
+        padding: 1rem 0;
+    }
+    
+    .container.py-5 {
+        padding: 1rem !important;
+    }
+    
+    .empty-state {
+        padding: 2rem 1rem;
+        
+        .empty-icon {
+            font-size: 3rem;
+        }
+        
+        h5 {
+            font-size: 1.2rem;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+    }
+}
+
+// AMÉLIORATIONS VISUELLES
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+// EFFETS DE SURVOL AMÉLIORÉS
+.btn, .card, .list-group-item {
+    transition: $transition;
+    
+    &:hover {
+        transform: translateY(-2px);
+    }
+}
+
+// TYPOGRAPHIE AMÉLIORÉE
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+// COULEURS ET THÈME
+:root {
+    --primary-color: #{$primary-color};
+    --secondary-color: #{$secondary-color};
+    --accent-color: #{$accent-color};
+    --success-color: #{$success-color};
+    --warning-color: #{$warning-color};
+    --danger-color: #{$danger-color};
+}
