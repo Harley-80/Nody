@@ -130,3 +130,60 @@ Créer les services et utilitaires pour l'envoi d'emails, les paiements, et la g
 # (Étape 10) : Création du Seeder de Données
 
 Créer un seeder pour peupler la base de données avec des données initiales pour le développement et les différents tests.
+
+# (Étape 13) : Améliorations de l'Authentification et du Profil Utilisateur
+
+## Résumé des Améliorations Implémentées
+
+### 1. Ordre Nom/Prénom
+- **Changement** : Les champs de saisie sont maintenant dans l'ordre **Nom** puis **Prénom**
+- **Fichiers modifiés** :
+  - `src/pages/auth/inscription.jsx`
+  - `server/models/utilisateurModel.js`
+  - `server/controllers/authController.js`
+
+### 2. Gestion Avancée du Téléphone
+- **UX/Saisie** : Interface avec sélection de l'indicatif pays (menu déroulant + drapeaux)
+- **Pays prioritaires** : Sénégal, Côte d'Ivoire, Gabon, Cameroun, France, États-Unis
+- **Stockage** : Nettoyage (retirer espaces, tirets) et standardisation au format E.164
+- **Validation** : Expression régulière spécifique à chaque pays
+- **Nouveaux fichiers** :
+  - `src/constants/pays.js` - Liste des pays avec indicatifs et regex
+  - `src/utils/formatTelephone.js` - Utilitaires de formatage et validation
+  - `src/components/common/ChampTelephone.jsx` - Composant réutilisable
+  - `src/components/common/ChampTelephone.scss` - Styles du composant
+  - `server/utils/validationTelephone.js` - Validation côté serveur
+
+### 3. Gestion du Genre
+- **Visibilité** : Le genre est maintenant visible dans la base de données
+- **Valeurs** : Uniquement "Homme" ou "Femme"
+- **Validation** : Contrôle côté client et serveur
+- **Fichiers modifiés** :
+  - `src/pages/auth/inscription.jsx`
+  - `server/models/utilisateurModel.js`
+  - `server/controllers/authController.js`
+
+### 4. Confirmation du Mot de Passe
+- **Ajout** : Champ "Confirmer le mot de passe" dans l'inscription
+- **Validation** : Vérification que les mots de passe correspondent
+- **Fichier modifié** :
+  - `src/pages/auth/inscription.jsx`
+
+### 5. Amélioration des Messages de Connexion
+- **Durée** : Message "connexion réussie" prolongé (1.5 secondes)
+- **UX** : Redirection après un délai pour permettre la lecture du message
+- **Propreté** : Design cohérent avec le reste de l'application
+- **Fichier modifié** :
+  - `src/pages/auth/connexion.jsx`
+
+# (Étape 13) : Gestion des Rôles et Acteurs
+
+### Rôles Disponibles
+- **Administrateur** : Accès complet à la plateforme (code d'invitation requis)
+- **Modérateur** : Gestion du contenu et modération (code d'invitation requis)
+- **Vendeur** : Gestion des produits et ventes (inscription ouverte)
+- **Client** : Utilisateur standard pour les achats (inscription ouverte)
+
+### Endpoints d'Inscription par Rôle
+
+#### Inscription Standard (Client par défaut)

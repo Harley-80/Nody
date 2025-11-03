@@ -10,6 +10,12 @@ import {
     validerTelephone,
     nettoyerTelephone,
 } from '../utils/validationTelephone.js';
+// Importations pour la gestion des rôles
+import {
+    ROLES,
+    CONFIG_INSCRIPTION,
+    CODES_INVITATION,
+} from '../constants/roles.js';
 
 /**
  * Génère un token JWT pour un utilisateur
@@ -22,33 +28,143 @@ const genererToken = id => {
     });
 };
 
+// --- NOUVELLES FONCTIONS DE LOGIQUE D'INSCRIPTION PAR RÔLE ---
+
 /**
- * @desc    Inscription d'un utilisateur
+ * Valide l'inscription selon le rôle
+ * @param {Object} donnees - Données de la requête
+ * @param {string} role - Rôle de l'utilisateur
+ */
+const validerInscriptionParRole = (donnees, role) => {
+    const configRole = CONFIG_INSCRIPTION[role];
+
+    if (!configRole) {
+        throw new Error('Rôle invalide');
+    }
+
+    // 1. Vérifier les champs obligatoires
+    const champsManquants = configRole.champsObligatoires.filter(
+        champ => !donnees[champ]
+    );
+    if (champsManquants.length > 0) {
+        throw new Error(
+            `Champs obligatoires manquants: ${champsManquants.join(', ')}`
+        );
+    }
+
+    // 2. Vérification du code d'invitation pour les rôles restreints
+    if (configRole.codeInvitation && !donnees.codeInvitation) {
+        throw new Error("Code d'invitation requis pour ce rôle");
+    }
+
+    // 3. Validation spécifique du téléphone
+    if (configRole.validationTelephone && donnees.telephone) {
+        const validationTelephone = validerTelephone(donnees.telephone);
+        if (!validationTelephone.valide) {
+            throw new Error(validationTelephone.erreur);
+        }
+    }
+
+    return true;
+};
+
+/**
+ * Traiter l'inscription selon le rôle (ajout de données spécifiques, envoi d'emails staff)
+ * @param {Object} utilisateur - Instance Mongoose de l'utilisateur
+ * @param {string} role - Rôle de l'utilisateur
+ * @param {Object} donnees - Données supplémentaires (nomBoutique, etc.)
+ */
+const traiterInscriptionParRole = async (utilisateur, role, donnees) => {
+    const configRole = CONFIG_INSCRIPTION[role];
+
+    // Configuration spécifique selon le rôle
+    switch (role) {
+        case ROLES.VENDEUR:
+            utilisateur.boutique = {
+                nomBoutique:
+                    donnees.nomBoutique ||
+                    `${utilisateur.nom} ${utilisateur.prenom} Boutique`,
+                descriptionBoutique: donnees.descriptionBoutique || '',
+                siteWeb: donnees.siteWeb || '',
+            };
+            utilisateur.statutVerification = 'en_attente';
+            break;
+
+        case ROLES.ADMIN:
+        case ROLES.MODERATEUR:
+            utilisateur.statutVerification = 'en_attente';
+            // Logique d'approbation manuelle
+            try {
+                await envoyerEmail({
+                    a: config.adminEmail || 'admin@nody.sn',
+                    sujet: `Nouvelle demande d'inscription ${configRole.nom}`,
+                    modele: 'demande_inscription_admin',
+                    contexte: {
+                        nom: `${utilisateur.prenom} ${utilisateur.nom}`,
+                        email: utilisateur.email,
+                        role: configRole.nom,
+                        date: new Date().toLocaleDateString('fr-FR'),
+                    },
+                });
+            } catch (error) {
+                logger.error('Erreur envoi email notification admin:', error);
+            }
+            break;
+
+        case ROLES.CLIENT:
+            utilisateur.statutVerification = 'verifie';
+            break;
+    }
+
+    return utilisateur;
+};
+
+// --- CONTRÔLEURS MODIFIÉS OU AJOUTÉS ---
+
+/**
+ * @desc    Inscription d'un utilisateur avec gestion des rôles
  * @route   POST /api/auth/inscription
  * @access  Public
  */
 const inscription = asyncHandler(async (req, res) => {
-    const { nom, prenom, email, motDePasse, telephone, genre } = req.body;
+    const {
+        nom,
+        prenom,
+        email,
+        motDePasse,
+        telephone,
+        genre,
+        role,
+        codeInvitation,
+        ...autresDonnees
+    } = req.body;
 
-    // Validation des champs obligatoires
-    if (!nom || !prenom || !email || !motDePasse || !genre) {
+    // Déterminer le rôle (par défaut: client)
+    const roleInscription = role || ROLES.CLIENT;
+
+    try {
+        // Valider l'inscription selon le rôle
+        validerInscriptionParRole(
+            {
+                nom,
+                prenom,
+                email,
+                motDePasse,
+                telephone,
+                genre,
+                codeInvitation,
+            },
+            roleInscription
+        );
+    } catch (error) {
         res.status(400);
-        throw new Error('Tous les champs obligatoires doivent être remplis');
+        throw new Error(error.message);
     }
 
     // Validation du genre
     if (!['Homme', 'Femme'].includes(genre)) {
         res.status(400);
         throw new Error('Le genre doit être Homme ou Femme');
-    }
-
-    // Validation du téléphone
-    if (telephone) {
-        const validationTelephone = validerTelephone(telephone);
-        if (!validationTelephone.valide) {
-            res.status(400);
-            throw new Error(validationTelephone.erreur);
-        }
     }
 
     // Vérifier si l'utilisateur existe déjà
@@ -58,61 +174,138 @@ const inscription = asyncHandler(async (req, res) => {
         throw new Error('Un utilisateur avec cet email existe déjà');
     }
 
+    // Vérifier le code d'invitation pour les rôles restreints
+    if (CONFIG_INSCRIPTION[roleInscription].codeInvitation) {
+        const codeValide = CODES_INVITATION[roleInscription];
+        if (!codeValide || codeInvitation !== codeValide.code) {
+            res.status(400);
+            throw new Error("Code d'invitation invalide");
+        }
+    }
+
     // Nettoyer le téléphone
     const telephoneNettoye = telephone
         ? nettoyerTelephone(telephone)
         : undefined;
 
-    // Créer l'utilisateur
-    const utilisateur = await Utilisateur.create({
+    // Créer l'utilisateur de base
+    const utilisateur = new Utilisateur({
         nom,
         prenom,
         email,
         motDePasse,
         telephone: telephoneNettoye,
         genre,
+        role: roleInscription,
+        codeInvitation: codeInvitation || undefined,
     });
 
-    if (utilisateur) {
-        // Générer le token
-        const token = genererToken(utilisateur._id);
+    // Traiter l'inscription selon le rôle
+    await traiterInscriptionParRole(
+        utilisateur,
+        roleInscription,
+        autresDonnees
+    );
 
-        // Envoyer un email de vérification
-        try {
-            await envoyerEmail({
-                a: utilisateur.email,
-                sujet: 'Bienvenue sur Nody - Vérifiez votre email',
-                modele: 'bienvenue',
-                contexte: {
-                    nom: utilisateur.prenom,
-                    jetonVerification: utilisateur.jetonVerificationEmail,
-                },
-            });
-        } catch (error) {
-            logger.error('Erreur envoi email de bienvenue:', error);
+    // Sauvegarder l'utilisateur
+    await utilisateur.save();
+
+    // Générer le token
+    const token = genererToken(utilisateur._id);
+
+    // Envoyer un email de bienvenue selon le rôle
+    try {
+        const configRole = CONFIG_INSCRIPTION[roleInscription];
+        let modeleEmail = 'bienvenue';
+        let sujetEmail = 'Bienvenue sur Nody - Vérifiez votre email';
+
+        if (roleInscription === ROLES.VENDEUR) {
+            modeleEmail = 'bienvenue_vendeur';
+            sujetEmail = 'Bienvenue en tant que vendeur sur Nody';
+        } else if (
+            roleInscription === ROLES.ADMIN ||
+            roleInscription === ROLES.MODERATEUR
+        ) {
+            modeleEmail = 'bienvenue_staff';
+            sujetEmail = `Bienvenue en tant que ${configRole.nom} sur Nody`;
         }
 
-        res.status(201).json({
-            succes: true,
-            donnees: {
-                _id: utilisateur._id,
-                nom: utilisateur.nom,
-                prenom: utilisateur.prenom,
-                email: utilisateur.email,
-                telephone: utilisateur.telephone,
-                genre: utilisateur.genre,
-                role: utilisateur.role,
-                emailVerifie: utilisateur.emailVerifie,
-                token,
+        await envoyerEmail({
+            a: utilisateur.email,
+            sujet: sujetEmail,
+            modele: modeleEmail,
+            contexte: {
+                nom: utilisateur.prenom,
+                role: configRole.nom,
+                jetonVerification: utilisateur.jetonVerificationEmail,
             },
-            message:
-                'Inscription réussie. Un email de vérification a été envoyé.',
         });
-    } else {
-        res.status(400);
-        throw new Error('Données utilisateur invalides');
+    } catch (error) {
+        logger.error('Erreur envoi email de bienvenue:', error);
     }
+
+    res.status(201).json({
+        succes: true,
+        donnees: {
+            _id: utilisateur._id,
+            nom: utilisateur.nom,
+            prenom: utilisateur.prenom,
+            email: utilisateur.email,
+            telephone: utilisateur.telephone,
+            genre: utilisateur.genre,
+            role: utilisateur.role,
+            statutVerification: utilisateur.statutVerification,
+            emailVerifie: utilisateur.emailVerifie,
+            token,
+        },
+        message: `Inscription réussie en tant que ${CONFIG_INSCRIPTION[roleInscription].nom}.`,
+    });
 });
+
+/**
+ * @desc    Inscription spécifique pour vendeur
+ * @route   POST /api/auth/inscription/vendeur
+ * @access  Public
+ */
+const inscriptionVendeur = asyncHandler(async (req, res) => {
+    const { nomBoutique, descriptionBoutique, siteWeb, ...donneesUtilisateur } =
+        req.body;
+
+    // Forcer le rôle vendeur et ajouter les données spécifiques
+    req.body.role = ROLES.VENDEUR;
+    req.body = { ...req.body, nomBoutique, descriptionBoutique, siteWeb };
+
+    await inscription(req, res);
+});
+
+/**
+ * @desc    Inscription avec code d'invitation (Admin/Modérateur)
+ * @route   POST /api/auth/inscription/invitation
+ * @access  Public
+ */
+const inscriptionAvecInvitation = asyncHandler(async (req, res) => {
+    const { codeInvitation, ...donneesUtilisateur } = req.body;
+
+    // Déterminer le rôle basé sur le code d'invitation
+    let role = ROLES.CLIENT;
+    Object.entries(CODES_INVITATION).forEach(([roleCode, configCode]) => {
+        if (configCode.code === codeInvitation) {
+            role = roleCode;
+        }
+    });
+
+    if (role === ROLES.CLIENT) {
+        res.status(400);
+        throw new Error("Code d'invitation invalide");
+    }
+
+    req.body.role = role;
+    req.body.codeInvitation = codeInvitation;
+
+    await inscription(req, res);
+});
+
+// --- CONTRÔLEURS EXISTANTS (AVEC AMÉLIORATIONS) ---
 
 /**
  * @desc    Connexion d'un utilisateur
@@ -133,6 +326,25 @@ const connexion = asyncHandler(async (req, res) => {
             throw new Error('Compte désactivé. Contactez le support.');
         }
 
+        // Vérifier si le compte est vérifié selon le rôle
+        if (
+            utilisateur.role === ROLES.VENDEUR &&
+            utilisateur.statutVerification !== 'verifie'
+        ) {
+            res.status(403);
+            throw new Error(
+                'Votre compte vendeur est en attente de vérification.'
+            );
+        }
+
+        if (
+            [ROLES.ADMIN, ROLES.MODERATEUR].includes(utilisateur.role) &&
+            utilisateur.statutVerification !== 'verifie'
+        ) {
+            res.status(403);
+            throw new Error("Votre compte est en attente d'approbation.");
+        }
+
         // Mettre à jour le compteur de connexions
         await utilisateur.incrementerNombreConnexions();
 
@@ -148,6 +360,7 @@ const connexion = asyncHandler(async (req, res) => {
                 telephone: utilisateur.telephone,
                 genre: utilisateur.genre,
                 role: utilisateur.role,
+                statutVerification: utilisateur.statutVerification,
                 emailVerifie: utilisateur.emailVerifie,
                 token,
             },
@@ -199,7 +412,8 @@ const obtenirMoi = asyncHandler(async (req, res) => {
  * @access  Private
  */
 const mettreAJourMoi = asyncHandler(async (req, res) => {
-    const { nom, prenom, telephone, dateNaissance, genre } = req.body;
+    const { nom, prenom, telephone, dateNaissance, genre, ...autresDonnees } =
+        req.body;
 
     // Validation du téléphone si fourni
     if (telephone) {
@@ -230,6 +444,14 @@ const mettreAJourMoi = asyncHandler(async (req, res) => {
     if (dateNaissance) champsAMettreAJour.dateNaissance = dateNaissance;
     if (genre) champsAMettreAJour.genre = genre;
 
+    // Mise à jour des données spécifiques aux vendeurs
+    if (req.utilisateur.role === ROLES.VENDEUR && autresDonnees.boutique) {
+        champsAMettreAJour.boutique = {
+            ...req.utilisateur.boutique,
+            ...autresDonnees.boutique,
+        };
+    }
+
     const utilisateur = await Utilisateur.findByIdAndUpdate(
         req.utilisateur._id,
         champsAMettreAJour,
@@ -253,7 +475,7 @@ const mettreAJourMoi = asyncHandler(async (req, res) => {
 
 /**
  * @desc    Changer le mot de passe de l'utilisateur connecté
- * @route   PUT /api/auth/changerMotDePasse
+ * @route   PUT /api/auth/changer-mot-de-passe
  * @access  Private
  */
 const changerMotDePasse = asyncHandler(async (req, res) => {
@@ -289,7 +511,7 @@ const changerMotDePasse = asyncHandler(async (req, res) => {
 
 /**
  * @desc    Demande de réinitialisation de mot de passe
- * @route   POST /api/auth/motDePasseOublie
+ * @route   POST /api/auth/mot-de-passe-oublie
  * @access  Public
  */
 const motDePasseOublie = asyncHandler(async (req, res) => {
@@ -320,7 +542,7 @@ const motDePasseOublie = asyncHandler(async (req, res) => {
     await utilisateur.save({ validateBeforeSave: false });
 
     // Créer l'URL de réinitialisation
-    const resetURL = `${req.protocol}://${req.get('host')}/api/auth/reinitialiserMotDePasse/${resetToken}`;
+    const resetURL = `${req.protocol}://${req.get('host')}/api/auth/reinitialiser-mot-de-passe/${resetToken}`;
 
     try {
         await envoyerEmail({
@@ -353,7 +575,7 @@ const motDePasseOublie = asyncHandler(async (req, res) => {
 
 /**
  * @desc    Réinitialisation du mot de passe avec le jeton
- * @route   PUT /api/auth/reinitialiserMotDePasse/:resetToken
+ * @route   PUT /api/auth/reinitialiser-mot-de-passe/:resetToken
  * @access  Public
  */
 const reinitialiserMotDePasse = asyncHandler(async (req, res) => {
@@ -400,7 +622,7 @@ const reinitialiserMotDePasse = asyncHandler(async (req, res) => {
 
 /**
  * @desc    Vérification d'email avec le jeton
- * @route   GET /api/auth/verifierEmail/:verificationToken
+ * @route   GET /api/auth/verifier-email/:verificationToken
  * @access  Public
  */
 const verifierEmail = asyncHandler(async (req, res) => {
@@ -428,7 +650,7 @@ const verifierEmail = asyncHandler(async (req, res) => {
 
 /**
  * @desc    Renvoyer l'email de vérification
- * @route   POST /api/auth/renvoyerVerification
+ * @route   POST /api/auth/renvoyer-verification
  * @access  Private
  */
 const renvoyerVerification = asyncHandler(async (req, res) => {
@@ -449,6 +671,9 @@ const renvoyerVerification = asyncHandler(async (req, res) => {
     utilisateur.jetonVerificationEmail = verificationToken;
     await utilisateur.save({ validateBeforeSave: false });
 
+    // Créer le lien de vérification
+    const lienVerification = `${req.protocol}://${req.get('host')}/api/auth/verifier-email/${verificationToken}`;
+
     try {
         await envoyerEmail({
             a: utilisateur.email,
@@ -456,7 +681,7 @@ const renvoyerVerification = asyncHandler(async (req, res) => {
             modele: 'verification_email',
             contexte: {
                 nom: utilisateur.prenom,
-                lienVerification: `${req.protocol}://${req.get('host')}/api/auth/verifierEmail/${verificationToken}`,
+                lienVerification: lienVerification,
             },
         });
 
@@ -474,6 +699,8 @@ const renvoyerVerification = asyncHandler(async (req, res) => {
 // Exportation des contrôleurs
 export {
     inscription,
+    inscriptionVendeur,
+    inscriptionAvecInvitation,
     connexion,
     deconnexion,
     obtenirMoi,

@@ -2,6 +2,8 @@
 import express from 'express';
 import {
     inscription,
+    inscriptionVendeur,
+    inscriptionAvecInvitation,
     connexion,
     deconnexion,
     obtenirMoi,
@@ -20,12 +22,31 @@ import {
 
 const routeur = express.Router();
 
+// Routes publiques
 /**
  * @route   POST /api/auth/inscription
- * @desc    Inscription d'un utilisateur
+ * @desc    Inscription d'un utilisateur (par défaut: client)
  * @access  Public
  */
 routeur.post('/inscription', validerInscription, inscription);
+
+/**
+ * @route   POST /api/auth/inscription/vendeur
+ * @desc    Inscription spécifique pour vendeur
+ * @access  Public
+ */
+routeur.post('/inscription/vendeur', validerInscription, inscriptionVendeur);
+
+/**
+ * @route   POST /api/auth/inscription/invitation
+ * @desc    Inscription avec code d'invitation (Admin/Modérateur)
+ * @access  Public
+ */
+routeur.post(
+    '/inscription/invitation',
+    validerInscription,
+    inscriptionAvecInvitation
+);
 
 /**
  * @route   POST /api/auth/connexion
@@ -33,34 +54,6 @@ routeur.post('/inscription', validerInscription, inscription);
  * @access  Public
  */
 routeur.post('/connexion', validerConnexion, connexion);
-
-/**
- * @route   POST /api/auth/deconnexion
- * @desc    Déconnexion d'un utilisateur
- * @access  Private
- */
-routeur.post('/deconnexion', proteger, deconnexion);
-
-/**
- * @route   GET /api/auth/moi
- * @desc    Récupérer le profil de l'utilisateur connecté
- * @access  Private
- */
-routeur.get('/moi', proteger, obtenirMoi);
-
-/**
- * @route   PUT /api/auth/moi
- * @desc    Mettre à jour le profil de l'utilisateur connecté
- * @access  Private
- */
-routeur.put('/moi', proteger, mettreAJourMoi);
-
-/**
- * @route   PUT /api/auth/changer-mot-de-passe
- * @desc    Changer le mot de passe de l'utilisateur connecté
- * @access  Private
- */
-routeur.put('/changer-mot-de-passe', proteger, changerMotDePasse);
 
 /**
  * @route   POST /api/auth/mot-de-passe-oublie
@@ -83,12 +76,43 @@ routeur.put('/reinitialiser-mot-de-passe/:token', reinitialiserMotDePasse);
  */
 routeur.get('/verifier-email/:token', verifierEmail);
 
+// Routes protégées
+routeur.use(proteger); // Toutes les routes suivantes nécessitent une authentification
+
+/**
+ * @route   POST /api/auth/deconnexion
+ * @desc    Déconnexion d'un utilisateur
+ * @access  Private
+ */
+routeur.post('/deconnexion', deconnexion);
+
+/**
+ * @route   GET /api/auth/moi
+ * @desc    Récupérer le profil de l'utilisateur connecté
+ * @access  Private
+ */
+routeur.get('/moi', obtenirMoi);
+
+/**
+ * @route   PUT /api/auth/moi
+ * @desc    Mettre à jour le profil de l'utilisateur connecté
+ * @access  Private
+ */
+routeur.put('/moi', mettreAJourMoi);
+
+/**
+ * @route   PUT /api/auth/changer-mot-de-passe
+ * @desc    Changer le mot de passe de l'utilisateur connecté
+ * @access  Private
+ */
+routeur.put('/changer-mot-de-passe', changerMotDePasse);
+
 /**
  * @route   POST /api/auth/renvoyer-verification
  * @desc    Renvoyer l'email de vérification
  * @access  Private
  */
-routeur.post('/renvoyer-verification', proteger, renvoyerVerification);
+routeur.post('/renvoyer-verification', renvoyerVerification);
 
 // Exportation du routeur
 export default routeur;

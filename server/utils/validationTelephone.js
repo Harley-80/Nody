@@ -1,43 +1,49 @@
-const PAYS_PRIORITAIRES = [
-    {
-        code: 'SN',
-        nom: 'Sénégal',
-        indicatif: '+221',
-        regex: /^(77|76|70|78)\d{7}$/,
-    },
-    {
-        code: 'CI',
-        nom: "Côte d'Ivoire",
-        indicatif: '+225',
-        regex: /^(07|05)\d{8}$/,
-    },
-    {
-        code: 'GA',
-        nom: 'Gabon',
-        indicatif: '+241',
-        regex: /^(0[67])\d{7}$/,
-    },
-    {
-        code: 'CM',
-        nom: 'Cameroun',
-        indicatif: '+237',
-        regex: /^(6[567]|2[23])\d{7,8}$/,
-    },
-    {
-        code: 'FR',
-        nom: 'France',
-        indicatif: '+33',
-        regex: /^[1-9]\d{8}$/,
-    },
-    {
-        code: 'US',
-        nom: 'États-Unis',
-        indicatif: '+1',
-        regex: /^\d{10}$/,
-    },
-];
+// Importation des constantes des pays
+import { PAYS_PRIORITAIRES, TOUS_LES_PAYS } from '../constants/pays.js';
 
-const validerTelephone = telephone => {
+/**
+ * Nettoie un numéro de téléphone en retirant les espaces, tirets, etc.
+ * @param {string} numero - Numéro de téléphone à nettoyer
+ * @returns {string} Numéro nettoyé
+ */
+export const nettoyerNumeroTelephone = numero => {
+    if (!numero) return '';
+    return numero.replace(/[\s\-\(\)\.]/g, '');
+};
+
+/**
+ * Formate un numéro au format E.164
+ * @param {string} indicatif - Indicatif du pays (ex: +221)
+ * @param {string} numero - Numéro de téléphone
+ * @returns {string} Numéro formaté E.164
+ */
+export const formaterE164 = (indicatif, numero) => {
+    const numeroNettoye = nettoyerNumeroTelephone(numero);
+    return `${indicatif}${numeroNettoye}`;
+};
+
+/**
+ * Valide un numéro de téléphone pour un pays spécifique
+ * @param {string} indicatif - Indicatif du pays
+ * @param {string} numero - Numéro de téléphone
+ * @returns {boolean} True si le numéro est valide
+ */
+export const validerNumeroPourPays = (indicatif, numero) => {
+    const pays = TOUS_LES_PAYS.find(p => p.indicatif === indicatif);
+    if (!pays) return false;
+
+    const numeroNettoye = nettoyerNumeroTelephone(numero);
+    const numeroSansIndicatif = numeroNettoye.replace(indicatif, '');
+
+    return pays.regex.test(numeroSansIndicatif);
+};
+
+/**
+ * Valide un numéro de téléphone complet (format E.164)
+ * @param {string} telephone - Numéro de téléphone au format E.164
+ * @returns {Object} Résultat de la validation
+ */
+export const validerTelephone = telephone => {
     if (!telephone) {
         return { valide: false, erreur: 'Le numéro de téléphone est requis' };
     }
@@ -67,13 +73,20 @@ const validerTelephone = telephone => {
     return { valide: true, pays: pays.nom };
 };
 
-const nettoyerTelephone = telephone => {
-    if (!telephone) return '';
-    return telephone.replace(/[\s\-\(\)\.]/g, '');
+/**
+ * Nettoie un numéro de téléphone (alias pour compatibilité)
+ * @param {string} telephone - Numéro de téléphone à nettoyer
+ * @returns {string} Numéro nettoyé
+ */
+export const nettoyerTelephone = telephone => {
+    return nettoyerNumeroTelephone(telephone);
 };
 
-module.exports = {
+// Export par défaut pour compatibilité
+export default {
     validerTelephone,
     nettoyerTelephone,
-    PAYS_PRIORITAIRES,
+    nettoyerNumeroTelephone,
+    formaterE164,
+    validerNumeroPourPays,
 };

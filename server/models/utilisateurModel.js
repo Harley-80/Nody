@@ -1,6 +1,7 @@
-// Importation de mongoose et bcrypt pour la gestion de la base de données et le hachage des mots de passe
+// Importation des modules nécessaires
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { ROLES } from '../constants/roles.js';
 
 // Définition du schéma pour les utilisateurs
 const utilisateurSchema = new mongoose.Schema(
@@ -54,14 +55,72 @@ const utilisateurSchema = new mongoose.Schema(
             enum: ['Homme', 'Femme'],
             required: [true, 'Le genre est requis'],
         },
+        role: {
+            type: String,
+            enum: Object.values(ROLES),
+            default: ROLES.CLIENT,
+            required: true,
+        },
+        statutVerification: {
+            type: String,
+            enum: ['en_attente', 'verifie', 'rejete', 'en_revision'],
+            default: 'en_attente',
+        },
+        dateVerification: {
+            type: Date,
+        },
+        raisonRejet: {
+            type: String,
+        },
+        // Champs spécifiques aux vendeurs
+        boutique: {
+            nomBoutique: String,
+            descriptionBoutique: String,
+            siteWeb: String,
+            logo: String,
+            banniere: String,
+            politiqueRetour: String,
+            conditionsVente: String,
+        },
+        // Documents de vérification (pour vendeurs et modérateurs)
+        documents: [
+            {
+                type: {
+                    type: String,
+                    enum: [
+                        'piece_identite',
+                        'justificatif_domicile',
+                        'registre_commerce',
+                        'autre',
+                    ],
+                },
+                url: String,
+                nomFichier: String,
+                dateUpload: {
+                    type: Date,
+                    default: Date.now,
+                },
+                statut: {
+                    type: String,
+                    enum: ['en_attente', 'approuve', 'rejete'],
+                    default: 'en_attente',
+                },
+            },
+        ],
+        // Informations de contact professionnel
+        contactProfessionnel: {
+            adresse: {
+                rue: String,
+                ville: String,
+                codePostal: String,
+                pays: String,
+            },
+            telephonePro: String,
+            emailPro: String,
+        },
         avatar: {
             type: String,
             default: '',
-        },
-        role: {
-            type: String,
-            enum: ['client', 'vendeur', 'admin', 'moderateur'],
-            default: 'client',
         },
         dateNaissance: {
             type: Date,
@@ -177,6 +236,16 @@ const utilisateurSchema = new mongoose.Schema(
         expirationJetonReinitialisationMotDePasse: Date,
         jetonVerificationEmail: String,
         expirationJetonVerificationEmail: Date,
+        // Champs pour l'invitation
+        codeInvitation: String,
+        invitePar: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Utilisateur',
+        },
+        dateInscription: {
+            type: Date,
+            default: Date.now,
+        },
     },
     {
         timestamps: true,
@@ -198,6 +267,7 @@ utilisateurSchema.index({ email: 1 });
 utilisateurSchema.index({ role: 1 });
 utilisateurSchema.index({ 'adresses.pays': 1 });
 utilisateurSchema.index({ createdAt: -1 });
+utilisateurSchema.index({ role: 1, statutVerification: 1 });
 
 // Middleware pour hacher le mot de passe avant la sauvegarde
 utilisateurSchema.pre('save', async function (next) {
@@ -215,7 +285,6 @@ utilisateurSchema.pre('save', async function (next) {
 // Middleware pour nettoyer le téléphone avant sauvegarde
 utilisateurSchema.pre('save', function (next) {
     if (this.telephone && this.isModified('telephone')) {
-        // Nettoyer le téléphone : retirer espaces, tirets, etc.
         this.telephone = this.telephone.replace(/[\s\-\(\)\.]/g, '');
     }
     next();
@@ -235,9 +304,36 @@ utilisateurSchema.methods.incrementerNombreConnexions = function () {
     return this.save();
 };
 
+// Méthode pour vérifier si l'utilisateur est vérifié selon son rôle
+utilisateurSchema.methods.estVerifie = function () {
+    if (this.role === ROLES.CLIENT) {
+        return this.emailVerifie;
+    } else {
+        return this.statutVerification === 'verifie' && this.emailVerifie;
+    }
+};
+
+// Méthode pour obtenir les permissions de l'utilisateur
+utilisateurSchema.methods.obtenirPermissions = function () {
+    const { PERMISSIONS } = require('../constants/roles');
+    return PERMISSIONS[this.role] || [];
+};
+
 // Virtual pour le nom complet
 utilisateurSchema.virtual('nomComplet').get(function () {
     return `${this.nom} ${this.prenom}`;
+});
+
+// Virtual pour le nom de la boutique (si vendeur)
+utilisateurSchema.virtual('nomBoutiqueAffichage').get(function () {
+    if (
+        this.role === ROLES.VENDEUR &&
+        this.boutique &&
+        this.boutique.nomBoutique
+    ) {
+        return this.boutique.nomBoutique;
+    }
+    return this.nomComplet;
 });
 
 // Création du modèle Utilisateur
