@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
     FaGoogle,
     FaFacebookF,
@@ -15,6 +15,8 @@ const Connexion = () => {
     const { login, user } = useAuth();
     const { addToast } = useToast();
     const navigate = useNavigate();
+    const location = useLocation();
+    
     const [email, setEmail] = useState(
         () => localStorage.getItem('nodyRememberEmail') || ''
     );
@@ -26,12 +28,19 @@ const Connexion = () => {
         !!localStorage.getItem('nodyRememberEmail')
     );
 
+    // Récupérer la page d'origine ou utiliser la page par défaut
+    const from = location.state?.from?.pathname || '/';
+
     // Rediriger si déjà connecté
     useEffect(() => {
         if (user) {
-            navigate('/profil', { replace: true });
+            if (user.isAdmin) {
+                navigate('/admin', { replace: true });
+            } else {
+                navigate(from, { replace: true });
+            }
         }
-    }, [user, navigate]);
+    }, [user, navigate, from]);
 
     // Envoyer le formulaire
     const handleSubmit = async e => {
@@ -40,21 +49,33 @@ const Connexion = () => {
         setError(null);
 
         try {
-            await login(email, motDePasse);
+            const response = await login(email, motDePasse);
+            
             if (remember) {
                 localStorage.setItem('nodyRememberEmail', email);
             } else {
                 localStorage.removeItem('nodyRememberEmail');
             }
+            
             addToast({
                 type: 'success',
                 title: 'Connexion réussie',
                 message: 'Bienvenue sur Nody !',
             });
-            // Redirection après un délai pour voir le message
-            setTimeout(() => {
-                navigate('/profil');
-            }, 1500);
+
+            // CORRECTION: Redirection intelligente basée sur le rôle
+            const userData = response.userData || response.donnees || response;
+            if (userData.isAdmin) {
+                // Rediriger l'admin vers le dashboard admin
+                setTimeout(() => {
+                    navigate('/admin', { replace: true });
+                }, 1000);
+            } else {
+                // Rediriger les autres utilisateurs vers la page d'origine ou le profil
+                setTimeout(() => {
+                    navigate(from, { replace: true });
+                }, 1000);
+            }
         } catch (err) {
             let msg = 'Connexion échouée. Veuillez vérifier vos informations.';
             if (err.response?.data?.message) {
@@ -84,7 +105,6 @@ const Connexion = () => {
         });
     };
 
-    // Affichage de la page de connexion
     return (
         <div className="container d-flex justify-content-center align-items-center vh-100">
             <div
@@ -220,6 +240,16 @@ const Connexion = () => {
                         Inscrivez-vous
                     </Link>
                 </p>
+
+                {/* Lien spécial pour les admins */}
+                <div className="text-center mt-2">
+                    <Link 
+                        to="/admin-login" 
+                        className="text-decoration-none text-muted small"
+                    >
+                        Accès administrateur
+                    </Link>
+                </div>
             </div>
         </div>
     );

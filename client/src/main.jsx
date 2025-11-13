@@ -11,13 +11,7 @@ import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ProduitsProvider } from './contexts/ProduitsContext';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <AuthProvider>
-        <BrowserRouter>
-            <ProduitsProvider>
-                <CartProvider>
-                    <App />
-                </CartProvider>
-            </ProduitsProvider>
-        </BrowserRouter>
-    </AuthProvider>
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>
 );

@@ -14,7 +14,13 @@
         "seed:utilisateurs": "node --env-file=../.env ./seeders/seeder.js --import utilisateurs",
         "seed:commandes": "node --env-file=../.env ./seeders/seeder.js --import commandes",
         "seed:paiements": "node --env-file=../.env ./seeders/seeder.js --import paiements",
-        "seed:destroy": "node --env-file=../.env ./seeders/seeder.js --destroy"
+        "seed:destroy": "node --env-file=../.env ./seeders/seeder.js --destroy",
+        "seed:admin": "node seeders/scripts/seedAdmin.js",
+        "seed:admin-simple": "node seeders/scripts/seedAdminSimple.js",
+        "seed:moderateurs": "node seeders/scripts/seedModerateurs.js",
+        "seed:vendeurs": "node seeders/scripts/seedVendeurs.js",
+        "seed:all-roles": "node seeders/scripts/seedTousRoles.js",
+        "seed:complete": "npm run seed:all-roles && npm run seed:produits"
     },
     "keywords": [
         "ecommerce",
@@ -43,6 +49,7 @@
         "nodemailer": "^7.0.6",
         "redis": "^5.8.2",
         "slugify": "^1.6.6",
+        "socket.io": "^4.8.1",
         "stripe": "^18.5.0",
         "winston": "^3.17.0"
     },

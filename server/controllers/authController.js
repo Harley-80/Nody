@@ -1,11 +1,12 @@
-// Importation des modules nécessaires
 import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
 import crypto from 'crypto';
 import Utilisateur from '../models/utilisateurModel.js';
 import logger from '../utils/logger.js';
 import config from '../config/env.js';
-import envoyerEmail from '../services/emailService.js';
+import envoyerEmail, {
+    envoyerEmailNotificationAdmin,
+} from '../services/emailService.js'; 
 import {
     validerTelephone,
     nettoyerTelephone,
@@ -93,18 +94,13 @@ const traiterInscriptionParRole = async (utilisateur, role, donnees) => {
         case ROLES.ADMIN:
         case ROLES.MODERATEUR:
             utilisateur.statutVerification = 'en_attente';
-            // Logique d'approbation manuelle
+            // Logique d'approbation manuelle (Utilisation de la fonction dédiée)
             try {
-                await envoyerEmail({
-                    a: config.adminEmail || 'admin@nody.sn',
-                    sujet: `Nouvelle demande d'inscription ${configRole.nom}`,
-                    modele: 'demande_inscription_admin',
-                    contexte: {
-                        nom: `${utilisateur.prenom} ${utilisateur.nom}`,
-                        email: utilisateur.email,
-                        role: configRole.nom,
-                        date: new Date().toLocaleDateString('fr-FR'),
-                    },
+                await envoyerEmailNotificationAdmin({
+                    nom: `${utilisateur.prenom} ${utilisateur.nom}`,
+                    email: utilisateur.email,
+                    role: configRole.nom,
+                    date: new Date().toLocaleDateString('fr-FR'),
                 });
             } catch (error) {
                 logger.error('Erreur envoi email notification admin:', error);
@@ -122,9 +118,9 @@ const traiterInscriptionParRole = async (utilisateur, role, donnees) => {
 // --- CONTRÔLEURS MODIFIÉS OU AJOUTÉS ---
 
 /**
- * @desc    Inscription d'un utilisateur avec gestion des rôles
- * @route   POST /api/auth/inscription
- * @access  Public
+ * @desc 	Inscription d'un utilisateur avec gestion des rôles
+ * @route 	 POST /api/auth/inscription
+ * @access 	Public
  */
 const inscription = asyncHandler(async (req, res) => {
     const {
@@ -256,16 +252,20 @@ const inscription = asyncHandler(async (req, res) => {
             role: utilisateur.role,
             statutVerification: utilisateur.statutVerification,
             emailVerifie: utilisateur.emailVerifie,
+            estActif: utilisateur.estActif,
             token,
+            // CORRECTION: Propriétés calculées pour le frontend
+            nomComplet: `${utilisateur.nom} ${utilisateur.prenom}`,
+            isAdmin: utilisateur.role === ROLES.ADMIN,
         },
         message: `Inscription réussie en tant que ${CONFIG_INSCRIPTION[roleInscription].nom}.`,
     });
 });
 
 /**
- * @desc    Inscription spécifique pour vendeur
- * @route   POST /api/auth/inscription/vendeur
- * @access  Public
+ * @desc 	Inscription spécifique pour vendeur
+ * @route 	 POST /api/auth/inscription/vendeur
+ * @access 	Public
  */
 const inscriptionVendeur = asyncHandler(async (req, res) => {
     const { nomBoutique, descriptionBoutique, siteWeb, ...donneesUtilisateur } =
@@ -279,9 +279,9 @@ const inscriptionVendeur = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Inscription avec code d'invitation (Admin/Modérateur)
- * @route   POST /api/auth/inscription/invitation
- * @access  Public
+ * @desc 	Inscription avec code d'invitation (Admin/Modérateur)
+ * @route 	 POST /api/auth/inscription/invitation
+ * @access 	Public
  */
 const inscriptionAvecInvitation = asyncHandler(async (req, res) => {
     const { codeInvitation, ...donneesUtilisateur } = req.body;
@@ -308,9 +308,9 @@ const inscriptionAvecInvitation = asyncHandler(async (req, res) => {
 // --- CONTRÔLEURS EXISTANTS (AVEC AMÉLIORATIONS) ---
 
 /**
- * @desc    Connexion d'un utilisateur
- * @route   POST /api/auth/connexion
- * @access  Public
+ * @desc 	Connexion d'un utilisateur
+ * @route 	 POST /api/auth/connexion
+ * @access 	Public
  */
 const connexion = asyncHandler(async (req, res) => {
     const { email, motDePasse } = req.body;
@@ -350,6 +350,7 @@ const connexion = asyncHandler(async (req, res) => {
 
         const token = genererToken(utilisateur._id);
 
+        // CORRECTION: Réponse structurée avec toutes les données nécessaires
         res.json({
             succes: true,
             donnees: {
@@ -362,7 +363,11 @@ const connexion = asyncHandler(async (req, res) => {
                 role: utilisateur.role,
                 statutVerification: utilisateur.statutVerification,
                 emailVerifie: utilisateur.emailVerifie,
+                estActif: utilisateur.estActif,
                 token,
+                // CORRECTION: Propriétés calculées pour le frontend
+                nomComplet: `${utilisateur.nom} ${utilisateur.prenom}`,
+                isAdmin: utilisateur.role === ROLES.ADMIN,
             },
             message: 'Connexion réussie',
         });
@@ -376,9 +381,9 @@ const connexion = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Déconnexion d'un utilisateur
- * @route   POST /api/auth/deconnexion
- * @access  Private
+ * @desc 	Déconnexion d'un utilisateur
+ * @route 	 POST /api/auth/deconnexion
+ * @access 	Private
  */
 const deconnexion = asyncHandler(async (req, res) => {
     res.json({
@@ -388,9 +393,9 @@ const deconnexion = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Récupérer le profil de l'utilisateur connecté
- * @route   GET /api/auth/moi
- * @access  Private
+ * @desc 	Récupérer le profil de l'utilisateur connecté
+ * @route 	 GET /api/auth/moi
+ * @access 	Private
  */
 const obtenirMoi = asyncHandler(async (req, res) => {
     const utilisateur = await Utilisateur.findById(req.utilisateur._id);
@@ -400,16 +405,21 @@ const obtenirMoi = asyncHandler(async (req, res) => {
         throw new Error('Utilisateur non trouvé');
     }
 
+    // CORRECTION: Ajouter les propriétés calculées
+    const userResponse = utilisateur.toObject();
+    userResponse.nomComplet = `${utilisateur.nom} ${utilisateur.prenom}`;
+    userResponse.isAdmin = utilisateur.role === ROLES.ADMIN;
+
     res.json({
         succes: true,
-        donnees: utilisateur,
+        donnees: userResponse,
     });
 });
 
 /**
- * @desc    Mettre à jour le profil de l'utilisateur connecté
- * @route   PUT /api/auth/moi
- * @access  Private
+ * @desc 	Mettre à jour le profil de l'utilisateur connecté
+ * @route 	 PUT /api/auth/moi
+ * @access 	Private
  */
 const mettreAJourMoi = asyncHandler(async (req, res) => {
     const { nom, prenom, telephone, dateNaissance, genre, ...autresDonnees } =
@@ -466,17 +476,22 @@ const mettreAJourMoi = asyncHandler(async (req, res) => {
         throw new Error('Utilisateur non trouvé');
     }
 
+    // CORRECTION: Ajouter les propriétés calculées
+    const userResponse = utilisateur.toObject();
+    userResponse.nomComplet = `${utilisateur.nom} ${utilisateur.prenom}`;
+    userResponse.isAdmin = utilisateur.role === ROLES.ADMIN;
+
     res.json({
         succes: true,
-        donnees: utilisateur,
+        donnees: userResponse,
         message: 'Profil mis à jour avec succès',
     });
 });
 
 /**
- * @desc    Changer le mot de passe de l'utilisateur connecté
- * @route   PUT /api/auth/changer-mot-de-passe
- * @access  Private
+ * @desc 	Changer le mot de passe de l'utilisateur connecté
+ * @route 	 PUT /api/auth/changer-mot-de-passe
+ * @access 	Private
  */
 const changerMotDePasse = asyncHandler(async (req, res) => {
     const { motDePasseActuel, nouveauMotDePasse } = req.body;
@@ -510,9 +525,9 @@ const changerMotDePasse = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Demande de réinitialisation de mot de passe
- * @route   POST /api/auth/mot-de-passe-oublie
- * @access  Public
+ * @desc 	Demande de réinitialisation de mot de passe
+ * @route 	 POST /api/auth/mot-de-passe-oublie
+ * @access 	Public
  */
 const motDePasseOublie = asyncHandler(async (req, res) => {
     const { email } = req.body;
@@ -574,9 +589,9 @@ const motDePasseOublie = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Réinitialisation du mot de passe avec le jeton
- * @route   PUT /api/auth/reinitialiser-mot-de-passe/:resetToken
- * @access  Public
+ * @desc 	Réinitialisation du mot de passe avec le jeton
+ * @route 	 PUT /api/auth/reinitialiser-mot-de-passe/:resetToken
+ * @access 	Public
  */
 const reinitialiserMotDePasse = asyncHandler(async (req, res) => {
     const { motDePasse } = req.body;
@@ -621,9 +636,9 @@ const reinitialiserMotDePasse = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Vérification d'email avec le jeton
- * @route   GET /api/auth/verifier-email/:verificationToken
- * @access  Public
+ * @desc 	Vérification d'email avec le jeton
+ * @route 	 GET /api/auth/verifier-email/:verificationToken
+ * @access 	Public
  */
 const verifierEmail = asyncHandler(async (req, res) => {
     const { verificationToken } = req.params;
@@ -649,9 +664,9 @@ const verifierEmail = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Renvoyer l'email de vérification
- * @route   POST /api/auth/renvoyer-verification
- * @access  Private
+ * @desc 	Renvoyer l'email de vérification
+ * @route 	 POST /api/auth/renvoyer-verification
+ * @access 	Private
  */
 const renvoyerVerification = asyncHandler(async (req, res) => {
     const utilisateur = await Utilisateur.findById(req.utilisateur._id);

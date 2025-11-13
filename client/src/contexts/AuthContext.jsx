@@ -18,12 +18,19 @@ export function AuthProvider({ children }) {
                 const savedUser = authService.getCurrentUser();
                 if (savedUser && savedUser.token) {
                     // Vérifier si le token est encore valide
-                    const userData = await authService.getMe();
-                    setUser(userData.donnees || userData);
+                    try {
+                        const userData = await authService.getMe();
+                        const userWithRole = userData.donnees || userData;
+                        userWithRole.isAdmin = userWithRole.role === 'admin';
+                        setUser(userWithRole);
+                    } catch (error) {
+                        console.error('Token invalide:', error);
+                        authService.clearAuth();
+                    }
                 }
             } catch (error) {
                 console.error('Erreur de chargement utilisateur:', error);
-                localStorage.removeItem('nodyUser');
+                authService.clearAuth();
             } finally {
                 setLoading(false);
             }
@@ -34,15 +41,17 @@ export function AuthProvider({ children }) {
     const handleAuthResponse = responseData => {
         const userData = responseData.donnees || responseData;
         userData.nomComplet = `${userData.nom} ${userData.prenom}`;
+        userData.isAdmin = userData.role === 'admin';
         setUser(userData);
         localStorage.setItem('nodyUser', JSON.stringify(userData));
+        return userData;
     };
 
     const login = async (email, motDePasse) => {
         try {
             const response = await authService.login(email, motDePasse);
-            handleAuthResponse(response);
-            return response;
+            const userData = handleAuthResponse(response);
+            return { ...response, userData };
         } catch (error) {
             console.error('Erreur de connexion:', error);
             throw error;
@@ -67,20 +76,17 @@ export function AuthProvider({ children }) {
             console.error('Erreur de déconnexion:', error);
         } finally {
             setUser(null);
-            localStorage.removeItem('nodyUser');
+            authService.clearAuth();
         }
     };
 
-    const loginAsAdmin = () => {
-        const mockUser = {
-            nomComplet: 'Admin',
-            isAdmin: true,
-            email: 'admin@nody.sn',
-            id: 'admin-mock-id',
-            token: 'mock-token',
-        };
-        setUser(mockUser);
-        localStorage.setItem('nodyUser', JSON.stringify(mockUser));
+    const updateUser = newUserData => {
+        setUser(prevUser => {
+            const updatedUser = { ...prevUser, ...newUserData };
+            updatedUser.isAdmin = updatedUser.role === 'admin';
+            localStorage.setItem('nodyUser', JSON.stringify(updatedUser));
+            return updatedUser;
+        });
     };
 
     const value = {
@@ -88,9 +94,10 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout,
-        loginAsAdmin,
+        updateUser,
         loading,
         isAuthenticated: !!user,
+        isAdmin: user?.isAdmin || false,
     };
 
     return (

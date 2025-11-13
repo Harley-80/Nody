@@ -1,4 +1,3 @@
-// models/produitModel.js
 import mongoose from 'mongoose';
 import slugify from 'slugify';
 const avisSchema = new mongoose.Schema(
@@ -113,6 +112,17 @@ const produitSchema = new mongoose.Schema(
         vendeur: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Utilisateur',
+        },
+        statut: {
+            type: String,
+            enum: ['en_attente', 'actif', 'rejete', 'inactif'],
+            default: 'en_attente'
+        },
+        raisonRejet: String,
+        dateValidation: Date,
+        moderateur: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Utilisateur'
         },
         images: [
             {

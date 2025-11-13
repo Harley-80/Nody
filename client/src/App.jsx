@@ -1,16 +1,31 @@
-import AppRoutes from './routes/index';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { CategoriesProvider } from './contexts/CategoriesContext';
+import { CartProvider } from './contexts/CartContext';
+import { ProduitsProvider } from './contexts/ProduitsContext';
+import AppRoutes from './routes/index';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
 
-export default function App() {
+function App() {
     return (
-        <ToastProvider>
-            <CategoriesProvider>
-                <div className="App">
-                    <AppRoutes />
-                </div>
-            </CategoriesProvider>
-        </ToastProvider>
+        <Router>
+            <AuthProvider>
+                <ToastProvider>
+                    <CategoriesProvider>
+                        <ProduitsProvider>
+                            <CartProvider>
+                                <div className="App">
+                                    <AppRoutes />
+                                </div>
+                            </CartProvider>
+                        </ProduitsProvider>
+                    </CategoriesProvider>
+                </ToastProvider>
+            </AuthProvider>
+        </Router>
     );
 }
+
+export default App;

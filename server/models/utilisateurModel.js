@@ -43,11 +43,10 @@ const utilisateurSchema = new mongoose.Schema(
             trim: true,
             validate: {
                 validator: function (v) {
-                    if (!v) return true; // Téléphone optionnel
+                    if (!v) return true;
                     return /^\+\d{1,15}$/.test(v);
                 },
-                message:
-                    'Le format du téléphone doit être E.164 (ex: +221771234567)',
+                message: 'Le format du téléphone doit être E.164',
             },
         },
         genre: {
@@ -81,42 +80,6 @@ const utilisateurSchema = new mongoose.Schema(
             banniere: String,
             politiqueRetour: String,
             conditionsVente: String,
-        },
-        // Documents de vérification (pour vendeurs et modérateurs)
-        documents: [
-            {
-                type: {
-                    type: String,
-                    enum: [
-                        'piece_identite',
-                        'justificatif_domicile',
-                        'registre_commerce',
-                        'autre',
-                    ],
-                },
-                url: String,
-                nomFichier: String,
-                dateUpload: {
-                    type: Date,
-                    default: Date.now,
-                },
-                statut: {
-                    type: String,
-                    enum: ['en_attente', 'approuve', 'rejete'],
-                    default: 'en_attente',
-                },
-            },
-        ],
-        // Informations de contact professionnel
-        contactProfessionnel: {
-            adresse: {
-                rue: String,
-                ville: String,
-                codePostal: String,
-                pays: String,
-            },
-            telephonePro: String,
-            emailPro: String,
         },
         avatar: {
             type: String,
@@ -236,12 +199,6 @@ const utilisateurSchema = new mongoose.Schema(
         expirationJetonReinitialisationMotDePasse: Date,
         jetonVerificationEmail: String,
         expirationJetonVerificationEmail: Date,
-        // Champs pour l'invitation
-        codeInvitation: String,
-        invitePar: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Utilisateur',
-        },
         dateInscription: {
             type: Date,
             default: Date.now,
@@ -311,12 +268,6 @@ utilisateurSchema.methods.estVerifie = function () {
     } else {
         return this.statutVerification === 'verifie' && this.emailVerifie;
     }
-};
-
-// Méthode pour obtenir les permissions de l'utilisateur
-utilisateurSchema.methods.obtenirPermissions = function () {
-    const { PERMISSIONS } = require('../constants/roles');
-    return PERMISSIONS[this.role] || [];
 };
 
 // Virtual pour le nom complet

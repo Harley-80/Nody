@@ -5,20 +5,15 @@ import { api } from './api.js';
  * @description Fonction d'aide pour intercepter une erreur Axios, extraire le message
  * le plus pertinent du backend (si disponible) et le relancer comme une
  * nouvelle erreur JavaScript.
- * @param {object} error - L'objet erreur capturé par le bloc catch (généralement une erreur Axios).
- * @param {string} defaultMessage - Le message générique à utiliser si aucun message spécifique n'est trouvé.
  */
 const handleApiError = (error, defaultMessage) => {
-    // 1. Tenter d'extraire le message d'erreur du corps de la réponse du serveur (ex: 400 Bad Request)
     if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
-    }
-    // 2. Si c'est une erreur réseau ou une autre erreur locale (ex: timeout, pas d'internet)
-    else if (error.message) {
+    } else if (error.response?.data?.erreur) {
+        throw new Error(error.response.data.erreur);
+    } else if (error.message) {
         throw new Error(error.message);
-    }
-    // 3. Message d'erreur générique si rien n'est trouvé
-    else {
+    } else {
         throw new Error(defaultMessage);
     }
 };
@@ -35,6 +30,14 @@ export const authService = {
                 email,
                 motDePasse,
             });
+
+            if (response.data.succes && response.data.donnees) {
+                const userData = response.data.donnees;
+                userData.isAdmin = userData.role === 'admin';
+                localStorage.setItem('nodyUser', JSON.stringify(userData));
+                localStorage.setItem('nodyToken', userData.token);
+            }
+
             return response.data;
         } catch (error) {
             handleApiError(
@@ -52,6 +55,14 @@ export const authService = {
     async register(userData) {
         try {
             const response = await api.post('/auth/inscription', userData);
+
+            if (response.data.succes && response.data.donnees) {
+                const userData = response.data.donnees;
+                userData.isAdmin = userData.role === 'admin';
+                localStorage.setItem('nodyUser', JSON.stringify(userData));
+                localStorage.setItem('nodyToken', userData.token);
+            }
+
             return response.data;
         } catch (error) {
             handleApiError(
@@ -68,15 +79,15 @@ export const authService = {
      */
     async logout() {
         try {
-            // Requête pour nettoyer la session côté serveur (si applicable)
+            this.clearAuth();
             await api.post('/auth/deconnexion');
             return true;
         } catch (error) {
-            // On log l'erreur mais on ne la propage pas : l'essentiel est de nettoyer le client (fait dans AuthContext)
             console.error(
                 'Erreur de déconnexion côté serveur, mais on procède à la déconnexion locale.',
                 error
             );
+            this.clearAuth();
             return false;
         }
     },
@@ -87,9 +98,20 @@ export const authService = {
      * @description Récupère les informations de l'utilisateur connecté via son token.
      */
     async getMe() {
-        // Le try/catch est souvent géré dans l'useEffect de AuthContext pour gérer le nettoyage du token
-        const response = await api.get('/auth/moi');
-        return response.data;
+        try {
+            const response = await api.get('/auth/moi');
+
+            if (response.data.succes && response.data.donnees) {
+                const userData = response.data.donnees;
+                userData.isAdmin = userData.role === 'admin';
+                localStorage.setItem('nodyUser', JSON.stringify(userData));
+            }
+
+            return response.data;
+        } catch (error) {
+            this.clearAuth();
+            throw error;
+        }
     },
 
     /**
@@ -97,8 +119,9 @@ export const authService = {
      * @description Vérifie la présence de données utilisateur dans le stockage local.
      */
     isAuthenticated() {
-        const user = localStorage.getItem('nodyUser');
-        return !!user;
+        const user = this.getCurrentUser();
+        const token = localStorage.getItem('nodyToken');
+        return !!(user && token);
     },
 
     /**
@@ -107,9 +130,48 @@ export const authService = {
      */
     getCurrentUser() {
         try {
-            return JSON.parse(localStorage.getItem('nodyUser') || 'null');
+            const userStr = localStorage.getItem('nodyUser');
+            if (!userStr) return null;
+
+            const user = JSON.parse(userStr);
+            user.isAdmin = user.role === 'admin';
+            return user;
         } catch {
             return null;
         }
+    },
+
+    /**
+     * @function getToken
+     * @description Récupère le token d'authentification
+     */
+    getToken() {
+        return localStorage.getItem('nodyToken');
+    },
+
+    /**
+     * @function clearAuth
+     * @description Nettoie toutes les données d'authentification
+     */
+    clearAuth() {
+        localStorage.removeItem('nodyUser');
+        localStorage.removeItem('nodyToken');
+    },
+
+    /**
+     * @function hasRole
+     * @description Vérifie si l'utilisateur a un rôle spécifique
+     */
+    hasRole(role) {
+        const user = this.getCurrentUser();
+        return user && user.role === role;
+    },
+
+    /**
+     * @function isAdmin
+     * @description Vérifie si l'utilisateur est administrateur
+     */
+    isAdmin() {
+        return this.hasRole('admin');
     },
 };

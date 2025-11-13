@@ -87,5 +87,31 @@ const envoyerEmail = async ({ a, sujet, modele, contexte, piecesJointes }) => {
     }
 };
 
+/**
+ * Service d'envoi d'email de notification admin
+ * @param {Object} options - Options pour l'email de notification
+ * @returns {Object} Résultat de l'envoi
+ */
+const envoyerEmailNotificationAdmin = async options => {
+    // <-- CHANGEMENT : 'export' retiré ici
+    const { nom, email, role, date } = options;
+
+    const contexte = {
+        nom,
+        email,
+        role,
+        date,
+        urlAdmin: `${config.clientUrl}/admin/utilisateurs`,
+    };
+
+    return await envoyerEmail({
+        a: config.emailUser, // Envoi à l'admin (l'expéditeur configuré est souvent utilisé comme admin par défaut dans un setup simple)
+        sujet: `Nouvelle demande d'inscription ${role} - Nody`,
+        modele: 'demande_inscription_admin',
+        contexte,
+    });
+};
+
 // Exportation des fonctions
 export default envoyerEmail;
+export { envoyerEmailNotificationAdmin }; 

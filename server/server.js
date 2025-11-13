@@ -3,43 +3,40 @@ import config from './config/env.js';
 import logger from './utils/logger.js';
 import mongoose from 'mongoose';
 
+// AJOUT: Importer les routes admin
+import adminRoutes from './routes/adminRoutes.js';
+
 let server;
 
 /**
  * Fonction principale pour démarrer le serveur.
- * Initialise l'application Express (qui inclut la connexion à la base de données)
- * puis démarre le serveur HTTP.
  */
 async function startServer() {
     try {
         const app = await initializeApp();
         const PORT = config.port;
 
+        // AJOUT: Monter les routes admin
+        app.use('/api/admin', adminRoutes);
+
         server = app.listen(PORT, () => {
             logger.info(
                 `Serveur démarré en mode ${config.nodeEnv} sur le port ${PORT}`
             );
-            // Log supplémentaire pour confirmer le mode de l'environnement
             logger.info(`URL du serveur: ${config.serverUrl}`);
-            logger.info(`URL du client configurée: ${config.clientUrl}`);
             logger.info(`Connexion MongoDB: ${config.mongodbUri}`);
 
-            // Log ajouté : affiche l'état de la configuration Redis
-            logger.info(
-                `Configuration Redis: Hôte ${config.redisHost}, Port ${config.redisPort}`
-            );
+            // AJOUT: Log des routes disponibles
+            logger.info('Routes disponibles:');
+            logger.info('Auth: /api/auth/*');
+            logger.info('Admin: /api/admin/*');
+            logger.info('Users: /api/utilisateurs/*');
 
-            // Avertissement visible en mode développement
             if (config.nodeEnv === 'development') {
-                logger.warn('⚠️ Mode développement actif - Sécurité réduite');
+                logger.warn('Mode développement actif - Sécurité réduite');
             }
-
-            logger.info(
-                `Documentation de l'API : ${config.serverUrl}/api/health`
-            );
         });
     } catch (error) {
-        // Log en cas d'échec critique au démarrage
         logger.error('Échec du démarrage du serveur.', { error });
         process.exit(1);
     }

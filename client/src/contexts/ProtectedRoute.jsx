@@ -1,8 +1,9 @@
 import { useAuth } from './AuthContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 export default function ProtectedRoute({ children, adminOnly = false }) {
     const { user, loading } = useAuth();
+    const location = useLocation();
 
     // Afficher un loading pendant la vérification
     if (loading) {
@@ -16,8 +17,21 @@ export default function ProtectedRoute({ children, adminOnly = false }) {
         );
     }
 
-    if (!user) return <Navigate to="/connexion" replace />;
-    if (adminOnly && !user?.isAdmin) return <Navigate to="/" replace />;
+    if (!user) {
+        // Rediriger vers la page de connexion avec retour prévu
+        return <Navigate to="/connexion" state={{ from: location }} replace />;
+    }
+
+    // CORRECTION: Vérification améliorée du rôle admin
+    if (adminOnly && !user.isAdmin) {
+        console.warn(
+            "Accès admin refusé pour l'utilisateur:",
+            user.email,
+            'Rôle:',
+            user.role
+        );
+        return <Navigate to="/profil" replace />;
+    }
 
     return children;
 }
