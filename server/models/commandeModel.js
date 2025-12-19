@@ -1,4 +1,3 @@
-// Importation de mongoose pour la gestion de la base de données MongoDB
 import mongoose from 'mongoose';
 
 // Définition du schéma pour les commandes

@@ -1,0 +1,27 @@
+.graphique-ventes {
+    padding: 1rem 0;
+
+    .recharts-wrapper {
+        font-family: inherit;
+    }
+}
+
+.graphique-vide {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: #9ca3af;
+
+    i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    p {
+        font-size: 1rem;
+        font-weight: 500;
+    }
+}

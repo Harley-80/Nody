@@ -1,4 +1,3 @@
-// Importation du logger pour la gestion des erreurs
 import logger from '../utils/logger.js';
 
 /**

@@ -10,33 +10,40 @@ const ResponsiveTable = ({
     onDelete,
     selectedIds,
     onSelectionChange,
-    className = ''
+    className = '',
 }) => {
-    const handleSort = (key) => {
+    const handleSort = key => {
         if (onSort && sortConfig?.key === key) {
-        onSort(key, sortConfig.direction === 'asc' ? 'desc' : 'asc');
+            onSort(key, sortConfig.direction === 'asc' ? 'desc' : 'asc');
         } else if (onSort) {
-        onSort(key, 'asc');
+            onSort(key, 'asc');
         }
     };
 
-    const sortedColumns = useMemo(() =>
-        columns.map(col => ({
-            ...col,
-            isSorted: sortConfig?.key === col.key,
-            sortDirection: sortConfig?.direction
-        })),
+    const sortedColumns = useMemo(
+        () =>
+            columns.map(col => ({
+                ...col,
+                isSorted: sortConfig?.key === col.key,
+                sortDirection: sortConfig?.direction,
+            })),
         [columns, sortConfig]
     );
 
-    const isSelected   = useCallback((id) => selectedIds.includes(id), [selectedIds]);
-    const toggleRow    = useCallback((id) => {
-        onSelectionChange(
-            isSelected(id)
-            ? selectedIds.filter(i => i !== id)
-            : [...selectedIds, id]
-        );
-    }, [selectedIds, onSelectionChange, isSelected]);
+    const isSelected = useCallback(
+        id => selectedIds.includes(id),
+        [selectedIds]
+    );
+    const toggleRow = useCallback(
+        id => {
+            onSelectionChange(
+                isSelected(id)
+                    ? selectedIds.filter(i => i !== id)
+                    : [...selectedIds, id]
+            );
+        },
+        [selectedIds, onSelectionChange, isSelected]
+    );
 
     const toggleAll = () => {
         onSelectionChange(
@@ -55,25 +62,35 @@ const ResponsiveTable = ({
                                 <input
                                     type="checkbox"
                                     className="form-check-input"
-                                    checked={data.length > 0 && selectedIds.length === data.length}
+                                    checked={
+                                        data.length > 0 &&
+                                        selectedIds.length === data.length
+                                    }
                                     onChange={toggleAll}
                                 />
                             </th>
-                            {sortedColumns.map((col) => (
+                            {sortedColumns.map(col => (
                                 <th
                                     key={col.key}
-                                    onClick={() => col.sortable && handleSort(col.key)}
+                                    onClick={() =>
+                                        col.sortable && handleSort(col.key)
+                                    }
                                     className={`${col.sortable ? 'sortable' : ''} ${col.headerClassName || ''}`}
-                                    style={{ width: col.width, minWidth: col.minWidth }}
+                                    style={{
+                                        width: col.width,
+                                        minWidth: col.minWidth,
+                                    }}
                                 >
                                     <div className="d-flex align-items-center">
                                         {col.header}
                                         {col.sortable && (
                                             <span className="ms-2">
                                                 {col.isSorted
-                                                    ? (col.sortDirection === 'asc' ? '↑' : '↓')
-                                                    : '⇅'
-                                                }
+                                                    ? col.sortDirection ===
+                                                      'asc'
+                                                        ? '↑'
+                                                        : '↓'
+                                                    : '⇅'}
                                             </span>
                                         )}
                                     </div>
@@ -92,20 +109,21 @@ const ResponsiveTable = ({
                                         onChange={() => toggleRow(item.id)}
                                     />
                                 </td>
-                                {sortedColumns.map((col) => (
+                                {sortedColumns.map(col => (
                                     <td
                                         key={`${item.id}-${col.key}`}
                                         className={col.cellClassName || ''}
                                         data-label={col.header}
                                     >
-                                    {col.render
-                                        ? col.render(item)
-                                        : col.actions
-                                        ? (
+                                        {col.render ? (
+                                            col.render(item)
+                                        ) : col.actions ? (
                                             <div className="d-flex gap-2">
                                                 {onEdit && (
                                                     <button
-                                                        onClick={() => onEdit(item)}
+                                                        onClick={() =>
+                                                            onEdit(item)
+                                                        }
                                                         className="btn btn-sm btn-outline-primary"
                                                     >
                                                         Modifier
@@ -113,15 +131,18 @@ const ResponsiveTable = ({
                                                 )}
                                                 {onDelete && (
                                                     <button
-                                                        onClick={() => onDelete(item)}
+                                                        onClick={() =>
+                                                            onDelete(item)
+                                                        }
                                                         className="btn btn-sm btn-outline-danger"
                                                     >
                                                         Supprimer
                                                     </button>
                                                 )}
                                             </div>
-                                        )
-                                    : item[col.key]}
+                                        ) : (
+                                            item[col.key]
+                                        )}
                                     </td>
                                 ))}
                             </tr>
@@ -144,35 +165,44 @@ const ResponsiveTable = ({
                         </div>
                         <div className="card-body">
                             {sortedColumns
-                                .filter((col) => !col.hideOnMobile)
-                                .map((col) => (
-                                    <div key={`mobile-${item.id}-${col.key}`} className="row mb-2">
-                                        <div className="col-4 fw-bold">{col.header}</div>
+                                .filter(col => !col.hideOnMobile)
+                                .map(col => (
+                                    <div
+                                        key={`mobile-${item.id}-${col.key}`}
+                                        className="row mb-2"
+                                    >
+                                        <div className="col-4 fw-bold">
+                                            {col.header}
+                                        </div>
                                         <div className="col-8">
-                                            {col.render
-                                                ? col.render(item)
-                                                : col.actions
-                                                ? (
-                                                    <div className="d-flex gap-2">
-                                                        {onEdit && (
-                                                            <button
-                                                                onClick={() => onEdit(item)}
-                                                                className="btn btn-sm btn-outline-primary"
-                                                            >
-                                                                Modifier
-                                                            </button>
-                                                        )}
-                                                        {onDelete && (
-                                                            <button
-                                                                onClick={() => onDelete(item)}
-                                                                className="btn btn-sm btn-outline-danger"
-                                                            >
-                                                                Supprimer
-                                                            </button>
-                                                        )}
+                                            {col.render ? (
+                                                col.render(item)
+                                            ) : col.actions ? (
+                                                <div className="d-flex gap-2">
+                                                    {onEdit && (
+                                                        <button
+                                                            onClick={() =>
+                                                                onEdit(item)
+                                                            }
+                                                            className="btn btn-sm btn-outline-primary"
+                                                        >
+                                                            Modifier
+                                                        </button>
+                                                    )}
+                                                    {onDelete && (
+                                                        <button
+                                                            onClick={() =>
+                                                                onDelete(item)
+                                                            }
+                                                            className="btn btn-sm btn-outline-danger"
+                                                        >
+                                                            Supprimer
+                                                        </button>
+                                                    )}
                                                 </div>
-                                            )
-                                            : item[col.key]}
+                                            ) : (
+                                                item[col.key]
+                                            )}
                                         </div>
                                     </div>
                                 ))}
@@ -182,7 +212,9 @@ const ResponsiveTable = ({
             </div>
 
             {data.length === 0 && (
-                <div className="text-center py-4 text-muted">Aucun résultat trouvé</div>
+                <div className="text-center py-4 text-muted">
+                    Aucun résultat trouvé
+                </div>
             )}
         </div>
     );
@@ -200,20 +232,20 @@ ResponsiveTable.propTypes = {
             headerClassName: PropTypes.string,
             cellClassName: PropTypes.string,
             hideOnMobile: PropTypes.bool,
-            actions: PropTypes.bool
+            actions: PropTypes.bool,
         })
     ).isRequired,
     data: PropTypes.array.isRequired,
     sortConfig: PropTypes.shape({
         key: PropTypes.string,
-        direction: PropTypes.oneOf(['asc', 'desc'])
+        direction: PropTypes.oneOf(['asc', 'desc']),
     }),
     onSort: PropTypes.func,
     onEdit: PropTypes.func,
     onDelete: PropTypes.func,
     selectedIds: PropTypes.arrayOf(PropTypes.string).isRequired,
     onSelectionChange: PropTypes.func.isRequired,
-    className: PropTypes.string
+    className: PropTypes.string,
 };
 
 export default ResponsiveTable;

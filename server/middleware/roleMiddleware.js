@@ -71,13 +71,18 @@ export const verifierPermission = permissionRequise => {
 
 // Middlewares spécifiques par rôle
 export const estAdmin = verifierRole([ROLES.ADMIN]);
-export const estModerateur = verifierRole([ROLES.ADMIN, ROLES.MODERATEUR]);
-export const estVendeur = verifierRole([
+export const estModerateur = verifierRole([ROLES.MODERATEUR]);
+export const estVendeur = verifierRole([ROLES.VENDEUR]);
+export const estClient = verifierRole([ROLES.CLIENT]);
+
+// Middlewares combinés pour hiérarchie de rôles
+export const estAdminOuModerateur = verifierRole([
     ROLES.ADMIN,
     ROLES.MODERATEUR,
-    ROLES.VENDEUR,
 ]);
-export const estClient = verifierRole([
+export const estAdminOuVendeur = verifierRole([ROLES.ADMIN, ROLES.VENDEUR]);
+export const estStaff = verifierRole([ROLES.ADMIN, ROLES.MODERATEUR]);
+export const estToutRole = verifierRole([
     ROLES.ADMIN,
     ROLES.MODERATEUR,
     ROLES.VENDEUR,
@@ -202,6 +207,10 @@ export default {
     estModerateur,
     estVendeur,
     estClient,
+    estAdminOuModerateur,
+    estAdminOuVendeur,
+    estStaff,
+    estToutRole,
     estVerifie,
     peutModerer,
     peutGererProduits,

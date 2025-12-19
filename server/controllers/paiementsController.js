@@ -59,9 +59,8 @@ const creerIntentPaiement = asyncHandler(async (req, res) => {
 const confirmerPaiement = asyncHandler(async (req, res) => {
     const { idIntentPaiement } = req.body;
     // Récupérer les détails du paiement depuis Stripe
-    const intentPaiement = await stripe.paymentIntents.retrieve(
-        idIntentPaiement
-    );
+    const intentPaiement =
+        await stripe.paymentIntents.retrieve(idIntentPaiement);
     // Trouver la commande associée
     const commande = await Commande.findOne({
         'paiement.idTransaction': idIntentPaiement,

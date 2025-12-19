@@ -1,0 +1,220 @@
+.carte-produit-vendeur {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        border-color: #3f51b5;
+    }
+
+    .badge-statut {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        z-index: 2;
+
+        &.success {
+            background: linear-gradient(135deg, #4caf50, #8bc34a);
+            color: white;
+        }
+
+        &.warning {
+            background: linear-gradient(135deg, #ff9800, #ffc107);
+            color: white;
+        }
+
+        &.danger {
+            background: linear-gradient(135deg, #f44336, #ff5252);
+            color: white;
+        }
+
+        &.info {
+            background: linear-gradient(135deg, #2196f3, #03a9f4);
+            color: white;
+        }
+    }
+
+    .carte-image {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+        background: #f8f9fa;
+
+        .image-produit {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #adb5bd;
+            font-size: 48px;
+            background: #e9ecef;
+        }
+
+        .badge-discount {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: linear-gradient(135deg, #ff5722, #ff9800);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+    }
+
+    .carte-contenu {
+        padding: 20px;
+
+        .titre-produit {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: #2d3748;
+            line-height: 1.4;
+        }
+
+        .description-produit {
+            font-size: 14px;
+            color: #718096;
+            margin: 0 0 16px 0;
+            line-height: 1.5;
+        }
+
+        .section-prix {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+
+            .prix-actuel {
+                font-size: 20px;
+                font-weight: 700;
+                color: #2d3748;
+            }
+
+            .prix-original {
+                font-size: 16px;
+                color: #a0aec0;
+                text-decoration: line-through;
+            }
+        }
+
+        .stats-produit {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+
+            .stat-item {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                color: #4a5568;
+
+                svg {
+                    color: #667eea;
+                    width: 14px;
+                }
+            }
+        }
+
+        .section-stock {
+            .stock-indicator {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 12px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 500;
+
+                &.bon {
+                    background: rgba(76, 175, 80, 0.1);
+                    color: #2e7d32;
+                }
+
+                &.faible {
+                    background: rgba(255, 152, 0, 0.1);
+                    color: #ef6c00;
+                }
+
+                .warning-icon {
+                    color: #ff9800;
+                    margin-left: 4px;
+                }
+            }
+        }
+    }
+
+    .carte-actions {
+        display: flex;
+        border-top: 1px solid #e9ecef;
+        background: #f8f9fa;
+
+        .btn-action {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+
+            &:hover {
+                background: rgba(63, 81, 181, 0.1);
+            }
+
+            &.btn-vue {
+                color: #4caf50;
+
+                &:hover {
+                    color: #2e7d32;
+                }
+            }
+
+            &.btn-modifier {
+                color: #2196f3;
+                border-left: 1px solid #e9ecef;
+                border-right: 1px solid #e9ecef;
+
+                &:hover {
+                    color: #0d47a1;
+                }
+            }
+
+            &.btn-supprimer {
+                color: #f44336;
+
+                &:hover {
+                    color: #c62828;
+                }
+            }
+        }
+    }
+}

@@ -6,7 +6,7 @@ import logger from '../utils/logger.js';
 import config from '../config/env.js';
 import envoyerEmail, {
     envoyerEmailNotificationAdmin,
-} from '../services/emailService.js'; 
+} from '../services/emailService.js';
 import {
     validerTelephone,
     nettoyerTelephone,
@@ -17,6 +17,7 @@ import {
     CONFIG_INSCRIPTION,
     CODES_INVITATION,
 } from '../constants/roles.js';
+import { notifierNouvelleInscription } from '../services/websocketService.js'; 
 
 /**
  * Génère un token JWT pour un utilisateur
@@ -29,8 +30,7 @@ const genererToken = id => {
     });
 };
 
-// --- NOUVELLES FONCTIONS DE LOGIQUE D'INSCRIPTION PAR RÔLE ---
-
+// NOUVELLES FONCTIONS DE LOGIQUE D'INSCRIPTION PAR RÔLE
 /**
  * Valide l'inscription selon le rôle
  * @param {Object} donnees - Données de la requête
@@ -115,12 +115,11 @@ const traiterInscriptionParRole = async (utilisateur, role, donnees) => {
     return utilisateur;
 };
 
-// --- CONTRÔLEURS MODIFIÉS OU AJOUTÉS ---
-
+// CONTRÔLEURS MODIFIÉS OU AJOUTÉS
 /**
- * @desc 	Inscription d'un utilisateur avec gestion des rôles
- * @route 	 POST /api/auth/inscription
- * @access 	Public
+ * @desc    Inscription d'un utilisateur avec gestion des rôles
+ * @route   POST /api/auth/inscription
+ * @access  Public
  */
 const inscription = asyncHandler(async (req, res) => {
     const {
@@ -206,6 +205,16 @@ const inscription = asyncHandler(async (req, res) => {
     // Sauvegarder l'utilisateur
     await utilisateur.save();
 
+    // NOTIFICATION : Si c'est un rôle nécessitant une approbation, notifier modérateurs et admin
+    try {
+        if (utilisateur.statutVerification === 'en_attente') {
+            // MODIFICATION: Utilisation de la nouvelle fonction
+            notifierNouvelleInscription(utilisateur);
+        }
+    } catch (notifError) {
+        console.error('Erreur notification nouvelle inscription:', notifError);
+    }
+
     // Générer le token
     const token = genererToken(utilisateur._id);
 
@@ -263,9 +272,9 @@ const inscription = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc 	Inscription spécifique pour vendeur
- * @route 	 POST /api/auth/inscription/vendeur
- * @access 	Public
+ * @desc    Inscription spécifique pour vendeur
+ * @route   POST /api/auth/inscription/vendeur
+ * @access  Public
  */
 const inscriptionVendeur = asyncHandler(async (req, res) => {
     const { nomBoutique, descriptionBoutique, siteWeb, ...donneesUtilisateur } =
@@ -279,9 +288,9 @@ const inscriptionVendeur = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc 	Inscription avec code d'invitation (Admin/Modérateur)
- * @route 	 POST /api/auth/inscription/invitation
- * @access 	Public
+ * @desc    Inscription avec code d'invitation (Admin/Modérateur)
+ * @route   POST /api/auth/inscription/invitation
+ * @access  Public
  */
 const inscriptionAvecInvitation = asyncHandler(async (req, res) => {
     const { codeInvitation, ...donneesUtilisateur } = req.body;
@@ -305,12 +314,10 @@ const inscriptionAvecInvitation = asyncHandler(async (req, res) => {
     await inscription(req, res);
 });
 
-// --- CONTRÔLEURS EXISTANTS (AVEC AMÉLIORATIONS) ---
-
 /**
- * @desc 	Connexion d'un utilisateur
- * @route 	 POST /api/auth/connexion
- * @access 	Public
+ * @desc    Connexion d'un utilisateur
+ * @route   POST /api/auth/connexion
+ * @access  Public
  */
 const connexion = asyncHandler(async (req, res) => {
     const { email, motDePasse } = req.body;
@@ -350,7 +357,7 @@ const connexion = asyncHandler(async (req, res) => {
 
         const token = genererToken(utilisateur._id);
 
-        // CORRECTION: Réponse structurée avec toutes les données nécessaires
+        // Réponse structurée avec toutes les données
         res.json({
             succes: true,
             donnees: {
@@ -381,9 +388,9 @@ const connexion = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc 	Déconnexion d'un utilisateur
- * @route 	 POST /api/auth/deconnexion
- * @access 	Private
+ * @desc    Déconnexion d'un utilisateur
+ * @route   POST /api/auth/deconnexion
+ * @access  Private
  */
 const deconnexion = asyncHandler(async (req, res) => {
     res.json({
@@ -393,9 +400,10 @@ const deconnexion = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc 	Récupérer le profil de l'utilisateur connecté
- * @route 	 GET /api/auth/moi
- * @access 	Private
+ * @desc    Récupérer le profil de l'utilisateur connecté
+ * @route   GET /api/auth/moi
+ * @route   GET /api/auth/profil (alias)
+ * @access  Private
  */
 const obtenirMoi = asyncHandler(async (req, res) => {
     const utilisateur = await Utilisateur.findById(req.utilisateur._id);
@@ -405,21 +413,22 @@ const obtenirMoi = asyncHandler(async (req, res) => {
         throw new Error('Utilisateur non trouvé');
     }
 
-    // CORRECTION: Ajouter les propriétés calculées
+    // Structure de réponse compatible avec le frontend
     const userResponse = utilisateur.toObject();
-    userResponse.nomComplet = `${utilisateur.nom} ${utilisateur.prenom}`;
+
+    // Ajouter les propriétés calculées nécessaires au frontend
+    userResponse.nomComplet = `${utilisateur.prenom} ${utilisateur.nom}`;
     userResponse.isAdmin = utilisateur.role === ROLES.ADMIN;
 
-    res.json({
-        succes: true,
-        donnees: userResponse,
-    });
+    // Retourner directement l'utilisateur (pas dans donnees)
+    // Le frontend attend response.data directement
+    res.json(userResponse);
 });
 
 /**
- * @desc 	Mettre à jour le profil de l'utilisateur connecté
- * @route 	 PUT /api/auth/moi
- * @access 	Private
+ * @desc    Mettre à jour le profil de l'utilisateur connecté
+ * @route   PUT /api/auth/moi
+ * @access  Private
  */
 const mettreAJourMoi = asyncHandler(async (req, res) => {
     const { nom, prenom, telephone, dateNaissance, genre, ...autresDonnees } =
@@ -476,9 +485,9 @@ const mettreAJourMoi = asyncHandler(async (req, res) => {
         throw new Error('Utilisateur non trouvé');
     }
 
-    // CORRECTION: Ajouter les propriétés calculées
+    // Ajouter les propriétés calculées
     const userResponse = utilisateur.toObject();
-    userResponse.nomComplet = `${utilisateur.nom} ${utilisateur.prenom}`;
+    userResponse.nomComplet = `${utilisateur.prenom} ${utilisateur.nom}`;
     userResponse.isAdmin = utilisateur.role === ROLES.ADMIN;
 
     res.json({
@@ -489,9 +498,9 @@ const mettreAJourMoi = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc 	Changer le mot de passe de l'utilisateur connecté
- * @route 	 PUT /api/auth/changer-mot-de-passe
- * @access 	Private
+ * @desc    Changer le mot de passe de l'utilisateur connecté
+ * @route   PUT /api/auth/changer-mot-de-passe
+ * @access  Private
  */
 const changerMotDePasse = asyncHandler(async (req, res) => {
     const { motDePasseActuel, nouveauMotDePasse } = req.body;
@@ -525,9 +534,9 @@ const changerMotDePasse = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc 	Demande de réinitialisation de mot de passe
- * @route 	 POST /api/auth/mot-de-passe-oublie
- * @access 	Public
+ * @desc    Demande de réinitialisation de mot de passe
+ * @route   POST /api/auth/mot-de-passe-oublie
+ * @access  Public
  */
 const motDePasseOublie = asyncHandler(async (req, res) => {
     const { email } = req.body;
@@ -589,9 +598,9 @@ const motDePasseOublie = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc 	Réinitialisation du mot de passe avec le jeton
- * @route 	 PUT /api/auth/reinitialiser-mot-de-passe/:resetToken
- * @access 	Public
+ * @desc    Réinitialisation du mot de passe avec le jeton
+ * @route   PUT /api/auth/reinitialiser-mot-de-passe/:resetToken
+ * @access  Public
  */
 const reinitialiserMotDePasse = asyncHandler(async (req, res) => {
     const { motDePasse } = req.body;
@@ -636,9 +645,9 @@ const reinitialiserMotDePasse = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc 	Vérification d'email avec le jeton
- * @route 	 GET /api/auth/verifier-email/:verificationToken
- * @access 	Public
+ * @desc    Vérification d'email avec le jeton
+ * @route   GET /api/auth/verifier-email/:verificationToken
+ * @access  Public
  */
 const verifierEmail = asyncHandler(async (req, res) => {
     const { verificationToken } = req.params;
@@ -664,9 +673,9 @@ const verifierEmail = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc 	Renvoyer l'email de vérification
- * @route 	 POST /api/auth/renvoyer-verification
- * @access 	Private
+ * @desc    Renvoyer l'email de vérification
+ * @route   POST /api/auth/renvoyer-verification
+ * @access  Private
  */
 const renvoyerVerification = asyncHandler(async (req, res) => {
     const utilisateur = await Utilisateur.findById(req.utilisateur._id);

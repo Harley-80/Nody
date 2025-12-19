@@ -1,4 +1,3 @@
-// Importation des modules nécessaires
 import { envoyerEmail } from '../services/emailService.js';
 
 /**

@@ -26,11 +26,9 @@ import logoNody from '@/assets/logo/neos-brands-solid.svg';
 import { useTranslation } from 'react-i18next';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { useProduits } from '@/contexts/ProduitsContext';
+import { useDevise } from '@/contexts/DeviseContext';
 import imageSearchIcon from '@/assets/icons/recherche.png';
 import ImageSearch from './ImageSearch';
-import DeviseSelector from '../DeviseSelector';
-import LangueSelector from './LangueSelector';
 import CategoriesMegaMenu from './CategoriesMegaMenu';
 import CategoriesSidebar from './CategoriesSidebar';
 import './Header.scss';
@@ -44,7 +42,7 @@ export default function Header() {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const { panier } = useCart();
-    const { devise, setDevise } = useProduits();
+    const { devise, setDevise } = useDevise();
     const { user, logout } = useAuth();
 
     // Calcul du nombre total d'articles dans le panier
@@ -161,13 +159,48 @@ export default function Header() {
      * Gère la recherche par image
      * @param {File} imageFile - Fichier image à rechercher
      */
-    const handleImageSearch = imageFile => {
-        const formData = new FormData();
-        formData.append('image', imageFile);
-        console.log("Envoi de l'image pour recherche:", imageFile);
-        navigate(`/produits?imageSearch=true&timestamp=${Date.now()}`);
-        setImageSearchOpen(false);
-        closeMobile();
+    const handleImageSearch = async imageFile => {
+        try {
+            // Créer FormData pour l'upload
+            const formData = new FormData();
+            formData.append('image', imageFile);
+
+            // Afficher un message de chargement
+            console.log("Envoi de l'image pour recherche:", imageFile);
+
+            // Envoyer l'image au backend pour analyse
+            const response = await fetch(
+                'http://localhost:5000/api/produits/recherche-image',
+                {
+                    method: 'POST',
+                    body: formData,
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error('Erreur lors de la recherche par image');
+            }
+
+            const data = await response.json();
+
+            // Naviguer vers la page produits avec les résultats
+            if (data.produits && data.produits.length > 0) {
+                // Stocker les résultats dans localStorage
+                localStorage.setItem(
+                    'imageSearchResults',
+                    JSON.stringify(data.produits)
+                );
+                navigate(`/produits?imageSearch=true&timestamp=${Date.now()}`);
+            } else {
+                alert('Aucun produit similaire trouvé');
+            }
+
+            setImageSearchOpen(false);
+            closeMobile();
+        } catch (error) {
+            console.error('Erreur recherche image:', error);
+            alert('Erreur lors de la recherche par image. Veuillez réessayer.');
+        }
     };
 
     /**
@@ -419,7 +452,8 @@ export default function Header() {
                                                     <FontAwesomeIcon
                                                         icon={faGlobe}
                                                     />
-                                                    {t('Langue')}
+                                                    {t('header.language') ||
+                                                        'Langue'}
                                                 </h4>
                                                 <div className="config-options">
                                                     {[
@@ -470,7 +504,8 @@ export default function Header() {
                                                     <FontAwesomeIcon
                                                         icon={faMoneyBill}
                                                     />
-                                                    {t('Devise')}
+                                                    {t('header.currency') ||
+                                                        'Devise'}
                                                 </h4>
                                                 <div className="config-options">
                                                     {[
@@ -537,7 +572,7 @@ export default function Header() {
                                             <FontAwesomeIcon
                                                 icon={faUserShield}
                                             />
-                                            {t('header.admin')}
+                                            {t('header.admin') || 'Admin'}
                                         </Link>
                                         <button
                                             className="header-action-link"
@@ -546,7 +581,8 @@ export default function Header() {
                                             <FontAwesomeIcon
                                                 icon={faSignOutAlt}
                                             />
-                                            {t('header.logout')}
+                                            {t('header.logout') ||
+                                                'Déconnexion'}
                                         </button>
                                     </>
                                 ) : user ? (
@@ -559,7 +595,8 @@ export default function Header() {
                                         <span className="user-name">
                                             {user.prenom ||
                                                 user.nom ||
-                                                t('header.my_account')}
+                                                t('header.my_account') ||
+                                                'Mon compte'}
                                         </span>
                                     </Link>
                                 ) : (
@@ -673,7 +710,7 @@ export default function Header() {
                     <div className="config-section">
                         <h4 className="config-section-title">
                             <FontAwesomeIcon icon={faGlobe} />
-                            {t('header.language')}
+                            {t('header.language') || 'Langue'}
                         </h4>
                         <div className="config-options">
                             {[
@@ -711,7 +748,7 @@ export default function Header() {
                     <div className="config-section">
                         <h4 className="config-section-title">
                             <FontAwesomeIcon icon={faMoneyBill} />
-                            {t('header.currency')}
+                            {t('header.currency') || 'Devise'}
                         </h4>
                         <div className="config-options">
                             {['XOF', 'XAF', 'EUR', 'USD'].map(currency => (
@@ -811,11 +848,11 @@ export default function Header() {
                                 onClick={closeMobile}
                             >
                                 <FontAwesomeIcon icon={faUserShield} />
-                                {t('header.admin')}
+                                {t('header.admin') || 'Admin'}
                             </Link>
                             <button className="nav-link" onClick={handleLogout}>
                                 <FontAwesomeIcon icon={faSignOutAlt} />
-                                {t('header.logout')}
+                                {t('header.logout') || 'Déconnexion'}
                             </button>
                         </>
                     ) : user ? (
@@ -828,7 +865,8 @@ export default function Header() {
                             <span className="user-name">
                                 {user.prenom ||
                                     user.nom ||
-                                    t('header.my_account')}
+                                    t('header.my_account') ||
+                                    'Mon compte'}
                             </span>
                         </Link>
                     ) : (
@@ -838,7 +876,7 @@ export default function Header() {
                             onClick={closeMobile}
                         >
                             <FontAwesomeIcon icon={faSignInAlt} />
-                            {t('header.login')}
+                            {t('header.login') || 'Connexion'}
                         </Link>
                     )}
                 </div>

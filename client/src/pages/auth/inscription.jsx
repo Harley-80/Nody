@@ -32,7 +32,7 @@ const Inscription = () => {
     const [telephoneValide, setTelephoneValide] = useState(false);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    
+
     const handleChange = e => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -128,7 +128,7 @@ const Inscription = () => {
             setIsLoading(false);
         }
     };
-    
+
     const handleSocialRegister = provider => {
         console.log(`Inscription avec ${provider}`);
         addToast({

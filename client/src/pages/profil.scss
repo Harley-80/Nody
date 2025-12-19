@@ -1,522 +1,258 @@
-@use 'sass:color';
+// VARIABLES
+// Couleurs principales de Nody
+$nody-primary: #16213e;
+$nody-secondary: #0f3460;
+$nody-accent: #e94560;
+$nody-light: #f8f9fa;
+$nody-dark: #0a1929;
 
-// VARIABLES ET MIXINS
-$primary-color: #2c3e50;
-$secondary-color: #e74c3c;
-$accent-color: #3498db;
+// Couleurs UI
 $success-color: #27ae60;
 $warning-color: #f39c12;
 $danger-color: #e74c3c;
-$light-color: #ecf0f1;
-$dark-color: #2c3e50;
-$text-color: #333;
-$text-muted: #6c757d;
+$info-color: #3498db;
+
+// Couleurs de texte
+$text-primary: #2c3e50;
+$text-secondary: #6c757d;
+$text-muted: #95a5a6;
+$text-white: #ffffff;
+
+// Couleurs de fond
+$bg-light: #f5f7fa;
+$bg-white: #ffffff;
+$bg-card: #ffffff;
+
+// Bordures et ombres
 $border-color: #e9ecef;
-$background-light: #f8f9fa;
-$shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-$shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
 $border-radius: 12px;
-$transition: all 0.3s ease;
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+$shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
 
-// Couleurs fixes pour remplacer darken/lighten
-$primary-dark: #1a252f;
-$accent-light: #4fa3e3;
-$accent-dark: #2980b9;
-$success-dark: #219653;
-$warning-dark: #e67e22;
-$danger-dark: #c0392b;
-$text-muted-dark: #5a6268;
-
-@mixin flex-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-@mixin flex-between {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-@mixin card-style {
-    background: white;
-    border-radius: $border-radius;
-    box-shadow: $shadow;
-    border: 1px solid $border-color;
-    transition: $transition;
-    
-    &:hover {
-        box-shadow: $shadow-hover;
-        transform: translateY(-2px);
-    }
-}
-
-@mixin gradient-bg {
-    background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
-}
-
-@mixin badge-style($color, $dark-color) {
-    background: linear-gradient(135deg, $color 0%, $dark-color 100%);
-    color: white;
-    border: none;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-}
+// Transitions
+$transition-fast: all 0.2s ease;
+$transition-normal: all 0.3s ease;
+$transition-slow: all 0.5s ease;
 
 // STYLES GÉNÉRAUX DE LA PAGE PROFIL
 .profil-page {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     min-height: 100vh;
+    background: linear-gradient(135deg, $bg-light 0%, #e8eef5 100%);
     padding: 2rem 0;
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    // États de chargement et d'erreur
+    .loading-container,
+    .error-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+        background: $bg-white;
+        border-radius: $border-radius;
+        box-shadow: $shadow-md;
+        padding: 3rem;
+        text-align: center;
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid $border-color;
+            border-top-color: $nody-accent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        i {
+            font-size: 4rem;
+            color: $nody-accent;
+            margin-bottom: 1.5rem;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: $text-secondary;
+            margin-top: 1rem;
+        }
+
+        .btn-retry {
+            margin-top: 1.5rem;
+            padding: 0.75rem 2rem;
+            background: $nody-accent;
+            color: $text-white;
+            border: none;
+            border-radius: $border-radius;
+            font-weight: 600;
+            cursor: pointer;
+            transition: $transition-normal;
+
+            &:hover {
+                background: #c23a52;
+                transform: translateY(-2px);
+                box-shadow: $shadow-md;
+            }
+        }
+    }
 }
 
-.container.py-5 {
-    max-width: 1200px;
-    margin: 0 auto;
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 // EN-TÊTE DU PROFIL
 .profil-header {
-    margin-bottom: 3rem;
-    
-    .welcome-section {
-        h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: $dark-color;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, $primary-color, $accent-color);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .text-muted {
-            font-size: 1.1rem;
-            color: $text-muted;
-            margin-bottom: 2rem;
-        }
-    }
-    
-    .info-card {
-        @include card-style;
-        padding: 2rem;
-        position: relative;
-        overflow: hidden;
-        
-        &::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(to bottom, $accent-color, $primary-color);
-        }
-        
-        .card-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: $primary-color;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            
-            &::before {
-                content: '👤';
-                font-size: 1.2rem;
-            }
-        }
-        
-        p {
-            margin-bottom: 1rem;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            
-            strong {
-                color: $dark-color;
-                min-width: 140px;
-            }
-            
-            &:last-child {
-                margin-bottom: 0;
-            }
-        }
-    }
-    
-    .actions-section {
-        .d-grid {
-            gap: 1rem;
-            
-            .btn {
-                padding: 1rem 1.5rem;
-                border-radius: $border-radius;
-                font-weight: 600;
-                font-size: 1rem;
-                transition: $transition;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0.5rem;
-                border: 2px solid transparent;
-                
-                &.btn-outline-primary {
-                    border-color: $accent-color;
-                    color: $accent-color;
-                    
-                    &:hover {
-                        background: $accent-color;
-                        color: white;
-                        transform: translateY(-2px);
-                    }
-                }
-                
-                &.btn-outline-secondary {
-                    border-color: $text-muted;
-                    color: $text-muted;
-                    
-                    &:hover {
-                        background: $text-muted;
-                        color: white;
-                        transform: translateY(-2px);
-                    }
-                }
-                
-                &.btn-outline-danger {
-                    border-color: $danger-color;
-                    color: $danger-color;
-                    
-                    &:hover {
-                        background: $danger-color;
-                        color: white;
-                        transform: translateY(-2px);
-                    }
-                }
-            }
-        }
-    }
-}
-
-// SECTION HISTORIQUE DES COMMANDES
-.commandes-section {
-    h3 {
-        font-size: 2rem;
-        font-weight: 700;
-        color: $dark-color;
-        margin-bottom: 2rem;
-        position: relative;
-        padding-bottom: 0.5rem;
-        
-        &::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(to right, $accent-color, $primary-color);
-            border-radius: 2px;
-        }
-    }
-}
-
-// ÉTAT VIDE DES COMMANDES
-.empty-state {
-    padding: 4rem 2rem;
-    text-align: center;
-    @include card-style;
-    
-    .empty-icon {
-        font-size: 4rem;
-        color: $text-muted;
-        margin-bottom: 1.5rem;
-        opacity: 0.7;
-    }
-    
-    h5 {
-        font-size: 1.5rem;
-        color: $text-muted;
-        margin-bottom: 1rem;
-        font-weight: 600;
-    }
-    
-    p {
-        color: $text-muted;
-        margin-bottom: 2rem;
-        font-size: 1.1rem;
-    }
-    
-    .btn {
-        padding: 1rem 2rem;
-        font-size: 1.1rem;
-        font-weight: 600;
-        border-radius: $border-radius;
-        background: linear-gradient(135deg, $accent-color, $primary-color);
-        border: none;
-        color: white;
-        transition: $transition;
-        
-        &:hover {
-            transform: translateY(-2px);
-            box-shadow: $shadow-hover;
-        }
-    }
-}
-
-// ACCORDÉON DES COMMANDES
-.accordion {
-    gap: 1rem;
+    background: linear-gradient(135deg, $nody-primary 0%, $nody-secondary 100%);
+    border-radius: $border-radius;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: $shadow-md;
+    color: $text-white;
     display: flex;
-    flex-direction: column;
-    
-    .accordion-item {
-        @include card-style;
-        border: none;
-        overflow: hidden;
-        
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+
+        .avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, $nody-accent 0%, #c23a52 100%);
+            font-size: 2rem;
+            font-weight: 700;
+            color: $text-white;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+    }
+
+    .btn-deconnexion {
+        padding: 0.75rem 1.5rem;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: $text-white;
+        border-radius: $border-radius;
+        font-weight: 600;
+        cursor: pointer;
+        transition: $transition-normal;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
         &:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
             transform: translateY(-2px);
-        }
-        
-        .accordion-header {
-            .accordion-button {
-                background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-                border: none;
-                padding: 1.5rem;
-                font-weight: 600;
-                color: $dark-color;
-                transition: $transition;
-                
-                &:not(.collapsed) {
-                    background: linear-gradient(135deg, $accent-color, $accent-light);
-                    color: white;
-                    
-                    .badge {
-                        background: rgba(white, 0.2) !important;
-                        color: white;
-                    }
-                }
-                
-                &::after {
-                    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%232c3e50'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-                }
-                
-                &:not(.collapsed)::after {
-                    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-                }
-                
-                .badge {
-                    @include badge-style($accent-color, $accent-dark);
-                    font-size: 0.9rem;
-                }
-            }
-        }
-        
-        .accordion-collapse {
-            .accordion-body {
-                padding: 2rem;
-                background: #fafbfc;
-                
-                .client-info {
-                    margin-bottom: 1.5rem;
-                    
-                    h6 {
-                        font-size: 1.1rem;
-                        font-weight: 600;
-                        color: $primary-color;
-                        margin-bottom: 1rem;
-                        display: flex;
-                        align-items: center;
-                        gap: 0.5rem;
-                        
-                        &::before {
-                            content: '🚚';
-                        }
-                    }
-                    
-                    p {
-                        margin-bottom: 0.5rem;
-                        display: flex;
-                        align-items: center;
-                        gap: 0.5rem;
-                        
-                        strong {
-                            min-width: 80px;
-                            color: $dark-color;
-                        }
-                    }
-                }
-                
-                hr {
-                    margin: 1.5rem 0;
-                    border-color: $border-color;
-                    opacity: 0.6;
-                }
-                
-                h6 {
-                    font-size: 1.1rem;
-                    font-weight: 600;
-                    color: $primary-color;
-                    margin-bottom: 1rem;
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    
-                    &::before {
-                        content: '📦';
-                    }
-                }
-                
-                .list-group {
-                    .list-group-item {
-                        border: none;
-                        border-left: 3px solid $accent-color;
-                        margin-bottom: 0.5rem;
-                        border-radius: 8px;
-                        padding: 1rem;
-                        background: white;
-                        transition: $transition;
-                        
-                        &:hover {
-                            transform: translateX(5px);
-                            box-shadow: $shadow;
-                        }
-                        
-                        .badge {
-                            @include badge-style($text-muted, $text-muted-dark);
-                            font-size: 0.8rem;
-                        }
-                        
-                        small.text-muted {
-                            font-size: 0.9rem;
-                        }
-                    }
-                }
-                
-                .statut-commande {
-                    margin-top: 1.5rem;
-                    padding-top: 1rem;
-                    border-top: 1px solid $border-color;
-                    
-                    strong {
-                        color: $dark-color;
-                    }
-                    
-                    .badge {
-                        font-size: 0.9rem;
-                        padding: 0.5rem 1rem;
-                        
-                        &.bg-success {
-                            background: linear-gradient(135deg, $success-color, $success-dark) !important;
-                        }
-                        
-                        &.bg-warning {
-                            background: linear-gradient(135deg, $warning-color, $warning-dark) !important;
-                        }
-                        
-                        &.bg-danger {
-                            background: linear-gradient(135deg, $danger-color, $danger-dark) !important;
-                        }
-                        
-                        &.bg-secondary {
-                            background: linear-gradient(135deg, $text-muted, $text-muted-dark) !important;
-                        }
-                    }
-                }
-            }
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
     }
 }
 
-// SECTION ACTIONS DU COMPTE
-.actions-compte {
-    margin-top: 3rem;
-    
-    .card {
+// ONGLETS DE NAVIGATION
+.profil-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background: $bg-white;
+    padding: 0.5rem;
+    border-radius: $border-radius;
+    box-shadow: $shadow-sm;
+    overflow-x: auto;
+
+    &::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $nody-accent;
+        border-radius: 2px;
+    }
+
+    .tab {
+        flex: 1;
+        min-width: 150px;
+        padding: 1rem 1.5rem;
+        background: transparent;
         border: none;
-        @include card-style;
-        
-        .card-header {
-            background: linear-gradient(135deg, $warning-color, $warning-dark);
-            color: white;
-            border: none;
-            padding: 1.5rem 2rem;
-            
-            h5 {
-                font-size: 1.3rem;
-                font-weight: 700;
-                margin: 0;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                
-                &::before {
-                    content: '⚙️';
-                }
-            }
+        border-radius: calc($border-radius - 4px);
+        font-weight: 600;
+        color: $text-secondary;
+        cursor: pointer;
+        transition: $transition-normal;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+
+        i {
+            font-size: 1.2rem;
         }
-        
-        .card-body {
-            padding: 2rem;
-            
-            .card-text {
-                font-size: 1.1rem;
-                color: $text-color;
-                margin-bottom: 1.5rem;
-                line-height: 1.6;
-            }
-            
-            .d-flex {
-                gap: 1rem;
-                flex-wrap: wrap;
-                
-                .btn {
-                    padding: 1rem 1.5rem;
-                    font-weight: 600;
-                    border-radius: $border-radius;
-                    transition: $transition;
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    border: 2px solid transparent;
-                    
-                    &.btn-outline-warning {
-                        border-color: $warning-color;
-                        color: $warning-color;
-                        
-                        &:hover {
-                            background: $warning-color;
-                            color: white;
-                            transform: translateY(-2px);
-                        }
-                    }
-                    
-                    &.btn-outline-danger {
-                        border-color: $danger-color;
-                        color: $danger-color;
-                        
-                        &:hover {
-                            background: $danger-color;
-                            color: white;
-                            transform: translateY(-2px);
-                        }
-                    }
-                }
-            }
+
+        &:hover {
+            background: $bg-light;
+            color: $nody-primary;
+        }
+
+        &.active {
+            background: linear-gradient(
+                135deg,
+                $nody-primary 0%,
+                $nody-secondary 100%
+            );
+            color: $text-white;
+            box-shadow: $shadow-sm;
         }
     }
 }
 
-// ANIMATIONS ET EFFETS
-@keyframes fadeInUp {
+// CONTENU DES ONGLETS
+.profil-content {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
@@ -524,169 +260,382 @@ $text-muted-dark: #5a6268;
     }
 }
 
-.fade-in-up {
-    animation: fadeInUp 0.6s ease-out;
-}
+// ONGLET COMMANDES (Styles spécifiques)
+.commandes-tab {
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: $bg-white;
+        border-radius: $border-radius;
+        padding: 4rem 2rem;
+        box-shadow: $shadow-md;
+        text-align: center;
 
-// LOADING STATE
-.loading-state {
-    padding: 4rem 2rem;
-    text-align: center;
-    
-    .spinner-border {
-        width: 3rem;
-        height: 3rem;
-        border-width: 0.3em;
-        color: $accent-color;
+        i {
+            font-size: 5rem;
+            color: $text-muted;
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: $text-primary;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: $text-secondary;
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            padding: 1rem 2rem;
+            background: linear-gradient(
+                135deg,
+                $nody-primary 0%,
+                $nody-secondary 100%
+            );
+            color: $text-white;
+            border: none;
+            border-radius: $border-radius;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: $transition-normal;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: $shadow-md;
+            }
+        }
     }
-    
-    p {
-        margin-top: 1rem;
-        color: $text-muted;
-        font-size: 1.1rem;
+
+    .commandes-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+
+        .commande-card {
+            background: $bg-white;
+            border-radius: $border-radius;
+            box-shadow: $shadow-md;
+            overflow: hidden;
+            transition: $transition-normal;
+
+            &:hover {
+                transform: translateY(-4px);
+                box-shadow: $shadow-lg;
+            }
+
+            .commande-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1.5rem;
+                background: linear-gradient(135deg, $bg-light 0%, #e8eef5 100%);
+                border-bottom: 1px solid $border-color;
+
+                h4 {
+                    font-size: 1.2rem;
+                    font-weight: 700;
+                    color: $nody-primary;
+                    margin: 0;
+                }
+
+                .date {
+                    font-size: 0.9rem;
+                    color: $text-secondary;
+                    margin-top: 0.25rem;
+                }
+
+                .badge {
+                    padding: 0.5rem 1rem;
+                    border-radius: 20px;
+                    font-weight: 600;
+                    font-size: 0.85rem;
+
+                    &.badge-warning {
+                        background: linear-gradient(
+                            135deg,
+                            $warning-color 0%,
+                            #e67e22 100%
+                        );
+                        color: $text-white;
+                    }
+
+                    &.badge-info {
+                        background: linear-gradient(
+                            135deg,
+                            $info-color 0%,
+                            #2980b9 100%
+                        );
+                        color: $text-white;
+                    }
+
+                    &.badge-primary {
+                        background: linear-gradient(
+                            135deg,
+                            $nody-primary 0%,
+                            $nody-secondary 100%
+                        );
+                        color: $text-white;
+                    }
+
+                    &.badge-secondary {
+                        background: linear-gradient(
+                            135deg,
+                            $text-secondary 0%,
+                            #5a6268 100%
+                        );
+                        color: $text-white;
+                    }
+
+                    &.badge-success {
+                        background: linear-gradient(
+                            135deg,
+                            $success-color 0%,
+                            #219653 100%
+                        );
+                        color: $text-white;
+                    }
+
+                    &.badge-danger {
+                        background: linear-gradient(
+                            135deg,
+                            $danger-color 0%,
+                            #c0392b 100%
+                        );
+                        color: $text-white;
+                    }
+                }
+            }
+
+            .commande-produits {
+                padding: 1.5rem;
+                border-bottom: 1px solid $border-color;
+
+                .produit-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    padding: 1rem;
+                    background: $bg-light;
+                    border-radius: 8px;
+                    margin-bottom: 0.75rem;
+                    transition: $transition-fast;
+
+                    &:hover {
+                        background: #e8eef5;
+                        transform: translateX(4px);
+                    }
+
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
+
+                    img {
+                        width: 60px;
+                        height: 60px;
+                        border-radius: 8px;
+                        object-fit: cover;
+                        border: 2px solid $border-color;
+                    }
+
+                    .produit-info {
+                        flex: 1;
+
+                        .nom {
+                            font-weight: 600;
+                            color: $text-primary;
+                            margin: 0 0 0.25rem 0;
+                        }
+
+                        .quantite {
+                            font-size: 0.9rem;
+                            color: $text-secondary;
+                            margin: 0;
+                        }
+                    }
+
+                    .prix {
+                        font-weight: 700;
+                        color: $nody-accent;
+                        font-size: 1.1rem;
+                        margin: 0;
+                    }
+                }
+            }
+
+            .commande-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1.5rem;
+                background: $bg-light;
+
+                .total {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+
+                    span {
+                        font-size: 1rem;
+                        color: $text-secondary;
+                    }
+
+                    strong {
+                        font-size: 1.3rem;
+                        font-weight: 700;
+                        color: $nody-primary;
+                    }
+                }
+
+                .btn-details {
+                    padding: 0.75rem 1.5rem;
+                    background: linear-gradient(
+                        135deg,
+                        $nody-accent 0%,
+                        #c23a52 100%
+                    );
+                    color: $text-white;
+                    border: none;
+                    border-radius: $border-radius;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: $transition-normal;
+
+                    &:hover {
+                        background: linear-gradient(
+                            135deg,
+                            #c23a52 0%,
+                            #a32f44 100%
+                        );
+                        transform: translateY(-2px);
+                        box-shadow: $shadow-sm;
+                    }
+                }
+            }
+        }
     }
 }
 
 // RESPONSIVE DESIGN
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .profil-header {
-        .row {
-            flex-direction: column;
-            gap: 2rem;
-        }
-        
-        .welcome-section {
-            h2 {
-                font-size: 2rem;
+        .user-info {
+            .avatar {
+                width: 70px;
+                height: 70px;
+                font-size: 1.8rem;
             }
-        }
-        
-        .info-card {
-            padding: 1.5rem;
-        }
-        
-        .actions-section {
-            .d-grid {
-                .btn {
-                    padding: 0.8rem 1rem;
-                    font-size: 0.9rem;
-                }
-            }
-        }
-    }
-    
-    .commandes-section {
-        h3 {
-            font-size: 1.5rem;
-        }
-    }
-    
-    .accordion {
-        .accordion-item {
-            .accordion-header {
-                .accordion-button {
-                    padding: 1rem;
-                    font-size: 0.9rem;
-                    
-                    .d-flex {
-                        flex-direction: column;
-                        align-items: flex-start;
-                        gap: 0.5rem;
-                    }
-                }
-            }
-            
-            .accordion-collapse {
-                .accordion-body {
-                    padding: 1.5rem;
-                }
-            }
-        }
-    }
-    
-    .actions-compte {
-        .card {
-            .card-body {
-                padding: 1.5rem;
-                
-                .d-flex {
-                    flex-direction: column;
-                    
-                    .btn {
-                        width: 100%;
-                        justify-content: center;
-                    }
-                }
+
+            h1 {
+                font-size: 1.5rem;
             }
         }
     }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 768px) {
     .profil-page {
         padding: 1rem 0;
     }
-    
-    .container.py-5 {
-        padding: 1rem !important;
-    }
-    
-    .empty-state {
-        padding: 2rem 1rem;
-        
-        .empty-icon {
-            font-size: 3rem;
-        }
-        
-        h5 {
-            font-size: 1.2rem;
-        }
-        
-        .btn {
+
+    .profil-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.5rem;
+
+        .user-info {
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
             width: 100%;
+
+            .avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.3rem;
+            }
+        }
+
+        .btn-deconnexion {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    .profil-tabs {
+        .tab {
+            min-width: 120px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+
+            i {
+                font-size: 1rem;
+            }
+        }
+    }
+
+    .commandes-tab {
+        .commandes-list {
+            .commande-card {
+                .commande-header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 1rem;
+                }
+
+                .commande-footer {
+                    flex-direction: column;
+                    gap: 1rem;
+                    align-items: stretch;
+
+                    .total {
+                        justify-content: space-between;
+                    }
+
+                    .btn-details {
+                        width: 100%;
+                    }
+                }
+            }
         }
     }
 }
 
-// AMÉLIORATIONS VISUELLES
-.visually-hidden {
-    position: absolute !important;
-    width: 1px !important;
-    height: 1px !important;
-    padding: 0 !important;
-    margin: -1px !important;
-    overflow: hidden !important;
-    clip: rect(0, 0, 0, 0) !important;
-    white-space: nowrap !important;
-    border: 0 !important;
-}
+@media (max-width: 480px) {
+    .profil-tabs {
+        .tab {
+            font-size: 0.85rem;
+            padding: 0.75rem 0.75rem;
 
-// EFFETS DE SURVOL AMÉLIORÉS
-.btn, .card, .list-group-item {
-    transition: $transition;
-    
-    &:hover {
-        transform: translateY(-2px);
+            i {
+                font-size: 0.95rem;
+            }
+        }
     }
-}
 
-// TYPOGRAPHIE AMÉLIORÉE
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-}
+    .commandes-tab {
+        .empty-state {
+            padding: 2rem 1rem;
 
-h1, h2, h3, h4, h5, h6 {
-    font-weight: 700;
-    line-height: 1.2;
-}
+            i {
+                font-size: 3rem;
+            }
 
-// COULEURS ET THÈME
-:root {
-    --primary-color: #{$primary-color};
-    --secondary-color: #{$secondary-color};
-    --accent-color: #{$accent-color};
-    --success-color: #{$success-color};
-    --warning-color: #{$warning-color};
-    --danger-color: #{$danger-color};
+            h3 {
+                font-size: 1.3rem;
+            }
+        }
+    }
 }

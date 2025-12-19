@@ -1,0 +1,125 @@
+.filtres-periode {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e7eb;
+    margin-bottom: 2rem;
+
+    .filtres-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+
+        h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+    }
+
+    .periodes-predefinies {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .btn-periode {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        color: #64748b;
+        font-weight: 500;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        i {
+            font-size: 1.5rem;
+        }
+
+        &:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #475569;
+        }
+
+        &.active {
+            background: #16213e;
+            border-color: #16213e;
+            color: white;
+            box-shadow: 0 4px 12px rgba(22, 33, 62, 0.3);
+
+            &:hover {
+                background: #1a2847;
+                border-color: #1a2847;
+            }
+        }
+    }
+
+    .periode-personnalisee {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            padding: 0.625rem 0.875rem;
+
+            &:focus {
+                border-color: #16213e;
+                box-shadow: 0 0 0 3px rgba(22, 33, 62, 0.1);
+            }
+        }
+
+        .btn-primary {
+            background: #16213e;
+            border-color: #16213e;
+            border-radius: 8px;
+            padding: 0.625rem;
+
+            &:hover {
+                background: #1a2847;
+                border-color: #1a2847;
+            }
+
+            i {
+                font-size: 1.125rem;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .filtres-periode {
+        .filtres-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        .periodes-predefinies {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+}

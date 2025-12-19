@@ -1,8 +1,8 @@
-import React from 'react'
-import './Footer.scss'
-import logo from '../../../assets/logo/neos-brands-solid.svg'
-import appstore from '../../../assets/icons/appstore.png'
-import googleplay from '../../../assets/icons/googleplay.png'
+import React from 'react';
+import './Footer.scss';
+import logo from '../../../assets/logo/neos-brands-solid.svg';
+import appstore from '../../../assets/icons/appstore.png';
+import googleplay from '../../../assets/icons/googleplay.png';
 
 export default function Footer() {
     return (
@@ -123,5 +123,5 @@ export default function Footer() {
                 </div>
             </div>
         </footer>
-    )
+    );
 }

@@ -12,7 +12,10 @@ export default function Panier() {
         return (
             <div className="container py-5 text-center">
                 <h2>Votre panier est vide 🛒</h2>
-                <p className="lead">Découvrez nos <Link to="/produits">produits</Link> et commencez vos achats.</p>
+                <p className="lead">
+                    Découvrez nos <Link to="/produits">produits</Link> et
+                    commencez vos achats.
+                </p>
             </div>
         );
     }
@@ -40,7 +43,11 @@ export default function Panier() {
                                         <img
                                             src={item.image}
                                             alt={item.nom}
-                                            style={{ width: '60px', height: '60px', objectFit: 'cover' }}
+                                            style={{
+                                                width: '60px',
+                                                height: '60px',
+                                                objectFit: 'cover',
+                                            }}
                                             className="me-2 rounded"
                                         />
                                         <span>{item.nom}</span>
@@ -48,19 +55,31 @@ export default function Panier() {
                                 </td>
                                 <td>
                                     {item.options &&
-                                    Object.entries(item.options).map(([key, val]) => (
-                                        <div key={key}>
-                                            <small className="text-muted">{key} :</small> {val}
-                                        </div>
-                                    ))}
+                                        Object.entries(item.options).map(
+                                            ([key, val]) => (
+                                                <div key={key}>
+                                                    <small className="text-muted">
+                                                        {key} :
+                                                    </small>{' '}
+                                                    {val}
+                                                </div>
+                                            )
+                                        )}
                                 </td>
                                 <td>{item.quantite}</td>
                                 <td>{item.prix.toLocaleString()} XOF</td>
-                                <td className="fw-bold text-primary">{(item.prix * item.quantite).toLocaleString()} XOF</td>
+                                <td className="fw-bold text-primary">
+                                    {(
+                                        item.prix * item.quantite
+                                    ).toLocaleString()}{' '}
+                                    XOF
+                                </td>
                                 <td>
                                     <button
                                         className="btn btn-sm btn-outline-danger"
-                                        onClick={() => handleRemove(item.id, item.options)}
+                                        onClick={() =>
+                                            handleRemove(item.id, item.options)
+                                        }
                                     >
                                         <i className="fas fa-trash"></i>
                                     </button>
@@ -70,8 +89,12 @@ export default function Panier() {
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colSpan="4" className="text-end fw-bold fs-5">Total :</td>
-                            <td className="fw-bold fs-5 text-success">{totalPanier.toLocaleString()} XOF</td>
+                            <td colSpan="4" className="text-end fw-bold fs-5">
+                                Total :
+                            </td>
+                            <td className="fw-bold fs-5 text-success">
+                                {totalPanier.toLocaleString()} XOF
+                            </td>
                             <td></td>
                         </tr>
                     </tfoot>
@@ -79,7 +102,8 @@ export default function Panier() {
             </div>
             <div className="text-end mt-4">
                 <Link to="/paiement" className="btn btn-success btn-lg">
-                    <i className="fas fa-credit-card me-2"></i> Passer au paiement
+                    <i className="fas fa-credit-card me-2"></i> Passer au
+                    paiement
                 </Link>
             </div>
         </div>

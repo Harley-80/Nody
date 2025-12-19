@@ -1,0 +1,2726 @@
+[
+    {
+        "name": "Vêtements homme",
+        "parent": null,
+        "slug": "vetements-homme",
+        "level": 0
+    },
+    {
+        "name": "Vêtements femme",
+        "parent": null,
+        "slug": "vetements-femme",
+        "level": 0
+    },
+    {
+        "name": "Enfants",
+        "parent": null,
+        "slug": "enfants",
+        "level": 0
+    },
+    {
+        "name": "Chaussures",
+        "parent": null,
+        "slug": "chaussures",
+        "level": 0
+    },
+    {
+        "name": "Accessoires",
+        "parent": null,
+        "slug": "accessoires",
+        "level": 0
+    },
+    {
+        "name": "Sacs, bagages",
+        "parent": null,
+        "slug": "sacs-bagages",
+        "level": 0
+    },
+    {
+        "name": "Bijouterie",
+        "parent": null,
+        "slug": "bijouterie",
+        "level": 0
+    },
+    {
+        "name": "Extensions, perruques",
+        "parent": null,
+        "slug": "extensions-perruques",
+        "level": 0
+    },
+    {
+        "name": "Sous-vêtements, vêtements de détente",
+        "parent": null,
+        "slug": "sous-vetements-vetements-de-detente",
+        "level": 0
+    },
+    {
+        "name": "Pantalons",
+        "parent": "Vêtements homme",
+        "slug": "pantalons-homme",
+        "level": 1
+    },
+    {
+        "name": "Pulls",
+        "parent": "Vêtements homme",
+        "slug": "pulls-homme",
+        "level": 1
+    },
+    {
+        "name": "Blazers et costumes",
+        "parent": "Vêtements homme",
+        "slug": "blazers-costumes-homme",
+        "level": 1
+    },
+    {
+        "name": "Ensembles",
+        "parent": "Vêtements homme",
+        "slug": "ensembles-homme",
+        "level": 1
+    },
+    {
+        "name": "Doudounes",
+        "parent": "Vêtements homme",
+        "slug": "doudounes-homme",
+        "level": 1
+    },
+    {
+        "name": "Jeans",
+        "parent": "Vêtements homme",
+        "slug": "jeans-homme",
+        "level": 1
+    },
+    {
+        "name": "Vestes",
+        "parent": "Vêtements homme",
+        "slug": "vestes-homme",
+        "level": 1
+    },
+    {
+        "name": "Shorts",
+        "parent": "Vêtements homme",
+        "slug": "shorts-homme",
+        "level": 1
+    },
+    {
+        "name": "Chemises",
+        "parent": "Vêtements homme",
+        "slug": "chemises-homme",
+        "level": 1
+    },
+    {
+        "name": "Nouveautés",
+        "parent": "Vêtements homme",
+        "slug": "nouveautes-homme",
+        "level": 1
+    },
+    {
+        "name": "Plus d'options d'achats",
+        "parent": "Vêtements homme",
+        "slug": "plus-options-achats-homme",
+        "level": 1
+    },
+    {
+        "name": "Pantalons en cuir",
+        "parent": "Pantalons",
+        "slug": "pantalons-cuir-homme",
+        "level": 2
+    },
+    {
+        "name": "Pantalons crayon",
+        "parent": "Pantalons",
+        "slug": "pantalons-crayon-homme",
+        "level": 2
+    },
+    {
+        "name": "Pantalons décontractés",
+        "parent": "Pantalons",
+        "slug": "pantalons-decontractes-homme",
+        "level": 2
+    },
+    {
+        "name": "Pantalons droits",
+        "parent": "Pantalons",
+        "slug": "pantalons-droits-homme",
+        "level": 2
+    },
+    {
+        "name": "Pantalons bouffants",
+        "parent": "Pantalons",
+        "slug": "pantalons-bouffants-homme",
+        "level": 2
+    },
+    {
+        "name": "Joggings",
+        "parent": "Pantalons",
+        "slug": "joggings-homme",
+        "level": 2
+    },
+    {
+        "name": "Cols roulés",
+        "parent": "Pulls",
+        "slug": "cols-roules-homme",
+        "level": 2
+    },
+    {
+        "name": "Pulls imprimés",
+        "parent": "Pulls",
+        "slug": "pulls-imprimes-homme",
+        "level": 2
+    },
+    {
+        "name": "Gilets",
+        "parent": "Pulls",
+        "slug": "gilets-homme",
+        "level": 2
+    },
+    {
+        "name": "Gilets sans manches",
+        "parent": "Pulls",
+        "slug": "gilets-sans-manches-homme",
+        "level": 2
+    },
+    {
+        "name": "Pulls rayés",
+        "parent": "Pulls",
+        "slug": "pulls-rayes-homme",
+        "level": 2
+    },
+    {
+        "name": "Pulls",
+        "parent": "Pulls",
+        "slug": "pulls-simples-homme",
+        "level": 2
+    },
+    {
+        "name": "Vestes de costume",
+        "parent": "Blazers et costumes",
+        "slug": "vestes-costume-homme",
+        "level": 2
+    },
+    {
+        "name": "Costumes",
+        "parent": "Blazers et costumes",
+        "slug": "costumes-homme",
+        "level": 2
+    },
+    {
+        "name": "Costumes croisés",
+        "parent": "Blazers et costumes",
+        "slug": "costumes-croises-homme",
+        "level": 2
+    },
+    {
+        "name": "Blazers",
+        "parent": "Blazers et costumes",
+        "slug": "blazers-homme",
+        "level": 2
+    },
+    {
+        "name": "Costumes simple boutonnage",
+        "parent": "Blazers et costumes",
+        "slug": "costumes-simple-boutonnage-homme",
+        "level": 2
+    },
+    {
+        "name": "Pantalons de costume",
+        "parent": "Blazers et costumes",
+        "slug": "pantalons-costume-homme",
+        "level": 2
+    },
+    {
+        "name": "Ensembles de sport",
+        "parent": "Ensembles",
+        "slug": "ensembles-sport-homme",
+        "level": 2
+    },
+    {
+        "name": "Costumes tendances",
+        "parent": "Ensembles",
+        "slug": "costumes-tendances-homme",
+        "level": 2
+    },
+    {
+        "name": "Doudounes longues",
+        "parent": "Doudounes",
+        "slug": "doudounes-longues-homme",
+        "level": 2
+    },
+    {
+        "name": "Doudounes courtes",
+        "parent": "Doudounes",
+        "slug": "doudounes-courtes-homme",
+        "level": 2
+    },
+    {
+        "name": "Doudounes légères",
+        "parent": "Doudounes",
+        "slug": "doudounes-legeres-homme",
+        "level": 2
+    },
+    {
+        "name": "Doudounes à capuche",
+        "parent": "Doudounes",
+        "slug": "doudounes-capuche-homme",
+        "level": 2
+    },
+    {
+        "name": "Jeans brossés",
+        "parent": "Jeans",
+        "slug": "jeans-brosses-homme",
+        "level": 2
+    },
+    {
+        "name": "Jeans déchirés",
+        "parent": "Jeans",
+        "slug": "jeans-dechires-homme",
+        "level": 2
+    },
+    {
+        "name": "jeans destroy",
+        "parent": "Jeans",
+        "slug": "jeans-destroy-homme",
+        "level": 2
+    },
+    {
+        "name": "Jeans effilés",
+        "parent": "Jeans",
+        "slug": "jeans-effiles-homme",
+        "level": 2
+    },
+    {
+        "name": "Jeans slim",
+        "parent": "Jeans",
+        "slug": "jeans-slim-homme",
+        "level": 2
+    },
+    {
+        "name": "Jeans cargo/baggy",
+        "parent": "Jeans",
+        "slug": "jeans-cargo-baggy-homme",
+        "level": 2
+    },
+    {
+        "name": "Jeans délavés",
+        "parent": "Jeans",
+        "slug": "jeans-delaves-homme",
+        "level": 2
+    },
+    {
+        "name": "Jean",
+        "parent": "Jeans",
+        "slug": "jean-simple-homme",
+        "level": 2
+    },
+    {
+        "name": "Vestes bomber",
+        "parent": "Vestes",
+        "slug": "vestes-bomber-homme",
+        "level": 2
+    },
+    {
+        "name": "Manteaux",
+        "parent": "Vestes",
+        "slug": "manteaux-homme",
+        "level": 2
+    },
+    {
+        "name": "Vestes de baseball",
+        "parent": "Vestes",
+        "slug": "vestes-baseball-homme",
+        "level": 2
+    },
+    {
+        "name": "Gilet sans manches",
+        "parent": "Vestes",
+        "slug": "gilet-sans-manches-veste-homme",
+        "level": 2
+    },
+    {
+        "name": "Vestes en jean",
+        "parent": "Vestes",
+        "slug": "vestes-jean-homme",
+        "level": 2
+    },
+    {
+        "name": "Shorts de gym",
+        "parent": "Shorts",
+        "slug": "shorts-gym-homme",
+        "level": 2
+    },
+    {
+        "name": "Shorts de surf",
+        "parent": "Shorts",
+        "slug": "shorts-surf-homme",
+        "level": 2
+    },
+    {
+        "name": "Shorts en lin",
+        "parent": "Shorts",
+        "slug": "shorts-lin-homme",
+        "level": 2
+    },
+    {
+        "name": "Shorts en jean",
+        "parent": "Shorts",
+        "slug": "shorts-jean-homme",
+        "level": 2
+    },
+    {
+        "name": "Shorts cargo",
+        "parent": "Shorts",
+        "slug": "shorts-cargo-homme",
+        "level": 2
+    },
+    {
+        "name": "Shorts",
+        "parent": "Shorts",
+        "slug": "shorts-simples-homme",
+        "level": 2
+    },
+    {
+        "name": "Chemises cargo",
+        "parent": "Chemises",
+        "slug": "chemises-cargo-homme",
+        "level": 2
+    },
+    {
+        "name": "Chemises en lin",
+        "parent": "Chemises",
+        "slug": "chemises-lin-homme",
+        "level": 2
+    },
+    {
+        "name": "Chemises vestes",
+        "parent": "Chemises",
+        "slug": "chemises-vestes-homme",
+        "level": 2
+    },
+    {
+        "name": "Chemises imprimées ou motifs",
+        "parent": "Chemises",
+        "slug": "chemises-imprimees-motifs-homme",
+        "level": 2
+    },
+    {
+        "name": "Chemises en jean",
+        "parent": "Chemises",
+        "slug": "chemises-jean-homme",
+        "level": 2
+    },
+    {
+        "name": "Chemises unies",
+        "parent": "Chemises",
+        "slug": "chemises-unies-homme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés sweat ou pull-over",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-sweat-pull-over-homme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés pantalons",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-pantalons-homme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés shorts",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-shorts-homme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés ensembles",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-ensembles-homme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés costumes",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-costumes-homme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés t-shirts",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-t-shirts-homme",
+        "level": 2
+    },
+    {
+        "name": "Meilleures ventes",
+        "parent": "Plus d'options d'achats",
+        "slug": "meilleures-ventes-homme",
+        "level": 2
+    },
+    {
+        "name": "Bas",
+        "parent": "Vêtements femme",
+        "slug": "bas-femme",
+        "level": 1
+    },
+    {
+        "name": "Robes",
+        "parent": "Vêtements femme",
+        "slug": "robes-femme",
+        "level": 1
+    },
+    {
+        "name": "Robes occasion spéciale",
+        "parent": "Vêtements femme",
+        "slug": "robes-occasion-speciale-femme",
+        "level": 1
+    },
+    {
+        "name": "Grande taille",
+        "parent": "Vêtements femme",
+        "slug": "grande-taille-femme",
+        "level": 1
+    },
+    {
+        "name": "Vêtements d'extérieur",
+        "parent": "Vêtements femme",
+        "slug": "vetements-exterieur-femme",
+        "level": 1
+    },
+    {
+        "name": "Ensembles assortis",
+        "parent": "Vêtements femme",
+        "slug": "ensembles-assortis-femme",
+        "level": 1
+    },
+    {
+        "name": "Hauts",
+        "parent": "Vêtements femme",
+        "slug": "hauts-femme",
+        "level": 1
+    },
+    {
+        "name": "Maillots de bain",
+        "parent": "Vêtements femme",
+        "slug": "maillots-bain-femme",
+        "level": 1
+    },
+    {
+        "name": "Nouveautés",
+        "parent": "Vêtements femme",
+        "slug": "nouveautes-femme",
+        "level": 1
+    },
+    {
+        "name": "Plus d'options d'achats",
+        "parent": "Vêtements femme",
+        "slug": "plus-options-achats-femme",
+        "level": 1
+    },
+    {
+        "name": "Pantalons",
+        "parent": "Bas",
+        "slug": "pantalons-femme",
+        "level": 2
+    },
+    {
+        "name": "Shorts",
+        "parent": "Bas",
+        "slug": "shorts-femme",
+        "level": 2
+    },
+    {
+        "name": "Jupes",
+        "parent": "Bas",
+        "slug": "jupes-femme",
+        "level": 2
+    },
+    {
+        "name": "Jeans",
+        "parent": "Bas",
+        "slug": "jeans-femme",
+        "level": 2
+    },
+    {
+        "name": "collant",
+        "parent": "Bas",
+        "slug": "collant-femme",
+        "level": 2
+    },
+    {
+        "name": "Joggings",
+        "parent": "Bas",
+        "slug": "joggings-femme",
+        "level": 2
+    },
+    {
+        "name": "Robes tricotées",
+        "parent": "Robes",
+        "slug": "robes-tricotees-femme",
+        "level": 2
+    },
+    {
+        "name": "Robes longues",
+        "parent": "Robes",
+        "slug": "robes-longues-femme",
+        "level": 2
+    },
+    {
+        "name": "Robes à manches longues",
+        "parent": "Robes",
+        "slug": "robes-manches-longues-femme",
+        "level": 2
+    },
+    {
+        "name": "Robes de soirée",
+        "parent": "Robes",
+        "slug": "robes-soiree-femme",
+        "level": 2
+    },
+    {
+        "name": "Robes courtes",
+        "parent": "Robes",
+        "slug": "robes-courtes-femme",
+        "level": 2
+    },
+    {
+        "name": "Robes",
+        "parent": "Robes",
+        "slug": "robes-simples-femme",
+        "level": 2
+    },
+    {
+        "name": "Robes bal de promo",
+        "parent": "Robes occasion spéciale",
+        "slug": "robes-bal-promo-femme",
+        "level": 2
+    },
+    {
+        "name": "Robes de soirée",
+        "parent": "Robes occasion spéciale",
+        "slug": "robes-soiree-occasion-femme",
+        "level": 2
+    },
+    {
+        "name": "Robes africaines",
+        "parent": "Robes occasion spéciale",
+        "slug": "robes-africaines-femme",
+        "level": 2
+    },
+    {
+        "name": "Maillots de bain grande taille",
+        "parent": "Grande taille",
+        "slug": "maillots-bain-grande-taille-femme",
+        "level": 2
+    },
+    {
+        "name": "Vêtements d'extérieur grande taille",
+        "parent": "Grande taille",
+        "slug": "vetements-exterieur-grande-taille-femme",
+        "level": 2
+    },
+    {
+        "name": "Ensembles grande taille",
+        "parent": "Grande taille",
+        "slug": "ensembles-grande-taille-femme",
+        "level": 2
+    },
+    {
+        "name": "Grandes tailles",
+        "parent": "Grande taille",
+        "slug": "grandes-tailles-femme",
+        "level": 2
+    },
+    {
+        "name": "Hauts grande taille",
+        "parent": "Grande taille",
+        "slug": "hauts-grande-taille-femme",
+        "level": 2
+    },
+    {
+        "name": "Doudounes",
+        "parent": "Vêtements d'extérieur",
+        "slug": "doudounes-femme",
+        "level": 2
+    },
+    {
+        "name": "Manteaux en laine et manches longues",
+        "parent": "Vêtements d'extérieur",
+        "slug": "manteaux-laine-manches-longues-femme",
+        "level": 2
+    },
+    {
+        "name": "Doudounes longues",
+        "parent": "Vêtements d'extérieur",
+        "slug": "doudounes-longues-femme",
+        "level": 2
+    },
+    {
+        "name": "Doudounes courtes",
+        "parent": "Vêtements d'extérieur",
+        "slug": "doudounes-courtes-femme",
+        "level": 2
+    },
+    {
+        "name": "Gilets",
+        "parent": "Vêtements d'extérieur",
+        "slug": "gilets-femme",
+        "level": 2
+    },
+    {
+        "name": "Ensembles pantalons",
+        "parent": "Ensembles assortis",
+        "slug": "ensembles-pantalons-femme",
+        "level": 2
+    },
+    {
+        "name": "Ensembles shorts",
+        "parent": "Ensembles assortis",
+        "slug": "ensembles-shorts-femme",
+        "level": 2
+    },
+    {
+        "name": "Ensembles robes",
+        "parent": "Ensembles assortis",
+        "slug": "ensembles-robes-femme",
+        "level": 2
+    },
+    {
+        "name": "Ensembles pulls",
+        "parent": "Ensembles assortis",
+        "slug": "ensembles-pulls-femme",
+        "level": 2
+    },
+    {
+        "name": "Chemises et blouses",
+        "parent": "Hauts",
+        "slug": "chemises-blouses-femme",
+        "level": 2
+    },
+    {
+        "name": "Tricots",
+        "parent": "Hauts",
+        "slug": "tricots-femme",
+        "level": 2
+    },
+    {
+        "name": "Pulls chauds",
+        "parent": "Hauts",
+        "slug": "pulls-chauds-femme",
+        "level": 2
+    },
+    {
+        "name": "Pulls à col rond",
+        "parent": "Hauts",
+        "slug": "pulls-col-rond-femme",
+        "level": 2
+    },
+    {
+        "name": "T-shirts à manches longues",
+        "parent": "Hauts",
+        "slug": "t-shirts-manches-longues-femme",
+        "level": 2
+    },
+    {
+        "name": "T-shirts à manches court",
+        "parent": "Hauts",
+        "slug": "t-shirts-manches-court-femme",
+        "level": 2
+    },
+    {
+        "name": "Cols roulés",
+        "parent": "Hauts",
+        "slug": "cols-roules-femme",
+        "level": 2
+    },
+    {
+        "name": "Une pièce",
+        "parent": "Maillots de bain",
+        "slug": "une-piece-femme",
+        "level": 2
+    },
+    {
+        "name": "Bikinis ou tring",
+        "parent": "Maillots de bain",
+        "slug": "bikinis-tring-femme",
+        "level": 2
+    },
+    {
+        "name": "Pareos ou pagne",
+        "parent": "Maillots de bain",
+        "slug": "pareos-pagne-femme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés manteaux",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-manteaux-femme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés pantalons",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-pantalons-femme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés vêtements",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-vetements-femme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés robes",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-robes-femme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés ensembles",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-ensembles-femme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés pulls",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-pulls-femme",
+        "level": 2
+    },
+    {
+        "name": "Meilleures ventes",
+        "parent": "Plus d'options d'achats",
+        "slug": "meilleures-ventes-femme",
+        "level": 2
+    },
+    {
+        "name": "Accessoires enfants",
+        "parent": "Enfants",
+        "slug": "accessoires-enfants",
+        "level": 1
+    },
+    {
+        "name": "Vêtements enfant",
+        "parent": "Enfants",
+        "slug": "vetements-enfant",
+        "level": 1
+    },
+    {
+        "name": "Chaussures enfant",
+        "parent": "Enfants",
+        "slug": "chaussures-enfant",
+        "level": 1
+    },
+    {
+        "name": "Plus d'options d'achats",
+        "parent": "Enfants",
+        "slug": "plus-options-achats-enfant",
+        "level": 1
+    },
+    {
+        "name": "Chapeaux, écharpes, gants",
+        "parent": "Accessoires enfants",
+        "slug": "chapeaux-echarpes-gants-enfant",
+        "level": 2
+    },
+    {
+        "name": "Sacs enfants",
+        "parent": "Accessoires enfants",
+        "slug": "sacs-enfants",
+        "level": 2
+    },
+    {
+        "name": "Chaussure enfant",
+        "parent": "Vêtements enfant",
+        "slug": "chaussures-vetement-enfant",
+        "level": 2
+    },
+    {
+        "name": "Polos",
+        "parent": "Vêtements enfant",
+        "slug": "polos-enfant",
+        "level": 2
+    },
+    {
+        "name": "T-short",
+        "parent": "Vêtements enfant",
+        "slug": "t-short-enfant",
+        "level": 2
+    },
+    {
+        "name": "Shorts",
+        "parent": "Vêtements enfant",
+        "slug": "shorts-enfant",
+        "level": 2
+    },
+    {
+        "name": "Ensembles enfant",
+        "parent": "Vêtements enfant",
+        "slug": "ensembles-enfant",
+        "level": 2
+    },
+    {
+        "name": "Chaussettes enfant",
+        "parent": "Vêtements enfant",
+        "slug": "chaussettes-enfant",
+        "level": 2
+    },
+    {
+        "name": "Vêtements d'extérieur enfant",
+        "parent": "Vêtements enfant",
+        "slug": "vetements-exterieur-enfant",
+        "level": 2
+    },
+    {
+        "name": "Chaussures décontractées",
+        "parent": "Chaussures enfant",
+        "slug": "chaussures-decontractees-enfant",
+        "level": 2
+    },
+    {
+        "name": "Bottes enfant",
+        "parent": "Chaussures enfant",
+        "slug": "bottes-enfant",
+        "level": 2
+    },
+    {
+        "name": "Basket",
+        "parent": "Chaussures enfant",
+        "slug": "basket-enfant",
+        "level": 2
+    },
+    {
+        "name": "Mocassin",
+        "parent": "Chaussures enfant",
+        "slug": "mocassin-enfant",
+        "level": 2
+    },
+    {
+        "name": "Sandales",
+        "parent": "Chaussures enfant",
+        "slug": "sandales-enfant",
+        "level": 2
+    },
+    {
+        "name": "Meilleures ventes",
+        "parent": "Plus d'options d'achats",
+        "slug": "meilleures-ventes-enfant",
+        "level": 2
+    },
+    {
+        "name": "Chaussures décontractées",
+        "parent": "Chaussures",
+        "slug": "chaussures-decontractees",
+        "level": 1
+    },
+    {
+        "name": "Bottes femme",
+        "parent": "Chaussures",
+        "slug": "bottes-femme",
+        "level": 1
+    },
+    {
+        "name": "Chaussures plates",
+        "parent": "Chaussures",
+        "slug": "chaussures-plates",
+        "level": 1
+    },
+    {
+        "name": "Sandales et chaussures homme",
+        "parent": "Chaussures",
+        "slug": "sandales-chaussures-homme",
+        "level": 1
+    },
+    {
+        "name": "Chaussures à talons homme",
+        "parent": "Chaussures",
+        "slug": "chaussures-talons-homme",
+        "level": 1
+    },
+    {
+        "name": "Plus d'options d'achats",
+        "parent": "Chaussures",
+        "slug": "plus-options-achats-chaussures",
+        "level": 1
+    },
+    {
+        "name": "Chaussures décontractées (bis)",
+        "parent": "Chaussures",
+        "slug": "chaussures-decontractees-bis",
+        "level": 1
+    },
+    {
+        "name": "Accessoires",
+        "parent": "Chaussures",
+        "slug": "accessoires-chaussures",
+        "level": 1
+    },
+    {
+        "name": "Sandales et chaussons femme",
+        "parent": "Chaussures",
+        "slug": "sandales-chaussons-femme",
+        "level": 1
+    },
+    {
+        "name": "Bottes homme",
+        "parent": "Chaussures",
+        "slug": "bottes-homme",
+        "level": 1
+    },
+    {
+        "name": "Chaussures professionnelles",
+        "parent": "Chaussures",
+        "slug": "chaussures-professionnelles",
+        "level": 1
+    },
+    {
+        "name": "Bottines femme",
+        "parent": "Chaussures décontractées",
+        "slug": "bottines-femme",
+        "level": 2
+    },
+    {
+        "name": "Baskets femme",
+        "parent": "Chaussures décontractées",
+        "slug": "baskets-femme",
+        "level": 2
+    },
+    {
+        "name": "Chaussures en toile femme",
+        "parent": "Chaussures décontractées",
+        "slug": "chaussures-toile-femme",
+        "level": 2
+    },
+    {
+        "name": "Chaussures de skate femme",
+        "parent": "Chaussures décontractées",
+        "slug": "chaussures-skate-femme",
+        "level": 2
+    },
+    {
+        "name": "Chaussures mocassins femme",
+        "parent": "Chaussures décontractées",
+        "slug": "chaussures-mocassins-femme",
+        "level": 2
+    },
+    {
+        "name": "Bottines à lacets femme",
+        "parent": "Bottes femme",
+        "slug": "bottines-lacets-femme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés bottes femme",
+        "parent": "Bottes femme",
+        "slug": "nouveautes-bottes-femme",
+        "level": 2
+    },
+    {
+        "name": "Bottes de pluie",
+        "parent": "Bottes femme",
+        "slug": "bottes-pluie-femme",
+        "level": 2
+    },
+    {
+        "name": "Bottes hautes",
+        "parent": "Bottes femme",
+        "slug": "bottes-hautes-femme",
+        "level": 2
+    },
+    {
+        "name": "Chaussures babies",
+        "parent": "Chaussures plates",
+        "slug": "chaussures-babies",
+        "level": 2
+    },
+    {
+        "name": "Ballerines",
+        "parent": "Chaussures plates",
+        "slug": "ballerines",
+        "level": 2
+    },
+    {
+        "name": "Chaussures en cuir",
+        "parent": "Chaussures plates",
+        "slug": "chaussures-cuir-plates",
+        "level": 2
+    },
+    {
+        "name": "Chaussures compensées",
+        "parent": "Chaussures plates",
+        "slug": "chaussures-compensees",
+        "level": 2
+    },
+    {
+        "name": "Tongs homme",
+        "parent": "Sandales et chaussures homme",
+        "slug": "tongs-homme",
+        "level": 2
+    },
+    {
+        "name": "Sandales en cuir",
+        "parent": "Sandales et chaussures homme",
+        "slug": "sandales-cuir-homme",
+        "level": 2
+    },
+    {
+        "name": "Chaussons d'hiver homme",
+        "parent": "Sandales et chaussures homme",
+        "slug": "chaussons-hiver-homme",
+        "level": 2
+    },
+    {
+        "name": "Claquettes en plastique",
+        "parent": "Sandales et chaussures homme",
+        "slug": "claquettes-plastique-homme",
+        "level": 2
+    },
+    {
+        "name": "Sandales sport",
+        "parent": "Sandales et chaussures homme",
+        "slug": "sandales-sport-homme",
+        "level": 2
+    },
+    {
+        "name": "Chaussures à bout rond",
+        "parent": "Chaussures à talons homme",
+        "slug": "chaussures-bout-rond-homme",
+        "level": 2
+    },
+    {
+        "name": "Talons compensés",
+        "parent": "Chaussures à talons homme",
+        "slug": "talons-compenses-homme",
+        "level": 2
+    },
+    {
+        "name": "Chaussures à bout pointu",
+        "parent": "Chaussures à talons homme",
+        "slug": "chaussures-bout-pointu-homme",
+        "level": 2
+    },
+    {
+        "name": "Chaussures à bouts ouverts",
+        "parent": "Chaussures à talons homme",
+        "slug": "chaussures-bouts-ouverts-homme",
+        "level": 2
+    },
+    {
+        "name": "Talons très haut",
+        "parent": "Chaussures à talons homme",
+        "slug": "talons-tres-haut-homme",
+        "level": 2
+    },
+    {
+        "name": "Meilleures ventes",
+        "parent": "Plus d'options d'achats",
+        "slug": "meilleures-ventes-chaussures",
+        "level": 2
+    },
+    {
+        "name": "Mocassins homme",
+        "parent": "Chaussures décontractées (bis)",
+        "slug": "mocassins-homme",
+        "level": 2
+    },
+    {
+        "name": "Chaussures en toile homme",
+        "parent": "Chaussures décontractées (bis)",
+        "slug": "chaussures-toile-homme",
+        "level": 2
+    },
+    {
+        "name": "Chaussures en cuir",
+        "parent": "Chaussures décontractées (bis)",
+        "slug": "chaussures-cuir-homme",
+        "level": 2
+    },
+    {
+        "name": "Baskets décontractées",
+        "parent": "Chaussures décontractées (bis)",
+        "slug": "baskets-decontractees",
+        "level": 2
+    },
+    {
+        "name": "Chaussures sport",
+        "parent": "Chaussures décontractées (bis)",
+        "slug": "chaussures-sport",
+        "level": 2
+    },
+    {
+        "name": "Semelles intérieures",
+        "parent": "Accessoires",
+        "slug": "semelles-interieures",
+        "level": 2
+    },
+    {
+        "name": "Housses de chaussures",
+        "parent": "Accessoires",
+        "slug": "housses-chaussures",
+        "level": 2
+    },
+    {
+        "name": "Lacets",
+        "parent": "Accessoires",
+        "slug": "lacets",
+        "level": 2
+    },
+    {
+        "name": "Cirage à chaussures",
+        "parent": "Accessoires",
+        "slug": "cirage-chaussures",
+        "level": 2
+    },
+    {
+        "name": "Kits soin chaussures",
+        "parent": "Accessoires",
+        "slug": "kits-soin-chaussures",
+        "level": 2
+    },
+    {
+        "name": "Sandales à talons",
+        "parent": "Sandales et chaussons femme",
+        "slug": "sandales-talons-femme",
+        "level": 2
+    },
+    {
+        "name": "Mules",
+        "parent": "Sandales et chaussons femme",
+        "slug": "mules-femme",
+        "level": 2
+    },
+    {
+        "name": "Sandales à lanières",
+        "parent": "Sandales et chaussons femme",
+        "slug": "sandales-lanieres-femme",
+        "level": 2
+    },
+    {
+        "name": "Tongs femme",
+        "parent": "Sandales et chaussons femme",
+        "slug": "tongs-femme",
+        "level": 2
+    },
+    {
+        "name": "Sandales plates",
+        "parent": "Sandales et chaussons femme",
+        "slug": "sandales-plates-femme",
+        "level": 2
+    },
+    {
+        "name": "Chaussons d'hiver femme",
+        "parent": "Sandales et chaussons femme",
+        "slug": "chaussons-hiver-femme",
+        "level": 2
+    },
+    {
+        "name": "Bottines à lacets homme",
+        "parent": "Bottes homme",
+        "slug": "bottines-lacets-homme",
+        "level": 2
+    },
+    {
+        "name": "Chaussures travail et sécurité",
+        "parent": "Bottes homme",
+        "slug": "chaussures-travail-securite-homme",
+        "level": 2
+    },
+    {
+        "name": "Bottes en cuir",
+        "parent": "Bottes homme",
+        "slug": "bottes-cuir-homme",
+        "level": 2
+    },
+    {
+        "name": "Bottines militaires homme",
+        "parent": "Bottes homme",
+        "slug": "bottines-militaires-homme",
+        "level": 2
+    },
+    {
+        "name": "Chaussures derby",
+        "parent": "Chaussures professionnelles",
+        "slug": "chaussures-derby",
+        "level": 2
+    },
+    {
+        "name": "Chaussures élégantes",
+        "parent": "Chaussures professionnelles",
+        "slug": "chaussures-elegantes",
+        "level": 2
+    },
+    {
+        "name": "Mocassins",
+        "parent": "Chaussures professionnelles",
+        "slug": "mocassins-professionnels",
+        "level": 2
+    },
+    {
+        "name": "Chaussures décontractées",
+        "parent": "Chaussures professionnelles",
+        "slug": "chaussures-decontractees-professionnelles",
+        "level": 2
+    },
+    {
+        "name": "Écharpes et gants",
+        "parent": "Accessoires",
+        "slug": "echarpes-gants",
+        "level": 1
+    },
+    {
+        "name": "Chapeaux",
+        "parent": "Accessoires",
+        "slug": "chapeaux",
+        "level": 1
+    },
+    {
+        "name": "Ceintures",
+        "parent": "Accessoires",
+        "slug": "ceintures",
+        "level": 1
+    },
+    {
+        "name": "Lunettes de soleil",
+        "parent": "Accessoires",
+        "slug": "lunettes-soleil",
+        "level": 1
+    },
+    {
+        "name": "Plus d'options d'achats",
+        "parent": "Accessoires",
+        "slug": "plus-options-achats-accessoires",
+        "level": 1
+    },
+    {
+        "name": "Autres accessoires",
+        "parent": "Accessoires",
+        "slug": "autres-accessoires",
+        "level": 1
+    },
+    {
+        "name": "Accessoires de tête",
+        "parent": "Accessoires",
+        "slug": "accessoires-tete",
+        "level": 1
+    },
+    {
+        "name": "Foulards en soie",
+        "parent": "Écharpes et gants",
+        "slug": "foulards-soie",
+        "level": 2
+    },
+    {
+        "name": "Gants tricotés",
+        "parent": "Écharpes et gants",
+        "slug": "gants-tricotes",
+        "level": 2
+    },
+    {
+        "name": "Écharpes en soie",
+        "parent": "Écharpes et gants",
+        "slug": "echarpes-soie",
+        "level": 2
+    },
+    {
+        "name": "Écharpes unies",
+        "parent": "Écharpes et gants",
+        "slug": "echarpes-unies",
+        "level": 2
+    },
+    {
+        "name": "Écharpes cachemire",
+        "parent": "Écharpes et gants",
+        "slug": "echarpes-cachemire",
+        "level": 2
+    },
+    {
+        "name": "Écharpes à carreaux",
+        "parent": "Écharpes et gants",
+        "slug": "echarpes-carreaux",
+        "level": 2
+    },
+    {
+        "name": "Chapeaux fantaisie",
+        "parent": "Chapeaux",
+        "slug": "chapeaux-fantaisie",
+        "level": 2
+    },
+    {
+        "name": "Cagoules",
+        "parent": "Chapeaux",
+        "slug": "cagoules",
+        "level": 2
+    },
+    {
+        "name": "Chapeaux",
+        "parent": "Chapeaux",
+        "slug": "chapeaux-simples",
+        "level": 2
+    },
+    {
+        "name": "Chapeaux de soleil enfants",
+        "parent": "Chapeaux",
+        "slug": "chapeaux-soleil-enfants",
+        "level": 2
+    },
+    {
+        "name": "Casquettes",
+        "parent": "Chapeaux",
+        "slug": "casquettes",
+        "level": 2
+    },
+    {
+        "name": "Chaînes de taille",
+        "parent": "Ceintures",
+        "slug": "chaines-taille",
+        "level": 2
+    },
+    {
+        "name": "Ceintures homme",
+        "parent": "Ceintures",
+        "slug": "ceintures-homme",
+        "level": 2
+    },
+    {
+        "name": "Ceintures mode",
+        "parent": "Ceintures",
+        "slug": "ceintures-mode",
+        "level": 2
+    },
+    {
+        "name": "Accessoires ceinture",
+        "parent": "Ceintures",
+        "slug": "accessoires-ceinture",
+        "level": 2
+    },
+    {
+        "name": "Ceintures féminine",
+        "parent": "Ceintures",
+        "slug": "ceintures-feminine",
+        "level": 2
+    },
+    {
+        "name": "Lunettes de soleil femme",
+        "parent": "Lunettes de soleil",
+        "slug": "lunettes-soleil-femme",
+        "level": 2
+    },
+    {
+        "name": "Lunettes de soleil enfants",
+        "parent": "Lunettes de soleil",
+        "slug": "lunettes-soleil-enfants",
+        "level": 2
+    },
+    {
+        "name": "Lunettes de soleil polarisées",
+        "parent": "Lunettes de soleil",
+        "slug": "lunettes-soleil-polarisees",
+        "level": 2
+    },
+    {
+        "name": "Lunettes de soleil fantaisie",
+        "parent": "Lunettes de soleil",
+        "slug": "lunettes-soleil-fantaisie",
+        "level": 2
+    },
+    {
+        "name": "Lunettes de soleil tendance",
+        "parent": "Lunettes de soleil",
+        "slug": "lunettes-soleil-tendance",
+        "level": 2
+    },
+    {
+        "name": "Lunettes de soleil cycliste",
+        "parent": "Lunettes de soleil",
+        "slug": "lunettes-soleil-cycliste",
+        "level": 2
+    },
+    {
+        "name": "Meilleures ventes",
+        "parent": "Plus d'options d'achats",
+        "slug": "meilleures-ventes-accessoires",
+        "level": 2
+    },
+    {
+        "name": "Masques",
+        "parent": "Autres accessoires",
+        "slug": "masques",
+        "level": 2
+    },
+    {
+        "name": "Noeuds papillon",
+        "parent": "Autres accessoires",
+        "slug": "noeuds-papillon",
+        "level": 2
+    },
+    {
+        "name": "Mouchoirs en tissu",
+        "parent": "Autres accessoires",
+        "slug": "mouchoirs-tissu",
+        "level": 2
+    },
+    {
+        "name": "Cravates",
+        "parent": "Autres accessoires",
+        "slug": "cravates",
+        "level": 2
+    },
+    {
+        "name": "Cannes tendances",
+        "parent": "Autres accessoires",
+        "slug": "cannes-tendances",
+        "level": 2
+    },
+    {
+        "name": "Bretelles",
+        "parent": "Autres accessoires",
+        "slug": "bretelles",
+        "level": 2
+    },
+    {
+        "name": "Porte jarretelles",
+        "parent": "Autres accessoires",
+        "slug": "porte-jarretelles",
+        "level": 2
+    },
+    {
+        "name": "Pinces à cheveux",
+        "parent": "Accessoires de tête",
+        "slug": "pinces-cheveux",
+        "level": 2
+    },
+    {
+        "name": "Bonnets de nuit",
+        "parent": "Accessoires de tête",
+        "slug": "bonnets-nuit",
+        "level": 2
+    },
+    {
+        "name": "Élastiques et chouchous",
+        "parent": "Accessoires de tête",
+        "slug": "elastiques-chouchous",
+        "level": 2
+    },
+    {
+        "name": "Bandeaux",
+        "parent": "Accessoires de tête",
+        "slug": "bandeaux",
+        "level": 2
+    },
+    {
+        "name": "Barrettes à cheveux",
+        "parent": "Accessoires de tête",
+        "slug": "barrettes-cheveux",
+        "level": 2
+    },
+    {
+        "name": "Sac à main",
+        "parent": "Sacs, bagages",
+        "slug": "sac-main",
+        "level": 1
+    },
+    {
+        "name": "Portefeuille, porte-monnaie",
+        "parent": "Sacs, bagages",
+        "slug": "portefeuille-porte-monnaie",
+        "level": 1
+    },
+    {
+        "name": "Sacs à dos",
+        "parent": "Sacs, bagages",
+        "slug": "sacs-dos",
+        "level": 1
+    },
+    {
+        "name": "Sac banane",
+        "parent": "Sacs, bagages",
+        "slug": "sac-banane",
+        "level": 1
+    },
+    {
+        "name": "Plus d'options d'achats",
+        "parent": "Sacs, bagages",
+        "slug": "plus-options-achats-sacs",
+        "level": 1
+    },
+    {
+        "name": "Nouveautés",
+        "parent": "Sacs, bagages",
+        "slug": "nouveautes-sacs",
+        "level": 1
+    },
+    {
+        "name": "Sacs seau",
+        "parent": "Sac à main",
+        "slug": "sacs-seau",
+        "level": 2
+    },
+    {
+        "name": "Sacs Hobo",
+        "parent": "Sac à main",
+        "slug": "sacs-hobo",
+        "level": 2
+    },
+    {
+        "name": "Sacs carré",
+        "parent": "Sac à main",
+        "slug": "sacs-carre",
+        "level": 2
+    },
+    {
+        "name": "Sacs boston",
+        "parent": "Sac à main",
+        "slug": "sacs-boston",
+        "level": 2
+    },
+    {
+        "name": "Sac baguette",
+        "parent": "Sac à main",
+        "slug": "sac-baguette",
+        "level": 2
+    },
+    {
+        "name": "Accessoires sacs",
+        "parent": "Sac à main",
+        "slug": "accessoires-sacs",
+        "level": 2
+    },
+    {
+        "name": "Portefeuilles homme",
+        "parent": "Portefeuille, porte-monnaie",
+        "slug": "portefeuilles-homme",
+        "level": 2
+    },
+    {
+        "name": "Portefeuilles de voyage",
+        "parent": "Portefeuille, porte-monnaie",
+        "slug": "portefeuilles-voyage",
+        "level": 2
+    },
+    {
+        "name": "Portefeuilles femme",
+        "parent": "Portefeuille, porte-monnaie",
+        "slug": "portefeuilles-femme",
+        "level": 2
+    },
+    {
+        "name": "Porte-cartes de crédit",
+        "parent": "Portefeuille, porte-monnaie",
+        "slug": "porte-cartes-credit",
+        "level": 2
+    },
+    {
+        "name": "Portefeuilles cuir homme",
+        "parent": "Portefeuille, porte-monnaie",
+        "slug": "portefeuilles-cuir-homme",
+        "level": 2
+    },
+    {
+        "name": "Sacs à dos d'affaires",
+        "parent": "Sacs à dos",
+        "slug": "sacs-dos-affaires",
+        "level": 2
+    },
+    {
+        "name": "Sacs à dos antivol",
+        "parent": "Sacs à dos",
+        "slug": "sacs-dos-antivol",
+        "level": 2
+    },
+    {
+        "name": "Sacs bandoulière",
+        "parent": "Sacs à dos",
+        "slug": "sacs-bandouliere",
+        "level": 2
+    },
+    {
+        "name": "Sacoches",
+        "parent": "Sacs à dos",
+        "slug": "sacoches",
+        "level": 2
+    },
+    {
+        "name": "Sacs banane en cuir",
+        "parent": "Sac banane",
+        "slug": "sacs-banane-cuir",
+        "level": 2
+    },
+    {
+        "name": "Sacs banane à chaîne",
+        "parent": "Sac banane",
+        "slug": "sacs-banane-chaine",
+        "level": 2
+    },
+    {
+        "name": "Sacs banane sport",
+        "parent": "Sac banane",
+        "slug": "sacs-banane-sport",
+        "level": 2
+    },
+    {
+        "name": "Sacs banane en toile",
+        "parent": "Sac banane",
+        "slug": "sacs-banane-toile",
+        "level": 2
+    },
+    {
+        "name": "Meilleures ventes",
+        "parent": "Plus d'options d'achats",
+        "slug": "meilleures-ventes-sacs",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés sacs à main",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-sacs-main",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés sacs à dos",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-sacs-dos",
+        "level": 2
+    },
+    {
+        "name": "Bijoux",
+        "parent": "Bijouterie",
+        "slug": "bijoux",
+        "level": 1
+    },
+    {
+        "name": "Bagues",
+        "parent": "Bijouterie",
+        "slug": "bagues",
+        "level": 1
+    },
+    {
+        "name": "Autres bijoux",
+        "parent": "Bijouterie",
+        "slug": "autres-bijoux",
+        "level": 1
+    },
+    {
+        "name": "Bracelets",
+        "parent": "Bijouterie",
+        "slug": "bracelets",
+        "level": 1
+    },
+    {
+        "name": "Bijoux de corps",
+        "parent": "Bijouterie",
+        "slug": "bijoux-corps",
+        "level": 1
+    },
+    {
+        "name": "Matériel",
+        "parent": "Bijouterie",
+        "slug": "materiel-bijouterie",
+        "level": 1
+    },
+    {
+        "name": "Boucles d'oreilles",
+        "parent": "Bijouterie",
+        "slug": "boucles-oreilles",
+        "level": 1
+    },
+    {
+        "name": "Colliers",
+        "parent": "Bijouterie",
+        "slug": "colliers-bijoux",
+        "level": 1
+    },
+    {
+        "name": "Montres homme",
+        "parent": "Bijouterie",
+        "slug": "montres-homme",
+        "level": 1
+    },
+    {
+        "name": "Montres femme",
+        "parent": "Bijouterie",
+        "slug": "montres-femme",
+        "level": 1
+    },
+    {
+        "name": "Montres Connectées",
+        "parent": "Bijouterie",
+        "slug": "montres-connectees",
+        "level": 1
+    },
+    {
+        "name": "Plus d'options d'achats",
+        "parent": "Bijouterie",
+        "slug": "plus-options-achats-bijouterie",
+        "level": 1
+    },
+    {
+        "name": "Nouveautés",
+        "parent": "Bijouterie",
+        "slug": "nouveautes-bijouterie",
+        "level": 1
+    },
+    {
+        "name": "Parures de bijoux",
+        "parent": "Bijoux",
+        "slug": "parures-bijoux",
+        "level": 2
+    },
+    {
+        "name": "Emballages bijoux",
+        "parent": "Bijoux",
+        "slug": "emballages-bijoux",
+        "level": 2
+    },
+    {
+        "name": "Crochets bijoux",
+        "parent": "Bijoux",
+        "slug": "crochets-bijoux",
+        "level": 2
+    },
+    {
+        "name": "Médaillons",
+        "parent": "Bijoux",
+        "slug": "medaillons",
+        "level": 2
+    },
+    {
+        "name": "Chaînes",
+        "parent": "Bijoux",
+        "slug": "chaines-bijoux",
+        "level": 2
+    },
+    {
+        "name": "Bague pour femme",
+        "parent": "Bagues",
+        "slug": "bague-femme",
+        "level": 2
+    },
+    {
+        "name": "Bague pour homme",
+        "parent": "Bagues",
+        "slug": "bague-homme",
+        "level": 2
+    },
+    {
+        "name": "Bague de mariage",
+        "parent": "Bagues",
+        "slug": "bague-mariage",
+        "level": 2
+    },
+    {
+        "name": "Bague de couple",
+        "parent": "Bagues",
+        "slug": "bague-couple",
+        "level": 2
+    },
+    {
+        "name": "Bague connectée",
+        "parent": "Bagues",
+        "slug": "bague-connectee",
+        "level": 2
+    },
+    {
+        "name": "Bagues chevalières",
+        "parent": "Bagues",
+        "slug": "bagues-chevalieres",
+        "level": 2
+    },
+    {
+        "name": "Pinces à cravate",
+        "parent": "Autres bijoux",
+        "slug": "pinces-cravate",
+        "level": 2
+    },
+    {
+        "name": "Parures de bijoux",
+        "parent": "Autres bijoux",
+        "slug": "parures-bijoux-autres",
+        "level": 2
+    },
+    {
+        "name": "Porte-clés",
+        "parent": "Autres bijoux",
+        "slug": "porte-cles",
+        "level": 2
+    },
+    {
+        "name": "Broches",
+        "parent": "Autres bijoux",
+        "slug": "broches",
+        "level": 2
+    },
+    {
+        "name": "Bijoux cheveux",
+        "parent": "Autres bijoux",
+        "slug": "bijoux-cheveux",
+        "level": 2
+    },
+    {
+        "name": "Bracelets en argent",
+        "parent": "Bracelets",
+        "slug": "bracelets-argent",
+        "level": 2
+    },
+    {
+        "name": "Bracelets moissanite",
+        "parent": "Bracelets",
+        "slug": "bracelets-moissanite",
+        "level": 2
+    },
+    {
+        "name": "Bracelets pierre naturelle",
+        "parent": "Bracelets",
+        "slug": "bracelets-pierre-naturelle",
+        "level": 2
+    },
+    {
+        "name": "Bracelets chaîne",
+        "parent": "Bracelets",
+        "slug": "bracelets-chaine",
+        "level": 2
+    },
+    {
+        "name": "Bracelets en fil",
+        "parent": "Bracelets",
+        "slug": "bracelets-fil",
+        "level": 2
+    },
+    {
+        "name": "Bracelets plaqué or",
+        "parent": "Bracelets",
+        "slug": "bracelets-plaque-or",
+        "level": 2
+    },
+    {
+        "name": "Piercings d'oreille",
+        "parent": "Bijoux de corps",
+        "slug": "piercings-oreille",
+        "level": 2
+    },
+    {
+        "name": "Grills dents",
+        "parent": "Bijoux de corps",
+        "slug": "grills-dents",
+        "level": 2
+    },
+    {
+        "name": "Piercings nombril",
+        "parent": "Bijoux de corps",
+        "slug": "piercings-nombril",
+        "level": 2
+    },
+    {
+        "name": "Chaînes de corps",
+        "parent": "Bijoux de corps",
+        "slug": "chaines-corps",
+        "level": 2
+    },
+    {
+        "name": "Piercings nez",
+        "parent": "Bijoux de corps",
+        "slug": "piercings-nez",
+        "level": 2
+    },
+    {
+        "name": "Argent",
+        "parent": "Matériel",
+        "slug": "argent",
+        "level": 2
+    },
+    {
+        "name": "Argent 925",
+        "parent": "Matériel",
+        "slug": "argent-925",
+        "level": 2
+    },
+    {
+        "name": "Perles",
+        "parent": "Matériel",
+        "slug": "perles",
+        "level": 2
+    },
+    {
+        "name": "Or plaqué",
+        "parent": "Matériel",
+        "slug": "or-plaque",
+        "level": 2
+    },
+    {
+        "name": "Pierres précieuses",
+        "parent": "Matériel",
+        "slug": "pierres-precieuses",
+        "level": 2
+    },
+    {
+        "name": "Moissanite",
+        "parent": "Matériel",
+        "slug": "moissanite",
+        "level": 2
+    },
+    {
+        "name": "Boucles d'oreilles plaqué or",
+        "parent": "Boucles d'oreilles",
+        "slug": "boucles-oreilles-plaque-or",
+        "level": 2
+    },
+    {
+        "name": "Sets boucles d'oreilles",
+        "parent": "Boucles d'oreilles",
+        "slug": "sets-boucles-oreilles",
+        "level": 2
+    },
+    {
+        "name": "Boucles d'oreilles en argent",
+        "parent": "Boucles d'oreilles",
+        "slug": "boucles-oreilles-argent",
+        "level": 2
+    },
+    {
+        "name": "Créoles",
+        "parent": "Boucles d'oreilles",
+        "slug": "creoles",
+        "level": 2
+    },
+    {
+        "name": "Boucles d'oreilles en perle",
+        "parent": "Boucles d'oreilles",
+        "slug": "boucles-oreilles-perle",
+        "level": 2
+    },
+    {
+        "name": "Boucles d'oreilles pendantes",
+        "parent": "Boucles d'oreilles",
+        "slug": "boucles-oreilles-pendantes",
+        "level": 2
+    },
+    {
+        "name": "Colliers femme",
+        "parent": "Colliers",
+        "slug": "colliers-femme",
+        "level": 2
+    },
+    {
+        "name": "Colliers en argent",
+        "parent": "Colliers",
+        "slug": "colliers-argent",
+        "level": 2
+    },
+    {
+        "name": "Colliers hip-hop",
+        "parent": "Colliers",
+        "slug": "colliers-hip-hop",
+        "level": 2
+    },
+    {
+        "name": "Colliers de perles",
+        "parent": "Colliers",
+        "slug": "colliers-perles",
+        "level": 2
+    },
+    {
+        "name": "Colliers homme",
+        "parent": "Colliers",
+        "slug": "colliers-homme",
+        "level": 2
+    },
+    {
+        "name": "Collier superposé",
+        "parent": "Colliers",
+        "slug": "collier-superpose",
+        "level": 2
+    },
+    {
+        "name": "Montres mécaniques",
+        "parent": "Montres homme",
+        "slug": "montres-mecaniques-homme",
+        "level": 2
+    },
+    {
+        "name": "Montres automatiques",
+        "parent": "Montres homme",
+        "slug": "montres-automatiques-homme",
+        "level": 2
+    },
+    {
+        "name": "Montres à quartz",
+        "parent": "Montres homme",
+        "slug": "montres-quartz-homme",
+        "level": 2
+    },
+    {
+        "name": "Montres digitales",
+        "parent": "Montres homme",
+        "slug": "montres-digitales-homme",
+        "level": 2
+    },
+    {
+        "name": "Montres de sport",
+        "parent": "Montres homme",
+        "slug": "montres-sport-homme",
+        "level": 2
+    },
+    {
+        "name": "Montres de luxe",
+        "parent": "Montres homme",
+        "slug": "montres-luxe-homme",
+        "level": 2
+    },
+    {
+        "name": "Montres vintage",
+        "parent": "Montres homme",
+        "slug": "montres-vintage-homme",
+        "level": 2
+    },
+    {
+        "name": "Montres en cuir",
+        "parent": "Montres homme",
+        "slug": "montres-cuir-homme",
+        "level": 2
+    },
+    {
+        "name": "Bracelets de montres",
+        "parent": "Montres homme",
+        "slug": "bracelets-montres-homme",
+        "level": 2
+    },
+    {
+        "name": "Étuis montre homme",
+        "parent": "Montres homme",
+        "slug": "etuis-montre-homme",
+        "level": 2
+    },
+    {
+        "name": "Enrouleurs de montre",
+        "parent": "Montres homme",
+        "slug": "enrouleurs-montre-homme",
+        "level": 2
+    },
+    {
+        "name": "Montres mécaniques",
+        "parent": "Montres femme",
+        "slug": "montres-mecaniques-femme",
+        "level": 2
+    },
+    {
+        "name": "Montres à quartz",
+        "parent": "Montres femme",
+        "slug": "montres-quartz-femme",
+        "level": 2
+    },
+    {
+        "name": "Montres automatiques",
+        "parent": "Montres femme",
+        "slug": "montres-automatiques-femme",
+        "level": 2
+    },
+    {
+        "name": "Montres bracelet",
+        "parent": "Montres femme",
+        "slug": "montres-bracelet-femme",
+        "level": 2
+    },
+    {
+        "name": "Montres en cuir",
+        "parent": "Montres femme",
+        "slug": "montres-cuir-femme",
+        "level": 2
+    },
+    {
+        "name": "Montres de luxe",
+        "parent": "Montres femme",
+        "slug": "montres-luxe-femme",
+        "level": 2
+    },
+    {
+        "name": "Montres vintage",
+        "parent": "Montres femme",
+        "slug": "montres-vintage-femme",
+        "level": 2
+    },
+    {
+        "name": "Montres de sport",
+        "parent": "Montres femme",
+        "slug": "montres-sport-femme",
+        "level": 2
+    },
+    {
+        "name": "Bracelets de montres",
+        "parent": "Montres femme",
+        "slug": "bracelets-montres-femme",
+        "level": 2
+    },
+    {
+        "name": "Etuis montre femme",
+        "parent": "Montres femme",
+        "slug": "etuis-montre-femme",
+        "level": 2
+    },
+    {
+        "name": "Enrouleurs de montre",
+        "parent": "Montres femme",
+        "slug": "enrouleurs-montre-femme",
+        "level": 2
+    },
+    {
+        "name": "Montres connectées GPS",
+        "parent": "Montres Connectées",
+        "slug": "montres-connectees-gps",
+        "level": 2
+    },
+    {
+        "name": "Montres connectées de sport",
+        "parent": "Montres Connectées",
+        "slug": "montres-connectees-sport",
+        "level": 2
+    },
+    {
+        "name": "Montres connectées pour enfants",
+        "parent": "Montres Connectées",
+        "slug": "montres-connectees-enfants",
+        "level": 2
+    },
+    {
+        "name": "Montres connectées avec appel et SMS",
+        "parent": "Montres Connectées",
+        "slug": "montres-connectees-appel-sms",
+        "level": 2
+    },
+    {
+        "name": "Montres connectées avec mesure de la fréquence cardiaque",
+        "parent": "Montres Connectées",
+        "slug": "montres-connectees-frequence-cardiaque",
+        "level": 2
+    },
+    {
+        "name": "Meilleures ventes",
+        "parent": "Plus d'options d'achats",
+        "slug": "meilleures-ventes-bijouterie",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés porte-clés",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-porte-cles",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés montres homme",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-montres-homme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés colliers",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-colliers",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés bracelets",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-bracelets",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés bagues",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-bagues",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés fermoirs",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-fermoirs",
+        "level": 2
+    },
+    {
+        "name": "Extensions cheveux",
+        "parent": "Extensions, perruques",
+        "slug": "extensions-cheveux",
+        "level": 1
+    },
+    {
+        "name": "Postiches",
+        "parent": "Extensions, perruques",
+        "slug": "postiches",
+        "level": 1
+    },
+    {
+        "name": "Perruques tendances",
+        "parent": "Extensions, perruques",
+        "slug": "perruques-tendances",
+        "level": 1
+    },
+    {
+        "name": "Plus d'options d'achats",
+        "parent": "Extensions, perruques",
+        "slug": "plus-options-achats-extensions",
+        "level": 1
+    },
+    {
+        "name": "Accessoires perruques",
+        "parent": "Extensions, perruques",
+        "slug": "accessoires-perruques",
+        "level": 1
+    },
+    {
+        "name": "Perruques en dentelle",
+        "parent": "Extensions, perruques",
+        "slug": "perruques-dentelle",
+        "level": 1
+    },
+    {
+        "name": "Perruques",
+        "parent": "Extensions, perruques",
+        "slug": "perruques-simples",
+        "level": 1
+    },
+    {
+        "name": "Extensions à clip",
+        "parent": "Extensions cheveux",
+        "slug": "extensions-clip",
+        "level": 2
+    },
+    {
+        "name": "Mèches pour crochets",
+        "parent": "Extensions cheveux",
+        "slug": "meches-crochets",
+        "level": 2
+    },
+    {
+        "name": "Extensions cheveux humains",
+        "parent": "Extensions cheveux",
+        "slug": "extensions-cheveux-humains",
+        "level": 2
+    },
+    {
+        "name": "Tissages",
+        "parent": "Extensions cheveux",
+        "slug": "tissages",
+        "level": 2
+    },
+    {
+        "name": "Mèches avec closures",
+        "parent": "Extensions cheveux",
+        "slug": "meches-closures",
+        "level": 2
+    },
+    {
+        "name": "Grosses tresses",
+        "parent": "Extensions cheveux",
+        "slug": "grosses-tresses",
+        "level": 2
+    },
+    {
+        "name": "Toupets",
+        "parent": "Postiches",
+        "slug": "toupets",
+        "level": 2
+    },
+    {
+        "name": "Queues de cheval synthétiques",
+        "parent": "Postiches",
+        "slug": "queues-cheval-synthetiques",
+        "level": 2
+    },
+    {
+        "name": "Chignons synthétiques",
+        "parent": "Postiches",
+        "slug": "chignons-synthetiques",
+        "level": 2
+    },
+    {
+        "name": "Volumateurs capillaires",
+        "parent": "Postiches",
+        "slug": "volumateurs-capillaires",
+        "level": 2
+    },
+    {
+        "name": "Franges",
+        "parent": "Postiches",
+        "slug": "franges",
+        "level": 2
+    },
+    {
+        "name": "Queues de cheval cheveux",
+        "parent": "Postiches",
+        "slug": "queues-cheval-cheveux",
+        "level": 2
+    },
+    {
+        "name": "Perruques ondulées",
+        "parent": "Perruques tendances",
+        "slug": "perruques-ondulees",
+        "level": 2
+    },
+    {
+        "name": "Perruques bouclées",
+        "parent": "Perruques tendances",
+        "slug": "perruques-bouclees",
+        "level": 2
+    },
+    {
+        "name": "Perruques en dentelle",
+        "parent": "Perruques tendances",
+        "slug": "perruques-dentelle-tendances",
+        "level": 2
+    },
+    {
+        "name": "Perruques tressées en dentelle",
+        "parent": "Perruques tendances",
+        "slug": "perruques-tressees-dentelle",
+        "level": 2
+    },
+    {
+        "name": "Meilleures ventes",
+        "parent": "Plus d'options d'achats",
+        "slug": "meilleures-ventes-extensions",
+        "level": 2
+    },
+    {
+        "name": "Filets à cheveux",
+        "parent": "Accessoires perruques",
+        "slug": "filets-cheveux",
+        "level": 2
+    },
+    {
+        "name": "Supports pour perruque",
+        "parent": "Accessoires perruques",
+        "slug": "supports-perruque",
+        "level": 2
+    },
+    {
+        "name": "Perruques synthétiques",
+        "parent": "Perruques en dentelle",
+        "slug": "perruques-synthetiques",
+        "level": 2
+    },
+    {
+        "name": "Perruques naturelles raides",
+        "parent": "Perruques en dentelle",
+        "slug": "perruques-naturelles-raides",
+        "level": 2
+    },
+    {
+        "name": "Perruques naturelles",
+        "parent": "Perruques en dentelle",
+        "slug": "perruques-naturelles",
+        "level": 2
+    },
+    {
+        "name": "Perruques en soie à base",
+        "parent": "Perruques en dentelle",
+        "slug": "perruques-soie-base",
+        "level": 2
+    },
+    {
+        "name": "Perruques Dentelle Handmade",
+        "parent": "Perruques en dentelle",
+        "slug": "perruques-dentelle-handmade",
+        "level": 2
+    },
+    {
+        "name": "Perruques naturelles (bis)",
+        "parent": "Perruques en dentelle",
+        "slug": "perruques-naturelles-bis",
+        "level": 2
+    },
+    {
+        "name": "Perruques bandeau",
+        "parent": "Perruques",
+        "slug": "perruques-bandeau",
+        "level": 2
+    },
+    {
+        "name": "Perruques en U",
+        "parent": "Perruques",
+        "slug": "perruques-en-u",
+        "level": 2
+    },
+    {
+        "name": "Perruques juives",
+        "parent": "Perruques",
+        "slug": "perruques-juives",
+        "level": 2
+    },
+    {
+        "name": "Perruques afro",
+        "parent": "Perruques",
+        "slug": "perruques-afro",
+        "level": 2
+    },
+    {
+        "name": "Perruques coupe Pixie",
+        "parent": "Perruques",
+        "slug": "perruques-coupe-pixie",
+        "level": 2
+    },
+    {
+        "name": "Sous-vêtements homme",
+        "parent": "Sous-vêtements, vêtements de détente",
+        "slug": "sous-vetements-homme",
+        "level": 1
+    },
+    {
+        "name": "Chaussettes",
+        "parent": "Sous-vêtements, vêtements de détente",
+        "slug": "chaussettes-sous-vetements",
+        "level": 1
+    },
+    {
+        "name": "Lingerie sculptante",
+        "parent": "Sous-vêtements, vêtements de détente",
+        "slug": "lingerie-sculptante",
+        "level": 1
+    },
+    {
+        "name": "Soutien-gorge",
+        "parent": "Sous-vêtements, vêtements de détente",
+        "slug": "soutien-gorge",
+        "level": 1
+    },
+    {
+        "name": "Culottes",
+        "parent": "Sous-vêtements, vêtements de détente",
+        "slug": "culottes-sous-vetements",
+        "level": 1
+    },
+    {
+        "name": "Détente et sommeil",
+        "parent": "Sous-vêtements, vêtements de détente",
+        "slug": "detente-sommeil",
+        "level": 1
+    },
+    {
+        "name": "Nouveautés",
+        "parent": "Sous-vêtements, vêtements de détente",
+        "slug": "nouveautes-sous-vetements",
+        "level": 1
+    },
+    {
+        "name": "Plus d'options d'achats",
+        "parent": "Sous-vêtements, vêtements de détente",
+        "slug": "plus-options-achats-sous-vetements",
+        "level": 1
+    },
+    {
+        "name": "Boxers",
+        "parent": "Sous-vêtements homme",
+        "slug": "boxers",
+        "level": 2
+    },
+    {
+        "name": "Maillots de corps",
+        "parent": "Sous-vêtements homme",
+        "slug": "maillots-corps",
+        "level": 2
+    },
+    {
+        "name": "Chaussettes",
+        "parent": "Sous-vêtements homme",
+        "slug": "chaussettes-homme-sous-vetements",
+        "level": 2
+    },
+    {
+        "name": "Corsets sport hommes",
+        "parent": "Sous-vêtements homme",
+        "slug": "corsets-sport-hommes",
+        "level": 2
+    },
+    {
+        "name": "Pyjamas",
+        "parent": "Sous-vêtements homme",
+        "slug": "pyjamas-homme",
+        "level": 2
+    },
+    {
+        "name": "Sous-vêtements thermiques",
+        "parent": "Sous-vêtements homme",
+        "slug": "sous-vetements-thermiques",
+        "level": 2
+    },
+    {
+        "name": "Bas",
+        "parent": "Chaussettes",
+        "slug": "bas-chaussettes",
+        "level": 2
+    },
+    {
+        "name": "Chaussettes d'hiver",
+        "parent": "Chaussettes",
+        "slug": "chaussettes-hiver",
+        "level": 2
+    },
+    {
+        "name": "Chaussettes chaudes",
+        "parent": "Chaussettes",
+        "slug": "chaussettes-chaudes",
+        "level": 2
+    },
+    {
+        "name": "Chaussettes basses",
+        "parent": "Chaussettes",
+        "slug": "chaussettes-basses",
+        "level": 2
+    },
+    {
+        "name": "Chaussettes JK",
+        "parent": "Chaussettes",
+        "slug": "chaussettes-jk",
+        "level": 2
+    },
+    {
+        "name": "Chaussettes (bis)",
+        "parent": "Chaussettes",
+        "slug": "chaussettes-bis",
+        "level": 2
+    },
+    {
+        "name": "Gaines",
+        "parent": "Lingerie sculptante",
+        "slug": "gaines",
+        "level": 2
+    },
+    {
+        "name": "Corsets",
+        "parent": "Lingerie sculptante",
+        "slug": "corsets",
+        "level": 2
+    },
+    {
+        "name": "Culottes sculptantes",
+        "parent": "Lingerie sculptante",
+        "slug": "culottes-sculptantes",
+        "level": 2
+    },
+    {
+        "name": "Body",
+        "parent": "Lingerie sculptante",
+        "slug": "body",
+        "level": 2
+    },
+    {
+        "name": "Soutien-gorge adhésifs",
+        "parent": "Soutien-gorge",
+        "slug": "soutien-gorge-adhesifs",
+        "level": 2
+    },
+    {
+        "name": "Brassières sport",
+        "parent": "Soutien-gorge",
+        "slug": "brassieres-sport",
+        "level": 2
+    },
+    {
+        "name": "Soutien-gorge sans coutures",
+        "parent": "Soutien-gorge",
+        "slug": "soutien-gorge-sans-coutures",
+        "level": 2
+    },
+    {
+        "name": "Soutien-gorge sans bretelles",
+        "parent": "Soutien-gorge",
+        "slug": "soutien-gorge-sans-bretelles",
+        "level": 2
+    },
+    {
+        "name": "Soutien-gorge sexy",
+        "parent": "Soutien-gorge",
+        "slug": "soutien-gorge-sexy",
+        "level": 2
+    },
+    {
+        "name": "Soutien-gorge push-up",
+        "parent": "Soutien-gorge",
+        "slug": "soutien-gorge-push-up",
+        "level": 2
+    },
+    {
+        "name": "Culottes",
+        "parent": "Culottes",
+        "slug": "culottes-simples",
+        "level": 2
+    },
+    {
+        "name": "Culottes grande taille",
+        "parent": "Culottes",
+        "slug": "culottes-grande-taille",
+        "level": 2
+    },
+    {
+        "name": "Strings",
+        "parent": "Culottes",
+        "slug": "strings",
+        "level": 2
+    },
+    {
+        "name": "Culottes sexy",
+        "parent": "Culottes",
+        "slug": "culottes-sexy",
+        "level": 2
+    },
+    {
+        "name": "Culottes menstruelles",
+        "parent": "Culottes",
+        "slug": "culottes-menstruelles",
+        "level": 2
+    },
+    {
+        "name": "Chemises de nuit",
+        "parent": "Détente et sommeil",
+        "slug": "chemises-nuit",
+        "level": 2
+    },
+    {
+        "name": "Ensembles pyjama",
+        "parent": "Détente et sommeil",
+        "slug": "ensembles-pyjama",
+        "level": 2
+    },
+    {
+        "name": "Pyjamas d'hiver",
+        "parent": "Détente et sommeil",
+        "slug": "pyjamas-hiver",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés chaussettes",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-chaussettes",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés sous-vêtements",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-sous-vetements-autres",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés pyjamas femme",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-pyjamas-femme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés pyjamas homme",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-pyjamas-homme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés sous-vêtements femme",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-sous-vetements-femme",
+        "level": 2
+    },
+    {
+        "name": "Nouveautés chaussettes homme",
+        "parent": "Nouveautés",
+        "slug": "nouveautes-chaussettes-homme",
+        "level": 2
+    },
+    {
+        "name": "Meilleures ventes",
+        "parent": "Plus d'options d'achats",
+        "slug": "meilleures-ventes-sous-vetements",
+        "level": 2
+    }
+]

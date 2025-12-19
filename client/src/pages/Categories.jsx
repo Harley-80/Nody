@@ -5,12 +5,10 @@ import {
     faChevronRight,
     faHome,
     faSearch,
+    faSpinner,
+    faExclamationTriangle,
 } from '@fortawesome/free-solid-svg-icons';
-import {
-    categoriesData,
-    findCategoryBySlug,
-    getCategoryPath,
-} from '@/data/categories.data';
+import categoriesService from '@/services/categoriesService';
 import './Categories.scss';
 
 // Composant pour la page des catégories
@@ -19,40 +17,125 @@ export default function Categories() {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredCategories, setFilteredCategories] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Données du composant
-    const currentCategory = categorySlug
-        ? findCategoryBySlug(categorySlug)
-        : null;
-    const categoryPath = categorySlug ? getCategoryPath(categorySlug) : [];
-    const displayCategories = currentCategory?.subcategories || categoriesData;
+    // Récupérer les catégories depuis l'API
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                setLoading(true);
+                const data = await categoriesService.getAllCategories();
+                setCategories(data);
+
+                // Filtrer les catégories au chargement initial
+                let displayCategories = data;
+                if (categorySlug) {
+                    const currentCategory = findCategoryBySlug(
+                        categorySlug,
+                        data
+                    );
+                    if (currentCategory?.subcategories) {
+                        displayCategories = currentCategory.subcategories;
+                    }
+                }
+                setFilteredCategories(displayCategories);
+            } catch (err) {
+                setError(
+                    err.message || 'Erreur lors du chargement des catégories'
+                );
+                console.error('Erreur:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCategories();
+    }, [categorySlug]);
+
+    // Fonction pour trouver une catégorie par son slug
+    const findCategoryBySlug = (slug, categoryList = categories) => {
+        for (const category of categoryList) {
+            if (category.slug === slug) {
+                return category;
+            }
+            if (category.subcategories) {
+                const found = findCategoryBySlug(slug, category.subcategories);
+                if (found) return found;
+            }
+        }
+        return null;
+    };
+
+    // Fonction pour obtenir le chemin d'une catégorie
+    const getCategoryPath = (slug, categoryList = categories, path = []) => {
+        for (const category of categoryList) {
+            if (category.slug === slug) {
+                return [...path, { slug: category.slug, name: category.name }];
+            }
+            if (category.subcategories) {
+                const foundPath = getCategoryPath(
+                    slug,
+                    category.subcategories,
+                    [...path, { slug: category.slug, name: category.name }]
+                );
+                if (foundPath.length > 0) {
+                    return foundPath;
+                }
+            }
+        }
+        return [];
+    };
 
     // Filtrage des catégories
     useEffect(() => {
         if (!searchTerm.trim()) {
+            let displayCategories = categories;
+            if (categorySlug) {
+                const currentCategory = findCategoryBySlug(categorySlug);
+                if (currentCategory?.subcategories) {
+                    displayCategories = currentCategory.subcategories;
+                }
+            }
             setFilteredCategories(displayCategories);
             return;
         }
 
         const searchLower = searchTerm.toLowerCase();
-        const filterCategories = categories => {
-            return categories.filter(category => {
+
+        const filterCategories = categoryList => {
+            return categoryList.filter(category => {
                 const nameMatch = category.name
-                    .toLowerCase()
+                    ?.toLowerCase()
                     .includes(searchLower);
                 const subMatch = category.subcategories?.some(
                     sub =>
-                        sub.name.toLowerCase().includes(searchLower) ||
+                        sub.name?.toLowerCase().includes(searchLower) ||
                         sub.subcategories?.some(subSub =>
-                            subSub.name.toLowerCase().includes(searchLower)
+                            subSub.name?.toLowerCase().includes(searchLower)
                         )
                 );
                 return nameMatch || subMatch;
             });
         };
 
-        setFilteredCategories(filterCategories(displayCategories));
-    }, [searchTerm, displayCategories]);
+        let categoriesToFilter = categories;
+        if (categorySlug) {
+            const currentCategory = findCategoryBySlug(categorySlug);
+            if (currentCategory?.subcategories) {
+                categoriesToFilter = currentCategory.subcategories;
+            }
+        }
+
+        setFilteredCategories(filterCategories(categoriesToFilter));
+    }, [searchTerm, categories, categorySlug]);
+
+    // Données du composant
+    const currentCategory = categorySlug
+        ? findCategoryBySlug(categorySlug)
+        : null;
+    const categoryPath = categorySlug ? getCategoryPath(categorySlug) : [];
 
     // Gérer le clic sur une catégorie
     const handleCategoryClick = slug => {
@@ -61,9 +144,51 @@ export default function Categories() {
 
     // Gérer le clic sur un élément du fil d'Ariane
     const handleBreadcrumbClick = (slug, index) => {
-        if (index === categoryPath.length - 1) return; // Ne rien faire si on clique sur la catégorie actuelle
+        if (index === categoryPath.length - 1) return;
         navigate(`/categories/${slug}`);
     };
+
+    // Rendu en cas d'erreur
+    if (error) {
+        return (
+            <div className="categories-page">
+                <div className="container">
+                    <div className="error-state">
+                        <FontAwesomeIcon
+                            icon={faExclamationTriangle}
+                            className="error-icon"
+                        />
+                        <h2>Erreur de chargement</h2>
+                        <p>{error}</p>
+                        <button
+                            className="retry-btn"
+                            onClick={() => window.location.reload()}
+                        >
+                            Réessayer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Rendu en cas de chargement
+    if (loading) {
+        return (
+            <div className="categories-page">
+                <div className="container">
+                    <div className="loading-state">
+                        <FontAwesomeIcon
+                            icon={faSpinner}
+                            className="loading-spinner"
+                            spin
+                        />
+                        <p>Chargement des catégories...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     // Rendu du composant
     return (
@@ -170,7 +295,7 @@ export default function Categories() {
                         <div className="categories-grid">
                             {filteredCategories.map(category => (
                                 <CategoryCard
-                                    key={category.id}
+                                    key={category._id || category.id}
                                     category={category}
                                     onCategoryClick={handleCategoryClick}
                                     level={0}
@@ -184,7 +309,7 @@ export default function Categories() {
     );
 }
 
-// Composant Carte de Catégorie
+// Composant Carte de Catégorie (inchangé)
 function CategoryCard({ category, onCategoryClick, level }) {
     const [isExpanded, setIsExpanded] = useState(level < 1);
     const hasSubcategories =
@@ -197,7 +322,9 @@ function CategoryCard({ category, onCategoryClick, level }) {
                     className="category-main"
                     onClick={() => onCategoryClick(category.slug)}
                 >
-                    <span className="category-icon">{category.icon}</span>
+                    <span className="category-icon">
+                        {category.icon || '📁'}
+                    </span>
                     <div className="category-info">
                         <h3 className="category-name">{category.name}</h3>
                         {hasSubcategories && (
@@ -237,7 +364,7 @@ function CategoryCard({ category, onCategoryClick, level }) {
                 <div className="subcategories-list">
                     {category.subcategories.map(subCategory => (
                         <SubCategoryItem
-                            key={subCategory.id}
+                            key={subCategory._id || subCategory.id}
                             category={subCategory}
                             onCategoryClick={onCategoryClick}
                             level={level + 1}
@@ -249,7 +376,7 @@ function CategoryCard({ category, onCategoryClick, level }) {
     );
 }
 
-// Composant Sous-catégorie
+// Composant Sous-catégorie (inchangé)
 function SubCategoryItem({ category, onCategoryClick, level }) {
     const [isExpanded, setIsExpanded] = useState(false);
     const hasSubcategories =
@@ -298,7 +425,7 @@ function SubCategoryItem({ category, onCategoryClick, level }) {
                 <div className="subsubcategories-list">
                     {category.subcategories.map(subSubCategory => (
                         <button
-                            key={subSubCategory.id}
+                            key={subSubCategory._id || subSubCategory.id}
                             className="subsubcategory-btn"
                             onClick={() => onCategoryClick(subSubCategory.slug)}
                         >

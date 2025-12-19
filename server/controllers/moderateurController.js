@@ -1,343 +1,511 @@
 import asyncHandler from 'express-async-handler';
 import Utilisateur from '../models/utilisateurModel.js';
 import Produit from '../models/produitModel.js';
-import Categorie from '../models/categorieModel.js';
-import Commande from '../models/commandeModel.js';
-import { ROLES } from '../constants/roles.js';
+import Demande from '../models/demandeModel.js';
+import Notification from '../models/Notification.js';
+import NotificationService from '../services/notificationService.js';
+import { emitNotification } from '../services/websocketService.js';
+import vendeurNotificationService from '../services/vendeurNotificationService.js';
 
-// @desc    Obtenir les statistiques modérateur
-// @route   GET /api/moderateur/statistiques
-// @access  Private/Moderateur
-const getStatistiques = asyncHandler(async (req, res) => {
-    const totalProduits = await Produit.countDocuments();
-    const totalUtilisateurs = await Utilisateur.countDocuments();
-    const totalCommandes = await Commande.countDocuments();
-    const produitsEnAttente = await Produit.countDocuments({
-        statut: 'en_attente',
-    });
-    const vendeursEnAttente = await Utilisateur.countDocuments({
-        role: ROLES.VENDEUR,
-        statutVerification: 'en_attente',
-    });
+// Simulation d'un logger global
+const logger = {
+    info: message => console.log(`INFO: ${message}`),
+    error: (message, error) => console.error(`ERROR: ${message}`, error),
+};
 
-    res.json({
-        succes: true,
-        data: {
-            totalProduits,
-            totalUtilisateurs,
-            totalCommandes,
-            produitsEnAttente,
-            vendeursEnAttente,
-        },
-    });
-});
+/**
+ * Obtenir les statistiques pour le tableau de bord du modérateur
+ */
+const obtenirStatistiquesModerateurDashboard = asyncHandler(
+    async (req, res) => {
+        try {
+            const demandesEnAttente = await Demande.countDocuments({
+                statut: 'en_attente',
+            });
 
-// @desc    Obtenir tous les produits en attente de validation
-// @route   GET /api/moderateur/produits/en-attente
-// @access  Private/Moderateur
-const getProduitsEnAttente = asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+            const produitsEnAttente = await Produit.countDocuments({
+                statut: 'en_attente',
+            });
 
-    const produits = await Produit.find({ statut: 'en_attente' })
-        .populate('vendeur', 'nom prenom email boutique.nomBoutique')
-        .populate('categorie', 'nom')
-        .skip(skip)
-        .limit(limit)
-        .sort({ createdAt: -1 });
+            const vendeursEnAttente = await Utilisateur.countDocuments({
+                role: 'vendeur',
+                statutVerification: 'en_attente',
+            });
 
-    const total = await Produit.countDocuments({ statut: 'en_attente' });
+            const utilisateursActifs = await Utilisateur.countDocuments({
+                estActif: true,
+                role: { $in: ['client', 'vendeur'] },
+            });
 
-    res.json({
-        succes: true,
-        data: {
-            produits,
-            pagination: {
-                page,
-                pages: Math.ceil(total / limit),
+            const dateDebut = new Date();
+            dateDebut.setDate(dateDebut.getDate() - 30);
+
+            const actionsRecentes = await Demande.countDocuments({
+                moderateurId: req.utilisateur._id,
+                dateTraitement: { $gte: dateDebut },
+            });
+
+            res.json({
+                succes: true,
+                donnees: {
+                    demandesEnAttente,
+                    produitsEnAttente,
+                    vendeursEnAttente,
+                    utilisateursActifs,
+                    actionsRecentes,
+                    moderateur: {
+                        nom: req.utilisateur.nom,
+                        email: req.utilisateur.email,
+                    },
+                },
+            });
+        } catch (error) {
+            console.error('Erreur stats modérateur:', error);
+            res.status(500).json({
+                succes: false,
+                message: 'Erreur lors du chargement des statistiques',
+            });
+        }
+    }
+);
+
+/**
+ * Obtenir les demandes en attente de validation (Produits ou Vendeurs)
+ */
+const obtenirDemandes = asyncHandler(async (req, res) => {
+    const {
+        type = 'produit',
+        statut = 'en_attente',
+        page = 1,
+        limite = 20,
+    } = req.query;
+
+    try {
+        let filtre = {};
+        const skip = (parseInt(page) - 1) * parseInt(limite);
+        const limit = parseInt(limite);
+
+        let demandes, total;
+
+        if (type === 'produit') {
+            filtre.statut = statut;
+            total = await Produit.countDocuments(filtre);
+            demandes = await Produit.find(filtre)
+                .populate('vendeur', 'nom email entreprise')
+                .populate('categorie', 'nom')
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean();
+
+            demandes = demandes.map(produit => {
+                if (produit.images && produit.images.length > 0) {
+                    produit.images = produit.images.map(img => img.url || img);
+                }
+                return produit;
+            });
+        } else if (type === 'vendeur') {
+            filtre.role = 'vendeur';
+            filtre.statutVerification = statut;
+            total = await Utilisateur.countDocuments(filtre);
+            demandes = await Utilisateur.find(filtre)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .select(
+                    'nom email entreprise siret telephone statutVerification createdAt kbis'
+                );
+        }
+
+        res.json({
+            succes: true,
+            donnees: {
+                demandes,
                 total,
-                limit,
+                page: parseInt(page),
+                pages: Math.ceil(total / limit),
             },
-        },
-    });
+        });
+    } catch (error) {
+        console.error('Erreur récupération demandes:', error);
+        res.status(500).json({
+            succes: false,
+            message: 'Erreur lors du chargement des demandes',
+        });
+    }
 });
 
-// @desc    Valider un produit
-// @route   PUT /api/moderateur/produits/:id/valider
-// @access  Private/Moderateur
+/**
+ * Valider ou rejeter un produit
+ */
 const validerProduit = asyncHandler(async (req, res) => {
-    const produit = await Produit.findById(req.params.id);
+    const { id } = req.params;
+    const { decision, motif } = req.body;
 
-    if (!produit) {
-        res.status(404);
-        throw new Error('Produit non trouvé');
+    if (!['approuve', 'rejete'].includes(decision)) {
+        return res.status(400).json({
+            succes: false,
+            message: 'Décision invalide (approuve ou rejete)',
+        });
     }
 
-    if (produit.statut !== 'en_attente') {
-        res.status(400);
-        throw new Error('Ce produit a déjà été traité');
+    try {
+        const produit = await Produit.findById(id).populate(
+            'vendeur',
+            'nom email prenom'
+        );
+
+        if (!produit) {
+            return res.status(404).json({
+                succes: false,
+                message: 'Produit non trouvé',
+            });
+        }
+
+        if (produit.statut !== 'en_attente') {
+            return res.status(400).json({
+                succes: false,
+                message: 'Ce produit a déjà été traité',
+            });
+        }
+
+        produit.statut = decision;
+        produit.raisonRejet = decision === 'rejete' ? motif : undefined;
+        produit.moderateur = req.utilisateur._id;
+        produit.dateValidation = new Date();
+
+        await produit.save();
+
+        // 1. Notifier le vendeur via le service spécialisé
+        if (produit.vendeur?._id) {
+            try {
+                await vendeurNotificationService.notifierValidationProduit(
+                    produit.vendeur._id,
+                    produit,
+                    decision,
+                    motif
+                );
+            } catch (notifError) {
+                logger.error(
+                    'Erreur notification vendeur produit :',
+                    notifError
+                );
+            }
+        }
+
+        // 2. Historisation de l'action
+        await Demande.create({
+            type: 'produit',
+            elementId: produit._id,
+            statut: decision,
+            moderateurId: req.utilisateur._id,
+            motif: motif || null,
+            dateTraitement: new Date(),
+        });
+
+        // 3. Notifications internes et temps réel
+        const notificationAdmin = {
+            type: 'produit',
+            titre:
+                decision === 'approuve' ? 'Produit approuvé' : 'Produit rejeté',
+            message: `Le produit "${produit.nom}" a été ${decision} par ${req.utilisateur.nom}`,
+            priorite: 'normale',
+        };
+
+        emitNotification(notificationAdmin, 'role:admin');
+
+        res.json({
+            succes: true,
+            message: `Produit ${decision} avec succès`,
+            donnees: produit,
+        });
+    } catch (error) {
+        console.error('Erreur validation produit:', error);
+        res.status(500).json({
+            succes: false,
+            message: 'Erreur validation produit',
+        });
     }
-
-    produit.statut = 'actif';
-    produit.dateValidation = new Date();
-    produit.moderateur = req.utilisateur._id;
-
-    await produit.save();
-
-    res.json({
-        succes: true,
-        message: 'Produit validé avec succès',
-        data: produit,
-    });
 });
 
-// @desc    Rejeter un produit
-// @route   PUT /api/moderateur/produits/:id/rejeter
-// @access  Private/Moderateur
-const rejeterProduit = asyncHandler(async (req, res) => {
-    const { raison } = req.body;
+/**
+ * Valider ou rejeter un vendeur (Statut: verifie ou rejete)
+ */
+const validerVendeur = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { decision, motif } = req.body;
 
-    if (!raison) {
-        res.status(400);
-        throw new Error('Veuillez fournir une raison pour le rejet');
+    console.log('--- DEBUG validerVendeur ---');
+    console.log('ID vendeur:', id);
+    console.log('Decision:', decision);
+    console.log('Motif:', motif);
+
+    if (!['approuve', 'rejete'].includes(decision)) {
+        return res.status(400).json({
+            succes: false,
+            message: 'Décision invalide (approuve ou rejete)',
+        });
     }
 
-    const produit = await Produit.findById(req.params.id);
+    try {
+        const vendeur = await Utilisateur.findOne({ _id: id, role: 'vendeur' });
+        console.log('Vendeur trouvé:', vendeur ? 'OUI' : 'NON');
 
-    if (!produit) {
-        res.status(404);
-        throw new Error('Produit non trouvé');
-    }
+        if (!vendeur) {
+            return res.status(404).json({
+                succes: false,
+                message: 'Vendeur non trouvé',
+            });
+        }
 
-    if (produit.statut !== 'en_attente') {
-        res.status(400);
-        throw new Error('Ce produit a déjà été traité');
-    }
+        if (
+            vendeur.statutVerification &&
+            vendeur.statutVerification !== 'en_attente'
+        ) {
+            return res.status(400).json({
+                succes: false,
+                message: 'Ce vendeur a déjà été traité',
+            });
+        }
 
-    produit.statut = 'rejete';
-    produit.raisonRejet = raison;
-    produit.dateValidation = new Date();
-    produit.moderateur = req.utilisateur._id;
+        // CORRECTION : Mapper 'approuve' vers 'verifie' pour correspondre au schéma
+        vendeur.statutVerification =
+            decision === 'approuve' ? 'verifie' : 'rejete';
+        vendeur.raisonRejet = decision === 'rejete' ? motif : undefined;
+        vendeur.dateVerification = new Date();
 
-    await produit.save();
+        if (decision === 'approuve') {
+            vendeur.estActif = true;
+        }
 
-    res.json({
-        succes: true,
-        message: 'Produit rejeté avec succès',
-        data: produit,
-    });
-});
+        console.log(
+            'Avant save - statutVerification:',
+            vendeur.statutVerification
+        );
+        await vendeur.save();
+        console.log('Vendeur sauvegardé avec succès');
 
-// @desc    Obtenir tous les vendeurs en attente de vérification
-// @route   GET /api/moderateur/vendeurs/en-attente
-// @access  Private/Moderateur
-const getVendeursEnAttente = asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+        // Notifier le vendeur via le service dédié
+        try {
+            await vendeurNotificationService.notifierValidationVendeur(
+                vendeur._id,
+                decision,
+                motif
+            );
+        } catch (notifError) {
+            logger.error(
+                'Erreur notification validation vendeur :',
+                notifError
+            );
+        }
 
-    const vendeurs = await Utilisateur.find({
-        role: ROLES.VENDEUR,
-        statutVerification: 'en_attente',
-    })
-        .select('-motDePasse')
-        .skip(skip)
-        .limit(limit)
-        .sort({ createdAt: -1 });
+        // Création de l'historique
+        await Demande.create({
+            type: 'vendeur',
+            elementId: vendeur._id,
+            statut: decision,
+            moderateurId: req.utilisateur._id,
+            motif: motif || null,
+            dateTraitement: new Date(),
+        });
 
-    const total = await Utilisateur.countDocuments({
-        role: ROLES.VENDEUR,
-        statutVerification: 'en_attente',
-    });
+        // Notification Admin temps réel
+        const notificationAdmin = {
+            type: 'utilisateur',
+            titre:
+                decision === 'approuve' ? 'Vendeur approuvé' : 'Vendeur rejeté',
+            message: `Le vendeur "${vendeur.entreprise || vendeur.nom}" a été traité par ${req.utilisateur.nom}`,
+            priorite: 'normale',
+        };
+        emitNotification(notificationAdmin, 'role:admin');
 
-    res.json({
-        succes: true,
-        data: {
-            vendeurs,
-            pagination: {
-                page,
-                pages: Math.ceil(total / limit),
-                total,
-                limit,
+        // Notification temps réel spécifique pour le vendeur
+        emitNotification(
+            {
+                type: 'utilisateur',
+                titre:
+                    decision === 'approuve'
+                        ? 'Compte approuvé'
+                        : 'Demande rejetée',
+                message:
+                    decision === 'approuve'
+                        ? 'Votre compte vendeur est actif.'
+                        : `Motif: ${motif}`,
+                priorite: decision === 'approuve' ? 'normale' : 'haute',
             },
-        },
-    });
+            `user:${vendeur._id}`
+        );
+
+        // Envoi d'email via service de notification
+        try {
+            if (vendeur.email) {
+                if (decision === 'approuve') {
+                    await NotificationService.envoyerEmailApprobation(vendeur);
+                } else {
+                    await NotificationService.envoyerEmailRejet(vendeur, motif);
+                }
+            }
+        } catch (emailError) {
+            console.error('Erreur envoi email au vendeur:', emailError);
+        }
+
+        res.json({
+            succes: true,
+            message: `Vendeur ${vendeur.statutVerification} avec succès`,
+            donnees: vendeur,
+        });
+    } catch (error) {
+        console.error('ERREUR COMPLÈTE validerVendeur:', error);
+        res.status(500).json({
+            succes: false,
+            message:
+                'Erreur lors de la validation du vendeur: ' + error.message,
+            details:
+                process.env.NODE_ENV === 'development'
+                    ? error.errors
+                    : undefined,
+        });
+    }
 });
 
-// @desc    Vérifier un vendeur
-// @route   PUT /api/moderateur/vendeurs/:id/verifier
-// @access  Private/Moderateur
-const verifierVendeur = asyncHandler(async (req, res) => {
-    const vendeur = await Utilisateur.findById(req.params.id);
+/**
+ * Obtenir la liste des utilisateurs (clients et vendeurs)
+ */
+const obtenirUtilisateurs = asyncHandler(async (req, res) => {
+    const { role, page = 1, limite = 20, recherche = '' } = req.query;
 
-    if (!vendeur) {
-        res.status(404);
-        throw new Error('Vendeur non trouvé');
-    }
+    try {
+        const filtre = { role: { $in: ['client', 'vendeur'] } };
 
-    if (vendeur.role !== ROLES.VENDEUR) {
-        res.status(400);
-        throw new Error("Cet utilisateur n'est pas un vendeur");
-    }
+        if (role && ['client', 'vendeur'].includes(role)) {
+            filtre.role = role;
+        }
 
-    if (vendeur.statutVerification !== 'en_attente') {
-        res.status(400);
-        throw new Error('Ce vendeur a déjà été traité');
-    }
+        if (recherche) {
+            filtre.$or = [
+                { nom: { $regex: recherche, $options: 'i' } },
+                { email: { $regex: recherche, $options: 'i' } },
+            ];
+        }
 
-    vendeur.statutVerification = 'verifie';
-    vendeur.dateVerification = new Date();
+        const skip = (parseInt(page) - 1) * parseInt(limite);
+        const limit = parseInt(limite);
 
-    await vendeur.save();
+        const utilisateurs = await Utilisateur.find(filtre)
+            .select('nom email role estActif createdAt')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
 
-    res.json({
-        succes: true,
-        message: 'Vendeur vérifié avec succès',
-        data: vendeur,
-    });
-});
+        const total = await Utilisateur.countDocuments(filtre);
 
-// @desc    Rejeter un vendeur
-// @route   PUT /api/moderateur/vendeurs/:id/rejeter
-// @access  Private/Moderateur
-const rejeterVendeur = asyncHandler(async (req, res) => {
-    const { raison } = req.body;
-
-    if (!raison) {
-        res.status(400);
-        throw new Error('Veuillez fournir une raison pour le rejet');
-    }
-
-    const vendeur = await Utilisateur.findById(req.params.id);
-
-    if (!vendeur) {
-        res.status(404);
-        throw new Error('Vendeur non trouvé');
-    }
-
-    if (vendeur.role !== ROLES.VENDEUR) {
-        res.status(400);
-        throw new Error("Cet utilisateur n'est pas un vendeur");
-    }
-
-    if (vendeur.statutVerification !== 'en_attente') {
-        res.status(400);
-        throw new Error('Ce vendeur a déjà été traité');
-    }
-
-    vendeur.statutVerification = 'rejete';
-    vendeur.raisonRejet = raison;
-    vendeur.dateVerification = new Date();
-
-    await vendeur.save();
-
-    res.json({
-        succes: true,
-        message: 'Vendeur rejeté avec succès',
-        data: vendeur,
-    });
-});
-
-// @desc    Obtenir tous les utilisateurs
-// @route   GET /api/moderateur/utilisateurs
-// @access  Private/Moderateur
-const getUtilisateurs = asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-    const { role, statut } = req.query;
-
-    const filtre = {};
-    if (role) filtre.role = role;
-    if (statut) filtre.statutVerification = statut;
-
-    const utilisateurs = await Utilisateur.find(filtre)
-        .select('-motDePasse')
-        .skip(skip)
-        .limit(limit)
-        .sort({ createdAt: -1 });
-
-    const total = await Utilisateur.countDocuments(filtre);
-
-    res.json({
-        succes: true,
-        data: {
-            utilisateurs,
-            pagination: {
-                page,
-                pages: Math.ceil(total / limit),
+        res.json({
+            succes: true,
+            donnees: {
+                utilisateurs,
                 total,
-                limit,
+                page: parseInt(page),
+                pages: Math.ceil(total / limit),
             },
-        },
-    });
+        });
+    } catch (error) {
+        console.error('Erreur récupération utilisateurs:', error);
+        res.status(500).json({
+            succes: false,
+            message: 'Erreur chargement utilisateurs',
+        });
+    }
 });
 
-// @desc    Suspendre un utilisateur
-// @route   PUT /api/moderateur/utilisateurs/:id/suspendre
-// @access  Private/Moderateur
-const suspendreUtilisateur = asyncHandler(async (req, res) => {
-    const { raison } = req.body;
+/**
+ * Modifier le statut actif d'un utilisateur (Bannissement/Activation)
+ */
+const modifierStatutUtilisateur = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { estActif } = req.body;
 
-    const utilisateur = await Utilisateur.findById(req.params.id);
-
-    if (!utilisateur) {
-        res.status(404);
-        throw new Error('Utilisateur non trouvé');
+    if (typeof estActif !== 'boolean') {
+        return res
+            .status(400)
+            .json({ succes: false, message: 'estActif doit être un booléen' });
     }
 
-    if (utilisateur.role === ROLES.ADMIN) {
-        res.status(403);
-        throw new Error('Impossible de suspendre un administrateur');
+    try {
+        const utilisateur = await Utilisateur.findById(id);
+
+        if (!utilisateur) {
+            return res
+                .status(404)
+                .json({ succes: false, message: 'Utilisateur non trouvé' });
+        }
+
+        if (['admin', 'moderateur'].includes(utilisateur.role)) {
+            return res
+                .status(403)
+                .json({
+                    succes: false,
+                    message: 'Action interdite sur le staff',
+                });
+        }
+
+        utilisateur.estActif = estActif;
+        await utilisateur.save();
+
+        res.json({
+            succes: true,
+            message: `Utilisateur ${estActif ? 'activé' : 'désactivé'}`,
+            donnees: utilisateur,
+        });
+    } catch (error) {
+        res.status(500).json({
+            succes: false,
+            message: 'Erreur modification statut',
+        });
     }
-
-    utilisateur.estActif = false;
-    utilisateur.raisonSuspension = raison;
-    utilisateur.dateSuspension = new Date();
-
-    await utilisateur.save();
-
-    res.json({
-        succes: true,
-        message: 'Utilisateur suspendu avec succès',
-        data: utilisateur,
-    });
 });
 
-// @desc    Activer un utilisateur
-// @route   PUT /api/moderateur/utilisateurs/:id/activer
-// @access  Private/Moderateur
-const activerUtilisateur = asyncHandler(async (req, res) => {
-    const utilisateur = await Utilisateur.findById(req.params.id);
+/**
+ * Obtenir l'historique des actions du modérateur connecté
+ */
+const obtenirHistorique = asyncHandler(async (req, res) => {
+    const { page = 1, limite = 20 } = req.query;
 
-    if (!utilisateur) {
-        res.status(404);
-        throw new Error('Utilisateur non trouvé');
+    try {
+        const skip = (parseInt(page) - 1) * parseInt(limite);
+        const limit = parseInt(limite);
+
+        const historique = await Demande.find({
+            moderateurId: req.utilisateur._id,
+        })
+            .populate('elementId')
+            .sort({ dateTraitement: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const total = await Demande.countDocuments({
+            moderateurId: req.utilisateur._id,
+        });
+
+        res.json({
+            succes: true,
+            donnees: {
+                historique,
+                total,
+                page: parseInt(page),
+                pages: Math.ceil(total / limit),
+            },
+        });
+    } catch (error) {
+        res.status(500).json({ succes: false, message: 'Erreur historique' });
     }
-
-    utilisateur.estActif = true;
-    utilisateur.raisonSuspension = undefined;
-    utilisateur.dateSuspension = undefined;
-
-    await utilisateur.save();
-
-    res.json({
-        succes: true,
-        message: 'Utilisateur activé avec succès',
-        data: utilisateur,
-    });
 });
 
 export {
-    getStatistiques,
-    getProduitsEnAttente,
+    obtenirStatistiquesModerateurDashboard,
+    obtenirDemandes,
     validerProduit,
-    rejeterProduit,
-    getVendeursEnAttente,
-    verifierVendeur,
-    rejeterVendeur,
-    getUtilisateurs,
-    suspendreUtilisateur,
-    activerUtilisateur,
+    validerVendeur,
+    obtenirUtilisateurs,
+    modifierStatutUtilisateur,
+    obtenirHistorique,
 };

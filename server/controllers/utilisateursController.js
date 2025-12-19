@@ -1,4 +1,3 @@
-// Importation des modules nécessaires
 import asyncHandler from 'express-async-handler';
 import Utilisateur from '../models/utilisateurModel.js';
 import Produit from '../models/produitModel.js';

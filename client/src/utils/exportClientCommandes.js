@@ -1,7 +1,6 @@
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
-
 export function exporterMesCommandesExcel(commandes) {
     if (!commandes.length) return;
 
@@ -12,7 +11,7 @@ export function exporterMesCommandesExcel(commandes) {
         Date: cmd.date,
         Statut: cmd.statut || 'en_attente',
         Total: cmd.total,
-        Produits: cmd.produits.map(p => `${p.quantite}x ${p.nom}`).join(', ')
+        Produits: cmd.produits.map(p => `${p.quantite}x ${p.nom}`).join(', '),
     }));
 
     const workbook = XLSX.utils.book_new();

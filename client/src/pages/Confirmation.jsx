@@ -1,18 +1,22 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
-import { FaCheckCircle, FaExclamationCircle, FaInfoCircle } from 'react-icons/fa';
+import {
+    FaCheckCircle,
+    FaExclamationCircle,
+    FaInfoCircle,
+} from 'react-icons/fa';
 
 export default function Confirmation() {
     const navigate = useNavigate();
     const { state } = useLocation();
 
     const {
-        type = 'success',       
+        type = 'success',
         title = 'Action terminée',
         message = 'Votre opération a été réalisée avec succès.',
         buttonLabel = 'Retour à l’accueil',
         redirectTo = '/',
-        delay = null                  // en ms, optionnel
+        delay = null, // en ms, optionnel
     } = state || {};
 
     // Icône dynamique en fonction du type
@@ -34,12 +38,18 @@ export default function Confirmation() {
 
     return (
         <div className="container py-5 text-center">
-            <div className="card shadow-sm p-5 mx-auto" style={{ maxWidth: '600px' }}>
+            <div
+                className="card shadow-sm p-5 mx-auto"
+                style={{ maxWidth: '600px' }}
+            >
                 {icons[type] || icons.success}
                 <h2 className="mb-3">{title}</h2>
                 <p className="text-muted mb-4">{message}</p>
 
-                <button className="btn btn-dark btn-lg" onClick={() => navigate(redirectTo)}>
+                <button
+                    className="btn btn-dark btn-lg"
+                    onClick={() => navigate(redirectTo)}
+                >
                     {buttonLabel}
                 </button>
             </div>

@@ -3,10 +3,10 @@ import { api } from './api.js';
 export async function testServerConnection() {
     try {
         const response = await api.get('/health');
-        console.log('✅ Serveur accessible:', response.data);
+        console.log('Serveur accessible:', response.data);
         return true;
     } catch (error) {
-        console.error('❌ Serveur inaccessible:', error.message);
+        console.error('Serveur inaccessible:', error.message);
         return false;
     }
 }

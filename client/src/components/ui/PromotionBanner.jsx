@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTimes, faTag } from '@fortawesome/free-solid-svg-icons'
-import './PromotionBanner.scss'
+import React, { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes, faTag } from '@fortawesome/free-solid-svg-icons';
+import './PromotionBanner.scss';
 
 /**
  * Bannière promotionnelle avec temporisateur et option de fermeture
@@ -16,49 +16,49 @@ export default function PromotionBanner({
     expirationDate,
     theme = 'primary',
 }) {
-    const [isVisible, setIsVisible] = useState(true)
-    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft())
+    const [isVisible, setIsVisible] = useState(true);
+    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
     /**
      * Calcule le temps restant avant expiration
      * @returns {Object} Temps restant formaté
      */
     function calculateTimeLeft() {
-        if (!expirationDate) return null
+        if (!expirationDate) return null;
 
-        const difference = new Date(expirationDate) - new Date()
-        if (difference <= 0) return null
+        const difference = new Date(expirationDate) - new Date();
+        if (difference <= 0) return null;
 
         return {
             days: Math.floor(difference / (1000 * 60 * 60 * 24)),
             hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
             minutes: Math.floor((difference / 1000 / 60) % 60),
             seconds: Math.floor((difference / 1000) % 60),
-        }
+        };
     }
 
     // Met à jour le compteur toutes les secondes
     useEffect(() => {
         if (expirationDate) {
             const timer = setTimeout(() => {
-                setTimeLeft(calculateTimeLeft())
-            }, 1000)
+                setTimeLeft(calculateTimeLeft());
+            }, 1000);
 
-            return () => clearTimeout(timer)
+            return () => clearTimeout(timer);
         }
-    }, [timeLeft, expirationDate])
+    }, [timeLeft, expirationDate]);
 
     /**
      * Ferme la bannière promotionnelle
      */
     const closeBanner = () => {
-        setIsVisible(false)
+        setIsVisible(false);
         // Optionnel: stocker en localStorage pour ne pas réafficher
-        localStorage.setItem('promoBannerClosed', 'true')
-    }
+        localStorage.setItem('promoBannerClosed', 'true');
+    };
 
     // Si la bannière est masquée, ne rien afficher
-    if (!isVisible) return null
+    if (!isVisible) return null;
 
     return (
         <div className={`promotion-banner theme-${theme}`}>
@@ -96,5 +96,5 @@ export default function PromotionBanner({
                 <FontAwesomeIcon icon={faTimes} />
             </button>
         </div>
-    )
+    );
 }

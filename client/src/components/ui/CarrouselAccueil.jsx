@@ -23,31 +23,31 @@ export default function CarrouselAccueil({ produits }) {
                     nextEl: '.swiper-button-next',
                     prevEl: '.swiper-button-prev',
                 }}
-                pagination={{ 
+                pagination={{
                     clickable: true,
-                    dynamicBullets: true 
+                    dynamicBullets: true,
                 }}
-                autoplay={{ 
+                autoplay={{
                     delay: 5000,
-                    disableOnInteraction: false 
+                    disableOnInteraction: false,
                 }}
                 a11y={{
                     prevSlideMessage: 'Produit précédent',
-                    nextSlideMessage: 'Produit suivant'
+                    nextSlideMessage: 'Produit suivant',
                 }}
                 breakpoints={{
                     576: { slidesPerView: 2 },
                     768: { slidesPerView: 3 },
-                    992: { slidesPerView: 4 }
+                    992: { slidesPerView: 4 },
                 }}
                 className="my-4"
             >
-                {produits.map((produit) => (
+                {produits.map(produit => (
                     <SwiperSlide key={produit.id}>
                         <ProductCard produit={produit} />
                     </SwiperSlide>
                 ))}
-                
+
                 <div className="swiper-button-prev"></div>
                 <div className="swiper-button-next"></div>
             </Swiper>

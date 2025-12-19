@@ -1,0 +1,74 @@
+.indicateurs-performance {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+
+    .indicateur {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        &.indicateur-primary .indicateur-icone {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        &.indicateur-success .indicateur-icone {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        &.indicateur-warning .indicateur-icone {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        &.indicateur-info .indicateur-icone {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+    }
+
+    .indicateur-icone {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .indicateur-info {
+        flex: 1;
+    }
+
+    .indicateur-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+
+    .indicateur-valeur {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        line-height: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .indicateurs-performance {
+        grid-template-columns: 1fr;
+    }
+}

@@ -18,10 +18,12 @@ export default function MesCommandes() {
                 const saved = localStorage.getItem('nodyCommandes');
                 if (saved) {
                     const commandesParsees = JSON.parse(saved);
-                    setCommandes(Array.isArray(commandesParsees) ? commandesParsees : []);
+                    setCommandes(
+                        Array.isArray(commandesParsees) ? commandesParsees : []
+                    );
                 }
             } catch (e) {
-                console.error("Erreur lors du chargement des commandes :", e);
+                console.error('Erreur lors du chargement des commandes :', e);
                 setCommandes([]);
             } finally {
                 setIsLoading(false);
@@ -32,29 +34,45 @@ export default function MesCommandes() {
         chargerCommandes();
     }, []);
 
-    const voirDetail = useCallback((commande) => {
-        try {
-            localStorage.setItem('nodyCommandeActive', JSON.stringify(commande));
-            navigate('/commande-detail');
-        } catch (e) {
-            console.error("Erreur navigation détail :", e);
-            alert("Une erreur est survenue lors de l'affichage des détails.");
-        }
-    }, [navigate]);
+    const voirDetail = useCallback(
+        commande => {
+            try {
+                localStorage.setItem(
+                    'nodyCommandeActive',
+                    JSON.stringify(commande)
+                );
+                navigate('/commande-detail');
+            } catch (e) {
+                console.error('Erreur navigation détail :', e);
+                alert(
+                    "Une erreur est survenue lors de l'affichage des détails."
+                );
+            }
+        },
+        [navigate]
+    );
 
     const commandesFiltrees = commandes.filter(cmd => {
         const termesRecherche = [
             cmd.client?.nom || '',
             cmd.date || '',
-            ...(cmd.produits || []).map(p => p.nom || '')
-        ].join(' ').toLowerCase();
-        
+            ...(cmd.produits || []).map(p => p.nom || ''),
+        ]
+            .join(' ')
+            .toLowerCase();
+
         return termesRecherche.includes(recherche.toLowerCase());
     });
 
-    const totalPages = Math.max(1, Math.ceil(commandesFiltrees.length / parPage));
+    const totalPages = Math.max(
+        1,
+        Math.ceil(commandesFiltrees.length / parPage)
+    );
     const indexDebut = (page - 1) * parPage;
-    const commandesPage = commandesFiltrees.slice(indexDebut, indexDebut + parPage);
+    const commandesPage = commandesFiltrees.slice(
+        indexDebut,
+        indexDebut + parPage
+    );
 
     useEffect(() => {
         if (page > totalPages && totalPages > 0) {
@@ -86,7 +104,7 @@ export default function MesCommandes() {
                         className="search-input"
                         placeholder="Rechercher une commande..."
                         value={recherche}
-                        onChange={(e) => {
+                        onChange={e => {
                             setRecherche(e.target.value);
                             setPage(1);
                         }}
@@ -94,7 +112,8 @@ export default function MesCommandes() {
                     />
                 </div>
                 <div className="results-count">
-                    {commandesFiltrees.length} résultat{commandesFiltrees.length !== 1 ? 's' : ''}
+                    {commandesFiltrees.length} résultat
+                    {commandesFiltrees.length !== 1 ? 's' : ''}
                 </div>
             </div>
 
@@ -119,9 +138,12 @@ export default function MesCommandes() {
                 <>
                     <div className="commandes-grid">
                         {commandesPage.map((cmd, i) => (
-                            <div key={`${cmd.id || i}-${indexDebut}`} className="commande-item">
+                            <div
+                                key={`${cmd.id || i}-${indexDebut}`}
+                                className="commande-item"
+                            >
                                 <CommandeCard commande={cmd} />
-                                <button 
+                                <button
                                     className="detail-button"
                                     onClick={() => voirDetail(cmd)}
                                     aria-label={`Voir le détail de la commande ${cmd.id}`}
@@ -143,7 +165,7 @@ export default function MesCommandes() {
                             >
                                 <i className="bi bi-chevron-left"></i>
                             </button>
-                            
+
                             <div className="page-numbers">
                                 {Array.from({ length: totalPages }, (_, i) => (
                                     <button
@@ -155,7 +177,7 @@ export default function MesCommandes() {
                                     </button>
                                 ))}
                             </div>
-                            
+
                             <button
                                 className="pagination-button next"
                                 disabled={page === totalPages}

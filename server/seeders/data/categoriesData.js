@@ -24,6 +24,7 @@ const categoriesData = [
     { name: 'Nouveautés', parent: 'Vêtements homme' },
     { name: "Plus d'options d'achats", parent: 'Vêtements homme' },
 
+    // sous-catégories de Pantalons
     { name: 'Pantalons en cuir', parent: 'Pantalons' },
     { name: 'Pantalons crayon', parent: 'Pantalons' },
     { name: 'Pantalons décontractés', parent: 'Pantalons' },
@@ -31,6 +32,7 @@ const categoriesData = [
     { name: 'Pantalons bouffants', parent: 'Pantalons' },
     { name: 'Joggings', parent: 'Pantalons' },
 
+    // Sous-catégories de Pulls
     { name: 'Cols roulés', parent: 'Pulls' },
     { name: 'Pulls imprimés', parent: 'Pulls' },
     { name: 'Gilets', parent: 'Pulls' },
@@ -38,6 +40,7 @@ const categoriesData = [
     { name: 'Pulls rayés', parent: 'Pulls' },
     { name: 'Pulls', parent: 'Pulls' },
 
+    // sous-catégories de Blazer et costumes
     { name: 'Vestes de costume', parent: 'Blazers et costumes' },
     { name: 'Costumes', parent: 'Blazers et costumes' },
     { name: 'Costumes croisés', parent: 'Blazers et costumes' },
@@ -45,14 +48,17 @@ const categoriesData = [
     { name: 'Costumes simple boutonnage', parent: 'Blazers et costumes' },
     { name: 'Pantalons de costume', parent: 'Blazers et costumes' },
 
+    // Sous-catégories Ensembles
     { name: 'Ensembles de sport', parent: 'Ensembles' },
     { name: 'Costumes tendances', parent: 'Ensembles' },
 
+    // Sous-catégories Doudounes
     { name: 'Doudounes longues', parent: 'Doudounes' },
     { name: 'Doudounes courtes', parent: 'Doudounes' },
     { name: 'Doudounes légères', parent: 'Doudounes' },
     { name: 'Doudounes à capuche', parent: 'Doudounes' },
 
+    // Sous-catégories Jean
     { name: 'Jeans brossés', parent: 'Jeans' },
     { name: 'Jeans déchirés', parent: 'Jeans' },
     { name: 'jeans destroy', parent: 'Jeans' },

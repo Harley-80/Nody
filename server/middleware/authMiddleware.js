@@ -1,4 +1,3 @@
-// Importation des modules nécessaires
 import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
 import Utilisateur from '../models/utilisateurModel.js';

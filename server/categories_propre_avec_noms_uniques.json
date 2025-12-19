@@ -1,0 +1,526 @@
+[
+    { "nom": "Homme", "slug": "homme", "parent": null, "niveau": 0 },
+    { "nom": "Femme", "slug": "femme", "parent": null, "niveau": 0 },
+    { "nom": "Enfant", "slug": "enfant", "parent": null, "niveau": 0 },
+    { "nom": "Chaussures", "slug": "chaussures", "parent": null, "niveau": 0 },
+    {
+        "nom": "Accessoires",
+        "slug": "accessoires",
+        "parent": null,
+        "niveau": 0
+    },
+    { "nom": "Montres", "slug": "montres", "parent": null, "niveau": 0 },
+
+    { "nom": "Hauts - Homme", "slug": "hauts", "parent": "Homme", "niveau": 1 },
+    { "nom": "Bas - Homme", "slug": "bas", "parent": "Homme", "niveau": 1 },
+    {
+        "nom": "Vêtements d'extérieur - Homme",
+        "slug": "vetements-exterieur",
+        "parent": "Homme",
+        "niveau": 1
+    },
+    {
+        "nom": "Ensembles - Homme",
+        "slug": "ensembles",
+        "parent": "Homme",
+        "niveau": 1
+    },
+    {
+        "nom": "Sous-vêtements et détente - Homme",
+        "slug": "sous-vetements-detente",
+        "parent": "Homme",
+        "niveau": 1
+    },
+
+    { "nom": "Hauts - Femme", "slug": "hauts", "parent": "Femme", "niveau": 1 },
+    { "nom": "Bas - Femme", "slug": "bas", "parent": "Femme", "niveau": 1 },
+    { "nom": "Robes - Femme", "slug": "robes", "parent": "Femme", "niveau": 1 },
+    {
+        "nom": "Vêtements d'extérieur - Femme",
+        "slug": "vetements-exterieur",
+        "parent": "Femme",
+        "niveau": 1
+    },
+    {
+        "nom": "Ensembles - Femme",
+        "slug": "ensembles",
+        "parent": "Femme",
+        "niveau": 1
+    },
+    {
+        "nom": "Maillots de bain - Femme",
+        "slug": "maillots-de-bain",
+        "parent": "Femme",
+        "niveau": 1
+    },
+    {
+        "nom": "Sous-vêtements et détente - Femme",
+        "slug": "sous-vetements-detente",
+        "parent": "Femme",
+        "niveau": 1
+    },
+
+    {
+        "nom": "Hauts - Enfant",
+        "slug": "hauts",
+        "parent": "Enfant",
+        "niveau": 1
+    },
+    { "nom": "Bas - Enfant", "slug": "bas", "parent": "Enfant", "niveau": 1 },
+    {
+        "nom": "Ensembles - Enfant",
+        "slug": "ensembles",
+        "parent": "Enfant",
+        "niveau": 1
+    },
+    {
+        "nom": "Vêtements d'extérieur - Enfant",
+        "slug": "vetements-exterieur",
+        "parent": "Enfant",
+        "niveau": 1
+    },
+    {
+        "nom": "Sous-vêtements et détente - Enfant",
+        "slug": "sous-vetements-detente",
+        "parent": "Enfant",
+        "niveau": 1
+    },
+    {
+        "nom": "Maillots de bain - Enfant",
+        "slug": "maillots-de-bain",
+        "parent": "Enfant",
+        "niveau": 1
+    },
+
+    {
+        "nom": "Baskets",
+        "slug": "baskets",
+        "parent": "Chaussures",
+        "niveau": 1
+    },
+    { "nom": "Bottes", "slug": "bottes", "parent": "Chaussures", "niveau": 1 },
+    {
+        "nom": "Sandales",
+        "slug": "sandales",
+        "parent": "Chaussures",
+        "niveau": 1
+    },
+    {
+        "nom": "Chaussures plates",
+        "slug": "chaussures-plates",
+        "parent": "Chaussures",
+        "niveau": 1
+    },
+    {
+        "nom": "Chaussures à talons",
+        "slug": "chaussures-talons",
+        "parent": "Chaussures",
+        "niveau": 1
+    },
+    {
+        "nom": "Chaussures professionnelles",
+        "slug": "chaussures-professionnelles",
+        "parent": "Chaussures",
+        "niveau": 1
+    },
+    {
+        "nom": "Chaussures décontractées",
+        "slug": "chaussures-decontractees",
+        "parent": "Chaussures",
+        "niveau": 1
+    },
+
+    {
+        "nom": "Sacs et bagages",
+        "slug": "sacs-bagages",
+        "parent": "Accessoires",
+        "niveau": 1
+    },
+    { "nom": "Bijoux", "slug": "bijoux", "parent": "Accessoires", "niveau": 1 },
+    {
+        "nom": "Lunettes de soleil",
+        "slug": "lunettes-soleil",
+        "parent": "Accessoires",
+        "niveau": 1
+    },
+    {
+        "nom": "Ceintures",
+        "slug": "ceintures",
+        "parent": "Accessoires",
+        "niveau": 1
+    },
+    {
+        "nom": "Écharpes, gants et chapeaux",
+        "slug": "echarpes-gants-chapeaux",
+        "parent": "Accessoires",
+        "niveau": 1
+    },
+    {
+        "nom": "Accessoires capillaires",
+        "slug": "accessoires-capillaires",
+        "parent": "Accessoires",
+        "niveau": 1
+    },
+
+    {
+        "nom": "Montres classiques",
+        "slug": "montres-classiques",
+        "parent": "Montres",
+        "niveau": 1
+    },
+    {
+        "nom": "Montres de sport",
+        "slug": "montres-sport",
+        "parent": "Montres",
+        "niveau": 1
+    },
+    {
+        "nom": "Montres connectées",
+        "slug": "montres-connectees",
+        "parent": "Montres",
+        "niveau": 1
+    },
+    {
+        "nom": "Montres de luxe",
+        "slug": "montres-luxe",
+        "parent": "Montres",
+        "niveau": 1
+    },
+    {
+        "nom": "Bracelets et accessoires",
+        "slug": "bracelets-accessoires",
+        "parent": "Montres",
+        "niveau": 1
+    },
+
+    {
+        "nom": "T-shirts - Homme",
+        "slug": "t-shirts",
+        "parent": "Hauts - Homme",
+        "niveau": 2
+    },
+    {
+        "nom": "Chemises - Homme",
+        "slug": "chemises",
+        "parent": "Hauts - Homme",
+        "niveau": 2
+    },
+    {
+        "nom": "Pulls - Homme",
+        "slug": "pulls",
+        "parent": "Hauts - Homme",
+        "niveau": 2
+    },
+    {
+        "nom": "Cols roulés - Homme",
+        "slug": "cols-roules",
+        "parent": "Hauts - Homme",
+        "niveau": 2
+    },
+    {
+        "nom": "Pantalons - Homme",
+        "slug": "pantalons",
+        "parent": "Bas - Homme",
+        "niveau": 2
+    },
+    {
+        "nom": "Jeans - Homme",
+        "slug": "jeans",
+        "parent": "Bas - Homme",
+        "niveau": 2
+    },
+    {
+        "nom": "Shorts - Homme",
+        "slug": "shorts",
+        "parent": "Bas - Homme",
+        "niveau": 2
+    },
+    {
+        "nom": "Joggings - Homme",
+        "slug": "joggings",
+        "parent": "Bas - Homme",
+        "niveau": 2
+    },
+    {
+        "nom": "Vestes - Homme",
+        "slug": "vestes",
+        "parent": "Vêtements d'extérieur - Homme",
+        "niveau": 2
+    },
+    {
+        "nom": "Doudounes - Homme",
+        "slug": "doudounes",
+        "parent": "Vêtements d'extérieur - Homme",
+        "niveau": 2
+    },
+    {
+        "nom": "Manteaux - Homme",
+        "slug": "manteaux",
+        "parent": "Vêtements d'extérieur - Homme",
+        "niveau": 2
+    },
+    {
+        "nom": "Blazers - Homme",
+        "slug": "blazers",
+        "parent": "Vêtements d'extérieur - Homme",
+        "niveau": 2
+    },
+    {
+        "nom": "Boxers - Homme",
+        "slug": "boxers",
+        "parent": "Sous-vêtements et détente - Homme",
+        "niveau": 2
+    },
+    {
+        "nom": "Maillots de corps - Homme",
+        "slug": "maillots-de-corps",
+        "parent": "Sous-vêtements et détente - Homme",
+        "niveau": 2
+    },
+    {
+        "nom": "Pyjamas - Homme",
+        "slug": "pyjamas",
+        "parent": "Sous-vêtements et détente - Homme",
+        "niveau": 2
+    },
+    {
+        "nom": "Chaussettes - Homme",
+        "slug": "chaussettes",
+        "parent": "Sous-vêtements et détente - Homme",
+        "niveau": 2
+    },
+
+    {
+        "nom": "T-shirts - Femme",
+        "slug": "t-shirts",
+        "parent": "Hauts - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Chemises et blouses - Femme",
+        "slug": "chemises-blouses",
+        "parent": "Hauts - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Pulls - Femme",
+        "slug": "pulls",
+        "parent": "Hauts - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Cols roulés - Femme",
+        "slug": "cols-roules",
+        "parent": "Hauts - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Pantalons - Femme",
+        "slug": "pantalons",
+        "parent": "Bas - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Jeans - Femme",
+        "slug": "jeans",
+        "parent": "Bas - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Shorts - Femme",
+        "slug": "shorts",
+        "parent": "Bas - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Jupes - Femme",
+        "slug": "jupes",
+        "parent": "Bas - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Joggings - Femme",
+        "slug": "joggings",
+        "parent": "Bas - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Robes courtes - Femme",
+        "slug": "robes-courtes",
+        "parent": "Robes - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Robes longues - Femme",
+        "slug": "robes-longues",
+        "parent": "Robes - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Robes de soirée - Femme",
+        "slug": "robes-soiree",
+        "parent": "Robes - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Robes tricotées - Femme",
+        "slug": "robes-tricotees",
+        "parent": "Robes - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Une pièce - Femme",
+        "slug": "une-piece",
+        "parent": "Maillots de bain - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Bikinis - Femme",
+        "slug": "bikinis",
+        "parent": "Maillots de bain - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Pareos - Femme",
+        "slug": "pareos",
+        "parent": "Maillots de bain - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Soutiens-gorge - Femme",
+        "slug": "soutiens-gorge",
+        "parent": "Sous-vêtements et détente - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Culottes - Femme",
+        "slug": "culottes",
+        "parent": "Sous-vêtements et détente - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Lingerie sculptante - Femme",
+        "slug": "lingerie-sculptante",
+        "parent": "Sous-vêtements et détente - Femme",
+        "niveau": 2
+    },
+    {
+        "nom": "Chemises de nuit - Femme",
+        "slug": "chemises-de-nuit",
+        "parent": "Sous-vêtements et détente - Femme",
+        "niveau": 2
+    },
+
+    {
+        "nom": "T-shirts - Enfant",
+        "slug": "t-shirts",
+        "parent": "Hauts - Enfant",
+        "niveau": 2
+    },
+    {
+        "nom": "Polos - Enfant",
+        "slug": "polos",
+        "parent": "Hauts - Enfant",
+        "niveau": 2
+    },
+    {
+        "nom": "Shorts - Enfant",
+        "slug": "shorts",
+        "parent": "Bas - Enfant",
+        "niveau": 2
+    },
+    {
+        "nom": "Pantalons - Enfant",
+        "slug": "pantalons",
+        "parent": "Bas - Enfant",
+        "niveau": 2
+    },
+    {
+        "nom": "Ensembles - Enfant",
+        "slug": "ensembles",
+        "parent": "Ensembles - Enfant",
+        "niveau": 2
+    },
+    {
+        "nom": "Vêtements d'extérieur - Enfant",
+        "slug": "vetements-exterieur",
+        "parent": "Vêtements d'extérieur - Enfant",
+        "niveau": 2
+    },
+    {
+        "nom": "Pyjamas - Enfant",
+        "slug": "pyjamas",
+        "parent": "Sous-vêtements et détente - Enfant",
+        "niveau": 2
+    },
+    {
+        "nom": "Maillots de bain - Enfant",
+        "slug": "maillots-de-bain",
+        "parent": "Maillots de bain - Enfant",
+        "niveau": 2
+    },
+
+    {
+        "nom": "Sacs à main",
+        "slug": "sacs-a-main",
+        "parent": "Sacs et bagages",
+        "niveau": 2
+    },
+    {
+        "nom": "Sacs à dos",
+        "slug": "sacs-a-dos",
+        "parent": "Sacs et bagages",
+        "niveau": 2
+    },
+    {
+        "nom": "Sacs banane",
+        "slug": "sacs-banane",
+        "parent": "Sacs et bagages",
+        "niveau": 2
+    },
+    {
+        "nom": "Portefeuilles",
+        "slug": "portefeuilles",
+        "parent": "Sacs et bagages",
+        "niveau": 2
+    },
+    { "nom": "Colliers", "slug": "colliers", "parent": "Bijoux", "niveau": 2 },
+    {
+        "nom": "Bracelets",
+        "slug": "bracelets",
+        "parent": "Bijoux",
+        "niveau": 2
+    },
+    {
+        "nom": "Boucles d’oreilles",
+        "slug": "boucles-oreilles",
+        "parent": "Bijoux",
+        "niveau": 2
+    },
+    { "nom": "Bagues", "slug": "bagues", "parent": "Bijoux", "niveau": 2 },
+    { "nom": "Parures", "slug": "parures", "parent": "Bijoux", "niveau": 2 },
+    {
+        "nom": "Perruques",
+        "slug": "perruques",
+        "parent": "Accessoires capillaires",
+        "niveau": 2
+    },
+    {
+        "nom": "Extensions",
+        "slug": "extensions",
+        "parent": "Accessoires capillaires",
+        "niveau": 2
+    },
+    {
+        "nom": "Postiches",
+        "slug": "postiches",
+        "parent": "Accessoires capillaires",
+        "niveau": 2
+    },
+    {
+        "nom": "Accessoires perruques",
+        "slug": "accessoires-perruques",
+        "parent": "Accessoires capillaires",
+        "niveau": 2
+    }
+]

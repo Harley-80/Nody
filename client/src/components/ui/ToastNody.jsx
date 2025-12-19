@@ -5,6 +5,7 @@ import {
     FaInfoCircle,
     FaExclamationTriangle,
 } from 'react-icons/fa';
+import './ToastNody.scss';
 
 const Toast = ({ toast, onRemove }) => {
     const [isExiting, setIsExiting] = useState(false);
@@ -27,7 +28,7 @@ const Toast = ({ toast, onRemove }) => {
             clearInterval(interval);
             clearTimeout(timer);
         };
-    }, []);
+    }, [toast.duration]);
 
     const dismiss = () => {
         setIsExiting(true);
@@ -35,55 +36,42 @@ const Toast = ({ toast, onRemove }) => {
     };
 
     const iconMap = {
-        success: <FaCheckCircle className="text-green-500" />,
-        error: <FaTimesCircle className="text-red-500" />,
-        warning: <FaExclamationTriangle className="text-yellow-500" />,
-        info: <FaInfoCircle className="text-blue-500" />,
+        success: <FaCheckCircle className="toast-icon toast-icon-success" />,
+        error: <FaTimesCircle className="toast-icon toast-icon-error" />,
+        warning: (
+            <FaExclamationTriangle className="toast-icon toast-icon-warning" />
+        ),
+        info: <FaInfoCircle className="toast-icon toast-icon-info" />,
     };
 
     return (
         <div
-            className={`
-            relative mb-2 p-4 pr-10 rounded shadow-lg min-w-[300px] 
-            bg-white border-l-4 ${
-                toast.type === 'success'
-                    ? 'border-green-500'
-                    : toast.type === 'error'
-                      ? 'border-red-500'
-                      : toast.type === 'warning'
-                        ? 'border-yellow-500'
-                        : 'border-blue-500'
-            }
-            transition-all duration-300
-            ${isExiting ? 'translate-x-full opacity-0' : 'translate-x-0 opacity-100'}
-        `}
+            className={`toast-nody toast-${toast.type} ${isExiting ? 'toast-exiting' : ''}`}
         >
-            <div className="flex items-start gap-3">
-                <div className="mt-1">{iconMap[toast.type]}</div>
-                <div>
-                    <p className="font-medium">
+            <div className="toast-content">
+                <div className="toast-icon-wrapper">{iconMap[toast.type]}</div>
+                <div className="toast-text">
+                    <p className="toast-title">
                         {toast.title || toast.type.toUpperCase()}
                     </p>
-                    <p className="text-sm text-gray-600">{toast.message}</p>
+                    <p className="toast-message">{toast.message}</p>
                 </div>
             </div>
             <button
                 onClick={dismiss}
-                className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+                className="toast-close-btn"
+                aria-label="Fermer"
             >
                 &times;
             </button>
-            <div
-                className="absolute bottom-0 left-0 h-1 bg-current opacity-20"
-                style={{ width: `${progress}%` }}
-            />
+            <div className="toast-progress" style={{ width: `${progress}%` }} />
         </div>
     );
 };
 
 export default function ToastContainer({ toasts, onRemove }) {
     return (
-        <div className="fixed bottom-4 right-4 z-[1000]">
+        <div className="toast-container-nody">
             {toasts.map(toast => (
                 <Toast key={toast.id} toast={toast} onRemove={onRemove} />
             ))}

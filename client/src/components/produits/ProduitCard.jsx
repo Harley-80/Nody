@@ -5,14 +5,14 @@ export default function ProduitCard({ produit }) {
     const [addedToCart, setAddedToCart] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
 
-    const handleAddToCart = (e) => {
+    const handleAddToCart = e => {
         e.preventDefault();
         e.stopPropagation();
         setAddedToCart(true);
         setTimeout(() => setAddedToCart(false), 2000);
     };
 
-    const handleToggleFavorite = (e) => {
+    const handleToggleFavorite = e => {
         e.preventDefault();
         e.stopPropagation();
         setIsFavorite(!isFavorite);
@@ -24,10 +24,15 @@ export default function ProduitCard({ produit }) {
     else if (produit.status === 'Exclusif') badgeClass = 'bg-warning text-dark';
 
     return (
-        <Link to={`/produit/${produit.id}`} className="text-decoration-none text-dark">
+        <Link
+            to={`/produit/${produit.id}`}
+            className="text-decoration-none text-dark"
+        >
             <div className="card h-100 shadow-sm card-hover overflow-hidden position-relative">
                 {produit.status && (
-                    <span className={`badge ${badgeClass} position-absolute top-0 start-0 m-2`}>
+                    <span
+                        className={`badge ${badgeClass} position-absolute top-0 start-0 m-2`}
+                    >
                         {produit.status}
                     </span>
                 )}
@@ -57,7 +62,9 @@ export default function ProduitCard({ produit }) {
                             className={`btn btn-link ${isFavorite ? 'text-danger' : 'text-secondary'} p-0`}
                             onClick={handleToggleFavorite}
                         >
-                            <i className={`fas fa-heart ${isFavorite ? 'fa-beat' : ''}`}></i>
+                            <i
+                                className={`fas fa-heart ${isFavorite ? 'fa-beat' : ''}`}
+                            ></i>
                         </button>
                     </div>
 
@@ -65,7 +72,9 @@ export default function ProduitCard({ produit }) {
                         className={`btn ${addedToCart ? 'btn-success' : 'btn-dark'} mt-3`}
                         onClick={handleAddToCart}
                     >
-                        <i className={`fas ${addedToCart ? 'fa-check' : 'fa-cart-plus'} me-2`}></i>
+                        <i
+                            className={`fas ${addedToCart ? 'fa-check' : 'fa-cart-plus'} me-2`}
+                        ></i>
                         {addedToCart ? 'Ajouté !' : 'Ajouter au panier'}
                     </button>
                 </div>

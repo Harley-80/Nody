@@ -1,53 +1,253 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useReactToPrint } from 'react-to-print';
-import CommandeFacture from '../components/commandes/CommandeFacture'; 
-import '../styles/CommandeFacture.scss';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { api } from '../services/api';
+import './CommandeDetail.scss';
 
-export default function CommandeDetail() {
+const CommandeDetail = () => {
+    const { id } = useParams();
+    const navigate = useNavigate();
     const [commande, setCommande] = useState(null);
-    const ref = useRef(); // La référence pour le contenu à imprimer
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const data = localStorage.getItem('nodyCommandeActive');
-        if (data) {
-            setCommande(JSON.parse(data));
+        chargerCommande();
+    }, [id]);
+
+    const chargerCommande = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                navigate('/connexion');
+                return;
+            }
+
+            // Charger la commande depuis l'API
+            const response = await api.get(`/commandes/${id}`);
+            setCommande(response.data);
+        } catch (err) {
+            console.error('Erreur chargement commande:', err);
+            setError('Impossible de charger les détails de la commande');
+
+            if (err.response?.status === 401) {
+                navigate('/connexion');
+            } else if (err.response?.status === 403) {
+                setError("Vous n'avez pas accès à cette commande");
+            } else if (err.response?.status === 404) {
+                setError('Commande introuvable');
+            }
+        } finally {
+            setLoading(false);
         }
-    }, []);
+    };
 
-    // Ajout du useEffect pour surveiller les changements de la commande
-    useEffect(() => {
-        console.log('Commande actuelle:', {
-            statut: commande?.statut,
-            normalized: commande?.statut?.toLowerCase().replace(/é/g, 'e')
-        });
-    }, [commande]);
+    const getStatusClass = statut => {
+        const statusMap = {
+            en_attente: 'warning',
+            confirmee: 'info',
+            en_preparation: 'primary',
+            expediee: 'secondary',
+            livree: 'success',
+            annulee: 'danger',
+        };
+        return statusMap[statut] || 'secondary';
+    };
 
-    // Utilisation du nom de variable 'imprimer' comme demandé
-    const imprimer = useReactToPrint({
-        content: () => ref.current,
-        // Utilisation de commande?.id pour le titre du document, comme demandé
-        documentTitle: `Facture_Nody_${commande?.id}`,
-        pageStyle: `@page { size: A4; margin: 15mm; }` // Options de style pour l'impression, si nécessaire
-    });
+    const getStatusText = statut => {
+        const statusText = {
+            en_attente: 'En attente',
+            confirmee: 'Confirmée',
+            en_preparation: 'En préparation',
+            expediee: 'Expédiée',
+            livree: 'Livrée',
+            annulee: 'Annulée',
+        };
+        return statusText[statut] || statut;
+    };
+
+    if (loading) {
+        return (
+            <div className="commande-detail-page">
+                <div className="loading-container">
+                    <div className="spinner"></div>
+                    <p>Chargement des détails...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="commande-detail-page">
+                <div className="error-container">
+                    <i className="fas fa-exclamation-circle"></i>
+                    <h3>{error}</h3>
+                    <button
+                        onClick={() => navigate('/profil')}
+                        className="btn-primary"
+                    >
+                        Retour au profil
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     if (!commande) {
-        return <div className="container py-5 text-muted">Aucune commande sélectionnée.</div>;
+        return null;
     }
 
     return (
-        <div className="container py-5">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2>Détail de la commande</h2>
-                {/* Le bouton pour déclencher l'impression/téléchargement PDF */}
-                <button className="btn btn-outline-dark" onClick={imprimer}>
-                    Télécharger Facture PDF
+        <div className="commande-detail-page">
+            <div className="container">
+                <button
+                    onClick={() => navigate('/profil')}
+                    className="btn-back"
+                >
+                    <i className="fas fa-arrow-left"></i>
+                    Retour au profil
                 </button>
-            </div>
 
-            {/* Le contenu de la facture, enveloppé dans la référence 'ref' */}
-            <div ref={ref}>
-                <CommandeFacture commande={commande} />
+                <div className="commande-header">
+                    <div>
+                        <h1>
+                            Commande #
+                            {commande.numeroCommande || commande._id.slice(-6)}
+                        </h1>
+                        <p className="date">
+                            Passée le{' '}
+                            {new Date(commande.createdAt).toLocaleDateString(
+                                'fr-FR',
+                                {
+                                    day: 'numeric',
+                                    month: 'long',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                }
+                            )}
+                        </p>
+                    </div>
+                    <span
+                        className={`badge badge-${getStatusClass(commande.statut)}`}
+                    >
+                        {getStatusText(commande.statut)}
+                    </span>
+                </div>
+
+                <div className="commande-content">
+                    <div className="section produits-section">
+                        <h2>Produits commandés</h2>
+                        <div className="produits-list">
+                            {commande.produits?.map((item, index) => (
+                                <div key={index} className="produit-item">
+                                    <div className="produit-image">
+                                        {item.produit?.images?.[0] ? (
+                                            <img
+                                                src={item.produit.images[0]}
+                                                alt={item.produit.nom}
+                                            />
+                                        ) : (
+                                            <div className="no-image">
+                                                <i className="fas fa-image"></i>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="produit-info">
+                                        <h3>
+                                            {item.produit?.nom || 'Produit'}
+                                        </h3>
+                                        <p>Quantité: {item.quantite}</p>
+                                        <p className="prix-unitaire">
+                                            {item.prix?.toLocaleString()} XOF /
+                                            unité
+                                        </p>
+                                    </div>
+                                    <div className="produit-total">
+                                        <strong>
+                                            {(
+                                                item.prix * item.quantite
+                                            )?.toLocaleString()}{' '}
+                                            XOF
+                                        </strong>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="section infos-section">
+                        <h2>Informations de livraison</h2>
+                        <div className="info-card">
+                            <div className="info-item">
+                                <i className="fas fa-user"></i>
+                                <div>
+                                    <label>Nom</label>
+                                    <p>
+                                        {commande.adresseLivraison?.nom ||
+                                            commande.utilisateur?.nom ||
+                                            'Non renseigné'}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="info-item">
+                                <i className="fas fa-phone"></i>
+                                <div>
+                                    <label>Téléphone</label>
+                                    <p>
+                                        {commande.adresseLivraison?.telephone ||
+                                            commande.utilisateur?.telephone ||
+                                            'Non renseigné'}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="info-item">
+                                <i className="fas fa-map-marker-alt"></i>
+                                <div>
+                                    <label>Adresse</label>
+                                    <p>
+                                        {commande.adresseLivraison?.adresse ||
+                                            'Non renseignée'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h2>Résumé de la commande</h2>
+                        <div className="resume-card">
+                            <div className="resume-item">
+                                <span>Sous-total</span>
+                                <span>
+                                    {commande.montantTotal?.toLocaleString()}{' '}
+                                    XOF
+                                </span>
+                            </div>
+                            <div className="resume-item">
+                                <span>Livraison</span>
+                                <span>
+                                    {commande.fraisLivraison?.toLocaleString() ||
+                                        0}{' '}
+                                    XOF
+                                </span>
+                            </div>
+                            <div className="resume-item total">
+                                <strong>Total</strong>
+                                <strong>
+                                    {(
+                                        commande.montantTotal +
+                                        (commande.fraisLivraison || 0)
+                                    )?.toLocaleString()}{' '}
+                                    XOF
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
-}
+};
+
+export default CommandeDetail;

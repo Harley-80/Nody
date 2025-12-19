@@ -1,0 +1,214 @@
+.tableau-dashboard {
+    .tableau-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+
+        &::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+
+            &:hover {
+                background: #94a3b8;
+            }
+        }
+    }
+
+    .table {
+        width: 100%;
+        margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+
+        thead {
+            th {
+                background: #f8fafc;
+                color: #475569;
+                font-weight: 600;
+                font-size: 0.875rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 1rem;
+                border-bottom: 2px solid #e2e8f0;
+                white-space: nowrap;
+
+                &:first-child {
+                    border-top-left-radius: 8px;
+                }
+
+                &:last-child {
+                    border-top-right-radius: 8px;
+                }
+            }
+        }
+
+        tbody {
+            tr {
+                transition: background-color 0.2s ease;
+
+                &:hover {
+                    background-color: #f8fafc;
+                }
+
+                &:last-child td {
+                    border-bottom: none;
+                }
+            }
+
+            td {
+                padding: 1rem;
+                border-bottom: 1px solid #e2e8f0;
+                vertical-align: middle;
+                color: #334155;
+                font-size: 0.9375rem;
+            }
+        }
+
+        .text-end {
+            text-align: right;
+        }
+    }
+
+    // Composants spécifiques
+    .produit-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .produit-rang {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 50%;
+        font-size: 0.75rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .produit-image {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        i {
+            color: #cbd5e1;
+            font-size: 1.25rem;
+        }
+    }
+
+    .produit-nom {
+        font-weight: 500;
+        color: #1e293b;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .numero-commande {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: #667eea;
+        font-size: 0.875rem;
+    }
+
+    .client-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .client-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        flex-shrink: 0;
+    }
+
+    .client-nom {
+        font-weight: 500;
+        color: #1e293b;
+    }
+
+    .client-email {
+        font-size: 0.8125rem;
+        color: #64748b;
+        margin-top: 2px;
+    }
+
+    .badge {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        border-radius: 6px;
+    }
+}
+
+.tableau-vide {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    color: #94a3b8;
+
+    i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    p {
+        font-size: 1rem;
+        font-weight: 500;
+        margin: 0;
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .tableau-dashboard {
+        .table {
+            thead th,
+            tbody td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.875rem;
+            }
+        }
+
+        .produit-nom {
+            max-width: 150px;
+        }
+    }
+}

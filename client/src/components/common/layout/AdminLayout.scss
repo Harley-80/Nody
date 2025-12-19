@@ -1,0 +1,186 @@
+// REFONTE ADMIN LAYOUT - Structure améliorée
+.admin-layout-refonte {
+    display: flex;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    position: relative;
+
+    // CONTAINER SIDEBAR
+    .sidebar-container-refonte {
+        width: 260px;
+        background: linear-gradient(180deg, #16213e 0%, #0f172a 100%);
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 100;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        // Animation d'entrée
+        animation: slideInLeft 0.3s ease;
+
+        &.collapsed {
+            transform: translateX(-100%);
+            box-shadow: none;
+        }
+
+        // Scrollbar personnalisée
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    }
+
+    // OVERLAY POUR MOBILE
+    .sidebar-overlay-refonte {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 99;
+        animation: fadeIn 0.3s ease;
+    }
+
+    // CONTENU PRINCIPAL
+    .admin-main-refonte {
+        flex: 1;
+        margin-left: 260px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        .sidebar-container-refonte.collapsed ~ & {
+            margin-left: 0;
+        }
+
+        .header-container-refonte {
+            position: sticky;
+            top: 0;
+            z-index: 90;
+
+            .sidebar-toggle-refonte {
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 101;
+                width: 40px;
+                height: 40px;
+                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                border: none;
+                border-radius: 10px;
+                color: white;
+                cursor: pointer;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+                transition: all 0.3s ease;
+
+                &:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+                }
+
+                .toggle-icon {
+                    font-size: 1.2rem;
+                    font-weight: 700;
+                }
+            }
+        }
+
+        .admin-content-refonte {
+            flex: 1;
+            padding: 1.5rem;
+            position: relative;
+            overflow-y: auto;
+
+            .content-container-refonte {
+                max-width: 1400px;
+                margin: 0 auto;
+                width: 100%;
+                animation: fadeInUp 0.3s ease;
+            }
+        }
+    }
+
+    // RESPONSIVE DESIGN
+    @media (max-width: 1200px) {
+        .sidebar-container-refonte {
+            transform: translateX(-100%);
+            z-index: 100;
+
+            &:not(.collapsed) {
+                transform: translateX(0);
+            }
+        }
+
+        .admin-main-refonte {
+            margin-left: 0;
+
+            .header-container-refonte {
+                .sidebar-toggle-refonte {
+                    display: flex;
+                }
+            }
+        }
+    }
+
+    @media (max-width: 768px) {
+        .admin-main-refonte {
+            .admin-content-refonte {
+                padding: 1rem;
+            }
+        }
+    }
+
+    // ANIMATIONS
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}

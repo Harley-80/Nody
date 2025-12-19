@@ -1,96 +1,139 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
-import { fakeApiGetProduits } from '../services/produitsService';
-import { useContext } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { api } from '../services/api';
 
-// Création du contexte
-export const ProduitsContext = createContext();
+// Créer le contexte des produits
+const ProduitsContext = createContext();
 
-export function ProduitsProvider({ children }) {
+// Fournisseur de contexte des produits
+export const ProduitsProvider = ({ children }) => {
     const [produits, setProduits] = useState([]);
-    const { t } = useTranslation();
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [categories, setCategories] = useState([]);
-    const [devise, setDevise] = useState('XOF');
 
-    // Fonction pour obtenir le taux de change en fonction de la devise
-    const getTauxDeChange = deviseCible => {
-        const taux = {
-            XOF: 1,
-            EUR: 0.0015,
-        };
-        return taux[deviseCible] || 1;
+    // Charger tous les produits depuis l'API
+    const chargerProduits = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await api.get('/produits');
+            const data = response.data;
+
+            // Gérer différents formats de réponse
+            if (data.produits) {
+                setProduits(data.produits);
+            } else if (data.data) {
+                setProduits(data.data);
+            } else if (Array.isArray(data)) {
+                setProduits(data);
+            } else {
+                setProduits([]);
+            }
+        } catch (err) {
+            console.error('Erreur lors du chargement des produits:', err);
+            setError(err.message);
+            setProduits([]);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    // Fonction pour charger les produits
-    const chargerProduits = useCallback(
-        async (category = null) => {
-            try {
-                setError(null);
-                const data = await fakeApiGetProduits(category);
-                setProduits(data.produits);
-                setCategories(data.categories || []);
-            } catch (err) {
-                console.error('Erreur de chargement des produits:', err);
-                setError(t('productErrors.load'));
-            }
-        },
-        [t]
-    );
-
-    const chargerCategories = useCallback(async () => {
+    // Rechercher des produits
+    const rechercherProduits = async query => {
         try {
+            setLoading(true);
             setError(null);
-            const data = await fakeApiGetProduits();
-            setCategories(data.categories || []);
-        } catch (err) {
-            console.error('Erreur de chargement des catégories:', err);
-            setError(t('productErrors.load'));
-        }
-    }, [t]);
+            const response = await api.get(
+                `/produits?search=${encodeURIComponent(query)}`
+            );
+            const data = response.data;
 
+            if (data.produits) {
+                setProduits(data.produits);
+            } else if (data.data) {
+                setProduits(data.data);
+            } else if (Array.isArray(data)) {
+                setProduits(data);
+            } else {
+                setProduits([]);
+            }
+        } catch (err) {
+            console.error('Erreur lors de la recherche:', err);
+            setError(err.message);
+            setProduits([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Obtenir les nouveaux produits
+    const getNouveauxProduits = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await api.get('/produits/nouveaux');
+            const data = response.data;
+
+            if (data.produits) {
+                return data.produits;
+            } else if (data.data) {
+                return data.data;
+            } else if (Array.isArray(data)) {
+                return data;
+            } else {
+                return [];
+            }
+        } catch (err) {
+            console.error(
+                'Erreur lors du chargement des nouveaux produits:',
+                err
+            );
+            setError(err.message);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Obtenir un produit par ID
+    const getProduitById = async id => {
+        try {
+            const response = await api.get(`/produits/${id}`);
+            return response.data;
+        } catch (err) {
+            console.error('Erreur lors du chargement du produit:', err);
+            throw err;
+        }
+    };
+
+    // Charger les produits au montage
     useEffect(() => {
         chargerProduits();
-    }, [chargerProduits]);
+    }, []);
 
-    const getProduitById = id => {
-        return produits.find(p => p.id === id);
-    };
-
-    const getProduitsByCategory = categoryId => {
-        return produits.filter(p => p.category === categoryId);
-    };
-
-    const convertirPrix = prix => {
-        const taux = getTauxDeChange(devise);
-        const prixConverti = prix * taux;
-        return new Intl.NumberFormat('fr-FR', {
-            style: 'currency',
-            currency: devise,
-            minimumFractionDigits: 0,
-        }).format(prixConverti);
+    const value = {
+        produits,
+        loading,
+        error,
+        chargerProduits,
+        rechercherProduits,
+        getNouveauxProduits,
+        getProduitById,
     };
 
     return (
-        <ProduitsContext.Provider
-            value={{
-                produits,
-                error,
-                categories,
-                devise,
-                setDevise,
-                chargerProduits,
-                chargerCategories,
-                getProduitById,
-                getProduitsByCategory,
-                convertirPrix,
-            }}
-        >
+        <ProduitsContext.Provider value={value}>
             {children}
         </ProduitsContext.Provider>
     );
-}
+};
 
-export function useProduits() {
-    return useContext(ProduitsContext);
-}
+// Hook personnalisé pour utiliser le contexte des produits
+export const useProduits = () => {
+    const context = useContext(ProduitsContext);
+    if (!context) {
+        throw new Error(
+            'useProduits doit être utilisé dans un ProduitsProvider'
+        );
+    }
+    return context;
+};

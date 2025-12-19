@@ -138,7 +138,9 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition:
+                transform 0.2s,
+                box-shadow 0.2s;
 
             &:hover {
                 transform: translateY(-5px);
@@ -237,6 +239,10 @@
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }

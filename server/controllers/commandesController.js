@@ -1,9 +1,15 @@
-// Importation des modules nécessaires
 import asyncHandler from 'express-async-handler';
 import mongoose from 'mongoose';
 import Commande from '../models/commandeModel.js';
 import Produit from '../models/produitModel.js';
 import Utilisateur from '../models/utilisateurModel.js';
+import vendeurNotificationService from '../services/vendeurNotificationService.js'; // 1. NOUVEL IMPORT
+
+// Simulation d'un logger global pour les besoins du code
+const logger = {
+    info: message => console.log(`INFO: ${message}`),
+    error: (message, error) => console.error(`ERROR: ${message}`, error),
+};
 
 /**
  * @desc    Créer une commande
@@ -29,10 +35,12 @@ const creerCommande = asyncHandler(async (req, res) => {
         // Vérifier le stock et calculer les totaux
         let sousTotal = 0;
         const articlesCommande = [];
+        const produitsAMettreAJour = []; // Stocker les articles avec infos vendeur/produit complets
+
         for (const article of articles) {
-            const produit = await Produit.findById(article.produit).session(
-                session
-            );
+            const produit = await Produit.findById(article.produit)
+                .session(session)
+                .populate('vendeur', '_id'); // Populater le vendeur pour les notifications
 
             if (!produit) {
                 throw new Error(`Produit non trouvé: ${article.produit}`);
@@ -40,8 +48,10 @@ const creerCommande = asyncHandler(async (req, res) => {
             if (produit.quantite < article.quantite) {
                 throw new Error(`Stock insuffisant pour: ${produit.nom}`);
             }
+
             const totalArticle = produit.prix * article.quantite;
             sousTotal += totalArticle;
+
             articlesCommande.push({
                 produit: produit._id,
                 nom: produit.nom,
@@ -51,12 +61,21 @@ const creerCommande = asyncHandler(async (req, res) => {
                 image: produit.images[0]?.url || '',
                 sku: produit.sku,
             });
+
+            // Préparer pour la mise à jour du stock et les notifications
+            produitsAMettreAJour.push({
+                produitId: produit._id,
+                quantite: article.quantite,
+                vendeurId: produit.vendeur?._id,
+            });
         }
+
         // Calculer les totaux (simplifié)
         const taxe = sousTotal * 0.2; // 20% de TVA
         const livraison = methodeLivraison?.cout || 0;
         const remise = 0; // À implémenter avec les coupons
         const total = sousTotal + taxe + livraison - remise;
+
         // Créer la commande
         const [commande] = await Commande.create(
             [
@@ -82,18 +101,38 @@ const creerCommande = asyncHandler(async (req, res) => {
             { session }
         );
 
-        // Mettre à jour le stock
-        for (const article of articlesCommande) {
-            await Produit.findByIdAndUpdate(
-                article.produit,
+        // Mettre à jour le stock et alerter le stock faible
+        for (const articleAUpdater of produitsAMettreAJour) {
+            // Mettre à jour le stock
+            const produitMisAJour = await Produit.findByIdAndUpdate(
+                articleAUpdater.produitId,
                 {
                     $inc: {
-                        quantite: -article.quantite,
-                        nombreVentes: article.quantite,
+                        quantite: -articleAUpdater.quantite,
+                        nombreVentes: articleAUpdater.quantite,
                     },
                 },
-                { session }
+                { new: true, session } // 'new: true' pour obtenir le document mis à jour
             );
+
+            // 3. ALERTE STOCK FAIBLE
+            if (produitMisAJour.quantite < 10 && articleAUpdater.vendeurId) {
+                try {
+                    await vendeurNotificationService.notifierStockFaible(
+                        articleAUpdater.vendeurId,
+                        produitMisAJour,
+                        produitMisAJour.quantite
+                    );
+                    logger.info(
+                        `Alerte stock faible envoyée pour produit ${produitMisAJour._id}`
+                    );
+                } catch (notifError) {
+                    logger.error(
+                        'Erreur notification stock faible :',
+                        notifError
+                    );
+                }
+            }
         }
 
         // Mettre à jour l'utilisateur
@@ -107,6 +146,44 @@ const creerCommande = asyncHandler(async (req, res) => {
         );
 
         await session.commitTransaction();
+
+        // Récupérer la commande pour les notifications (avec les détails du vendeur)
+        const commandePopulee = await Commande.findById(commande._id).populate({
+            path: 'articles.produit',
+            select: 'vendeur nom prix quantite images',
+            populate: {
+                path: 'vendeur',
+                select: 'nom email',
+            },
+        });
+
+        // 2. NOTIFIER CHAQUE VENDEUR CONCERNÉ
+        const vendeursNotifies = new Set();
+
+        // On itère sur la commande populée après le commit pour éviter les problèmes de transaction
+        for (const article of commandePopulee.articles) {
+            if (article.produit?.vendeur) {
+                vendeursNotifies.add(article.produit.vendeur._id.toString());
+            }
+        }
+
+        for (const vendeurId of vendeursNotifies) {
+            try {
+                await vendeurNotificationService.notifierNouvelleCommande(
+                    vendeurId,
+                    commandePopulee // Utiliser la commande populée complète
+                );
+                logger.info(
+                    `Notification nouvelle commande envoyée au vendeur ${vendeurId}`
+                );
+            } catch (notifError) {
+                logger.error(
+                    `Erreur notification vendeur ${vendeurId} :`,
+                    notifError
+                );
+            }
+        }
+
         res.status(201).json({
             succes: true,
             donnees: commande,
@@ -121,6 +198,8 @@ const creerCommande = asyncHandler(async (req, res) => {
     }
 });
 
+// ... Autres fonctions
+
 /**
  * @desc    Récupérer les commandes de l'utilisateur
  * @route   GET /api/commandes
@@ -130,14 +209,17 @@ const obtenirMesCommandes = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limite = parseInt(req.query.limite) || 10;
     const sauter = (page - 1) * limite;
+
     const commandes = await Commande.find({ client: req.utilisateur._id })
         .populate('articles.produit', 'nom images') // Un seul populate suffit
         .sort({ createdAt: -1 }) // Trier par date de création
         .skip(sauter) // Appliquer la pagination
         .limit(limite);
+
     const total = await Commande.countDocuments({
         client: req.utilisateur._id,
     });
+
     res.json({
         succes: true,
         donnees: commandes,
@@ -159,10 +241,12 @@ const obtenirCommande = asyncHandler(async (req, res) => {
     const commande = await Commande.findById(req.params.id)
         .populate('client', 'prenom nom email')
         .populate('articles.produit', 'nom images slug');
+
     if (!commande) {
         res.status(404);
         throw new Error('Commande non trouvée');
     }
+
     // Vérifier que l'utilisateur peut voir cette commande
     if (
         req.utilisateur.role !== 'admin' &&
@@ -171,6 +255,7 @@ const obtenirCommande = asyncHandler(async (req, res) => {
         res.status(403);
         throw new Error('Non autorisé à voir cette commande');
     }
+
     res.json({
         succes: true,
         donnees: commande,
@@ -184,11 +269,22 @@ const obtenirCommande = asyncHandler(async (req, res) => {
  */
 const mettreAJourStatutCommande = asyncHandler(async (req, res) => {
     const { statut, note } = req.body;
-    const commande = await Commande.findById(req.params.id);
+    const commande = await Commande.findById(req.params.id).populate({
+        path: 'articles.produit',
+        select: 'vendeur nom prix',
+        populate: {
+            path: 'vendeur',
+            select: 'nom email',
+        },
+    }); // Populater pour les notifications
+
     if (!commande) {
         res.status(404);
         throw new Error('Commande non trouvée');
     }
+
+    const ancienStatut = commande.statut; // Définir l'ancien statut
+
     commande.statut = statut;
 
     if (note) {
@@ -198,7 +294,38 @@ const mettreAJourStatutCommande = asyncHandler(async (req, res) => {
             estInterne: true,
         });
     }
+
     await commande.save();
+
+    // 4. NOTIFIER LE(S) VENDEUR(S)
+    const vendeursNotifies = new Set();
+
+    for (const article of commande.articles) {
+        // Le produit est déjà populé dans la requête findById
+        if (article.produit?.vendeur) {
+            vendeursNotifies.add(article.produit.vendeur._id.toString());
+        }
+    }
+
+    for (const vendeurId of vendeursNotifies) {
+        try {
+            await vendeurNotificationService.notifierMiseAJourCommande(
+                vendeurId,
+                commande,
+                ancienStatut,
+                statut
+            );
+            logger.info(
+                `Notification mise à jour commande envoyée au vendeur ${vendeurId}`
+            );
+        } catch (notifError) {
+            logger.error(
+                `Erreur notification vendeur ${vendeurId} :`,
+                notifError
+            );
+        }
+    }
+
     res.json({
         succes: true,
         donnees: commande,
@@ -213,10 +340,12 @@ const mettreAJourStatutCommande = asyncHandler(async (req, res) => {
  */
 const annulerCommande = asyncHandler(async (req, res) => {
     const commande = await Commande.findById(req.params.id);
+
     if (!commande) {
         res.status(404);
         throw new Error('Commande non trouvée');
     }
+
     // Vérifier les permissions
     if (
         req.utilisateur.role !== 'admin' &&
@@ -225,11 +354,13 @@ const annulerCommande = asyncHandler(async (req, res) => {
         res.status(403);
         throw new Error('Non autorisé à annuler cette commande');
     }
+
     // Vérifier si l'annulation est possible
     if (!['en_attente', 'confirme', 'en_cours'].includes(commande.statut)) {
         res.status(400);
         throw new Error("Impossible d'annuler cette commande");
     }
+
     // Restaurer le stock
     for (const article of commande.articles) {
         await Produit.findByIdAndUpdate(article.produit, {
@@ -239,9 +370,11 @@ const annulerCommande = asyncHandler(async (req, res) => {
             },
         });
     }
+
     commande.statut = 'annule';
     commande.raisonAnnulation = req.body.raison || 'Annulé par le client';
     await commande.save();
+
     res.json({
         succes: true,
         message: 'Commande annulée avec succès',
@@ -263,23 +396,33 @@ const obtenirToutesCommandes = asyncHandler(async (req, res) => {
         dateDebut,
         dateFin,
     } = req.query;
+
     let requete = {};
+
     if (statut) requete.statut = statut;
     if (client) requete.client = client;
+
     if (dateDebut || dateFin) {
         requete.createdAt = {}; // Correction: utiliser createdAt
         if (dateDebut) requete.createdAt.$gte = new Date(dateDebut);
         if (dateFin) requete.createdAt.$lte = new Date(dateFin);
     }
+
     const sauter = (page - 1) * limite;
+
     const commandes = await Commande.find(requete)
         .populate('client', 'prenom nom email')
-        .sort({ creeLe: -1 })
+        .sort({ createdAt: -1 }) // Utiliser 'createdAt' pour le tri, car 'creeLe' n'est pas standard Mongoose
         .skip(sauter)
         .limit(Number(limite));
+
     const total = await Commande.countDocuments(requete);
+
     // Statistiques
     const stats = await Commande.aggregate([
+        {
+            $match: requete, // Appliquer les filtres de la requête aux statistiques
+        },
         {
             $group: {
                 _id: null,
@@ -289,6 +432,7 @@ const obtenirToutesCommandes = asyncHandler(async (req, res) => {
             },
         },
     ]);
+
     res.json({
         succes: true,
         donnees: commandes,

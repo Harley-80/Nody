@@ -1,0 +1,858 @@
+[
+    {
+        "_id": "homme",
+        "name": "Homme",
+        "slug": "homme",
+        "parent": null,
+        "level": 0,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme",
+        "name": "Femme",
+        "slug": "femme",
+        "parent": null,
+        "level": 0,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant",
+        "name": "Enfant",
+        "slug": "enfant",
+        "parent": null,
+        "level": 0,
+        "isFeatured": false
+    },
+    {
+        "_id": "chaussures",
+        "name": "Chaussures",
+        "slug": "chaussures",
+        "parent": null,
+        "level": 0,
+        "isFeatured": false
+    },
+    {
+        "_id": "accessoires",
+        "name": "Accessoires",
+        "slug": "accessoires",
+        "parent": null,
+        "level": 0,
+        "isFeatured": false
+    },
+    {
+        "_id": "montres",
+        "name": "Montres",
+        "slug": "montres",
+        "parent": null,
+        "level": 0,
+        "isFeatured": false
+    },
+
+    // --- HOMME NIVEAU 2 ---
+    {
+        "_id": "homme_hauts",
+        "name": "Hauts",
+        "slug": "hauts",
+        "parent": "homme",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_bas",
+        "name": "Bas",
+        "slug": "bas",
+        "parent": "homme",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_vetements_exterieur",
+        "name": "Vêtements d'extérieur",
+        "slug": "vetements-exterieur",
+        "parent": "homme",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_ensembles",
+        "name": "Ensembles",
+        "slug": "ensembles",
+        "parent": "homme",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_sous_vetements",
+        "name": "Sous-vêtements et détente",
+        "slug": "sous-vetements-detente",
+        "parent": "homme",
+        "level": 1,
+        "isFeatured": false
+    },
+
+    // --- FEMME NIVEAU 2 ---
+    {
+        "_id": "femme_hauts",
+        "name": "Hauts",
+        "slug": "hauts",
+        "parent": "femme",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_bas",
+        "name": "Bas",
+        "slug": "bas",
+        "parent": "femme",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_robes",
+        "name": "Robes",
+        "slug": "robes",
+        "parent": "femme",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_vetements_exterieur",
+        "name": "Vêtements d'extérieur",
+        "slug": "vetements-exterieur",
+        "parent": "femme",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_ensembles",
+        "name": "Ensembles",
+        "slug": "ensembles",
+        "parent": "femme",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_maillots",
+        "name": "Maillots de bain",
+        "slug": "maillots-de-bain",
+        "parent": "femme",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_sous_vetements",
+        "name": "Sous-vêtements et détente",
+        "slug": "sous-vetements-detente",
+        "parent": "femme",
+        "level": 1,
+        "isFeatured": false
+    },
+
+    // --- ENFANT NIVEAU 2 ---
+    {
+        "_id": "enfant_vetements",
+        "name": "Vêtements",
+        "slug": "vetements",
+        "parent": "enfant",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant_chaussures",
+        "name": "Chaussures",
+        "slug": "chaussures",
+        "parent": "enfant",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant_accessoires",
+        "name": "Accessoires",
+        "slug": "accessoires",
+        "parent": "enfant",
+        "level": 1,
+        "isFeatured": false
+    },
+
+    // --- CHAUSSURES NIVEAU 2 (transverse) ---
+    {
+        "_id": "chaussures_baskets",
+        "name": "Baskets",
+        "slug": "baskets",
+        "parent": "chaussures",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "chaussures_bottes",
+        "name": "Bottes",
+        "slug": "bottes",
+        "parent": "chaussures",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "chaussures_sandales",
+        "name": "Sandales",
+        "slug": "sandales",
+        "parent": "chaussures",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "chaussures_plates",
+        "name": "Chaussures plates",
+        "slug": "chaussures-plates",
+        "parent": "chaussures",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "chaussures_talons",
+        "name": "Chaussures à talons",
+        "slug": "chaussures-talons",
+        "parent": "chaussures",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "chaussures_professionnelles",
+        "name": "Chaussures professionnelles",
+        "slug": "chaussures-professionnelles",
+        "parent": "chaussures",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "chaussures_decontractees",
+        "name": "Chaussures décontractées",
+        "slug": "chaussures-decontractees",
+        "parent": "chaussures",
+        "level": 1,
+        "isFeatured": false
+    },
+
+    // --- ACCESSOIRES NIVEAU 2 ---
+    {
+        "_id": "accessoires_sacs",
+        "name": "Sacs et bagages",
+        "slug": "sacs-bagages",
+        "parent": "accessoires",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "accessoires_bijoux",
+        "name": "Bijoux",
+        "slug": "bijoux",
+        "parent": "accessoires",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "accessoires_lunettes",
+        "name": "Lunettes de soleil",
+        "slug": "lunettes-soleil",
+        "parent": "accessoires",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "accessoires_ceintures",
+        "name": "Ceintures",
+        "slug": "ceintures",
+        "parent": "accessoires",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "accessoires_echarpes",
+        "name": "Écharpes, gants, chapeaux",
+        "slug": "echarpes-gants-chapeaux",
+        "parent": "accessoires",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "accessoires_capillaires",
+        "name": "Accessoires capillaires",
+        "slug": "accessoires-capillaires",
+        "parent": "accessoires",
+        "level": 1,
+        "isFeatured": false
+    },
+
+    // --- MONTRES NIVEAU 2 ---
+    {
+        "_id": "montres_classiques",
+        "name": "Montres classiques",
+        "slug": "montres-classiques",
+        "parent": "montres",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "montres_sport",
+        "name": "Montres de sport",
+        "slug": "montres-sport",
+        "parent": "montres",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "montres_connectees",
+        "name": "Montres connectées",
+        "slug": "montres-connectees",
+        "parent": "montres",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "montres_luxe",
+        "name": "Montres de luxe",
+        "slug": "montres-luxe",
+        "parent": "montres",
+        "level": 1,
+        "isFeatured": false
+    },
+    {
+        "_id": "montres_accessoires",
+        "name": "Bracelets et accessoires",
+        "slug": "bracelets-accessoires",
+        "parent": "montres",
+        "level": 1,
+        "isFeatured": false
+    },
+
+    // --- NIVEAU 3 : HOMME ---
+    // Hauts
+    {
+        "_id": "homme_tshirts",
+        "name": "T-shirts",
+        "slug": "t-shirts",
+        "parent": "homme_hauts",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_chemises",
+        "name": "Chemises",
+        "slug": "chemises",
+        "parent": "homme_hauts",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_pulls",
+        "name": "Pulls",
+        "slug": "pulls",
+        "parent": "homme_hauts",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_cols_roules",
+        "name": "Cols roulés",
+        "slug": "cols-roules",
+        "parent": "homme_hauts",
+        "level": 2,
+        "isFeatured": false
+    },
+    // Bas
+    {
+        "_id": "homme_pantalons",
+        "name": "Pantalons",
+        "slug": "pantalons",
+        "parent": "homme_bas",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_jeans",
+        "name": "Jeans",
+        "slug": "jeans",
+        "parent": "homme_bas",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_shorts",
+        "name": "Shorts",
+        "slug": "shorts",
+        "parent": "homme_bas",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_joggings",
+        "name": "Joggings",
+        "slug": "joggings",
+        "parent": "homme_bas",
+        "level": 2,
+        "isFeatured": false
+    },
+    // Extérieur
+    {
+        "_id": "homme_vestes",
+        "name": "Vestes",
+        "slug": "vestes",
+        "parent": "homme_vetements_exterieur",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_doudounes",
+        "name": "Doudounes",
+        "slug": "doudounes",
+        "parent": "homme_vetements_exterieur",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_manteaux",
+        "name": "Manteaux",
+        "slug": "manteaux",
+        "parent": "homme_vetements_exterieur",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_blazers",
+        "name": "Blazers",
+        "slug": "blazers",
+        "parent": "homme_vetements_exterieur",
+        "level": 2,
+        "isFeatured": false
+    },
+    // Sous-vêtements
+    {
+        "_id": "homme_boxers",
+        "name": "Boxers",
+        "slug": "boxers",
+        "parent": "homme_sous_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_maillots_corps",
+        "name": "Maillots de corps",
+        "slug": "maillots-de-corps",
+        "parent": "homme_sous_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_pyjamas",
+        "name": "Pyjamas",
+        "slug": "pyjamas",
+        "parent": "homme_sous_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "homme_chaussettes",
+        "name": "Chaussettes",
+        "slug": "chaussettes",
+        "parent": "homme_sous_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+
+    // --- NIVEAU 3 : FEMME ---
+    // Hauts
+    {
+        "_id": "femme_tshirts",
+        "name": "T-shirts",
+        "slug": "t-shirts",
+        "parent": "femme_hauts",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_chemises_blouses",
+        "name": "Chemises et blouses",
+        "slug": "chemises-blouses",
+        "parent": "femme_hauts",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_pulls",
+        "name": "Pulls",
+        "slug": "pulls",
+        "parent": "femme_hauts",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_cols_roules",
+        "name": "Cols roulés",
+        "slug": "cols-roules",
+        "parent": "femme_hauts",
+        "level": 2,
+        "isFeatured": false
+    },
+    // Bas
+    {
+        "_id": "femme_pantalons",
+        "name": "Pantalons",
+        "slug": "pantalons",
+        "parent": "femme_bas",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_jeans",
+        "name": "Jeans",
+        "slug": "jeans",
+        "parent": "femme_bas",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_shorts",
+        "name": "Shorts",
+        "slug": "shorts",
+        "parent": "femme_bas",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_jupes",
+        "name": "Jupes",
+        "slug": "jupes",
+        "parent": "femme_bas",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_joggings",
+        "name": "Joggings",
+        "slug": "joggings",
+        "parent": "femme_bas",
+        "level": 2,
+        "isFeatured": false
+    },
+    // Robes
+    {
+        "_id": "femme_robes_courtes",
+        "name": "Robes courtes",
+        "slug": "robes-courtes",
+        "parent": "femme_robes",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_robes_longues",
+        "name": "Robes longues",
+        "slug": "robes-longues",
+        "parent": "femme_robes",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_robes_soiree",
+        "name": "Robes de soirée",
+        "slug": "robes-soiree",
+        "parent": "femme_robes",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_robes_tricotees",
+        "name": "Robes tricotées",
+        "slug": "robes-tricotees",
+        "parent": "femme_robes",
+        "level": 2,
+        "isFeatured": false
+    },
+    // Maillots
+    {
+        "_id": "femme_maillot_unepiece",
+        "name": "Une pièce",
+        "slug": "une-piece",
+        "parent": "femme_maillots",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_maillot_bikinis",
+        "name": "Bikinis",
+        "slug": "bikinis",
+        "parent": "femme_maillots",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_maillot_pareos",
+        "name": "Pareos",
+        "slug": "pareos",
+        "parent": "femme_maillots",
+        "level": 2,
+        "isFeatured": false
+    },
+    // Sous-vêtements
+    {
+        "_id": "femme_soutiens_gorge",
+        "name": "Soutiens-gorge",
+        "slug": "soutiens-gorge",
+        "parent": "femme_sous_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_culottes",
+        "name": "Culottes",
+        "slug": "culottes",
+        "parent": "femme_sous_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_lingerie_sculptante",
+        "name": "Lingerie sculptante",
+        "slug": "lingerie-sculptante",
+        "parent": "femme_sous_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_pyjamas",
+        "name": "Pyjamas",
+        "slug": "pyjamas",
+        "parent": "femme_sous_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "femme_chemises_nuit",
+        "name": "Chemises de nuit",
+        "slug": "chemises-de-nuit",
+        "parent": "femme_sous_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+
+    // --- NIVEAU 3 : ENFANT ---
+    {
+        "_id": "enfant_tshirts",
+        "name": "T-shirts",
+        "slug": "t-shirts",
+        "parent": "enfant_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant_polos",
+        "name": "Polos",
+        "slug": "polos",
+        "parent": "enfant_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant_shorts",
+        "name": "Shorts",
+        "slug": "shorts",
+        "parent": "enfant_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant_pantalons",
+        "name": "Pantalons",
+        "slug": "pantalons",
+        "parent": "enfant_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant_ensembles",
+        "name": "Ensembles",
+        "slug": "ensembles",
+        "parent": "enfant_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant_vet_ext",
+        "name": "Vêtements d'extérieur",
+        "slug": "vetements-exterieur",
+        "parent": "enfant_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant_pyjamas",
+        "name": "Pyjamas",
+        "slug": "pyjamas",
+        "parent": "enfant_vetements",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant_baskets",
+        "name": "Baskets",
+        "slug": "baskets",
+        "parent": "enfant_chaussures",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant_bottes",
+        "name": "Bottes",
+        "slug": "bottes",
+        "parent": "enfant_chaussures",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant_sandales",
+        "name": "Sandales",
+        "slug": "sandales",
+        "parent": "enfant_chaussures",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant_mocassins",
+        "name": "Mocassins",
+        "slug": "mocassins",
+        "parent": "enfant_chaussures",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant_chapeaux",
+        "name": "Chapeaux",
+        "slug": "chapeaux",
+        "parent": "enfant_accessoires",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant_echarpes",
+        "name": "Écharpes et gants",
+        "slug": "echarpes-gants",
+        "parent": "enfant_accessoires",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "enfant_sacs_enfant",
+        "name": "Sacs",
+        "slug": "sacs",
+        "parent": "enfant_accessoires",
+        "level": 2,
+        "isFeatured": false
+    },
+
+    // --- NIVEAU 3 : ACCESSOIRES ---
+    // Sacs
+    {
+        "_id": "sacs_main",
+        "name": "Sacs à main",
+        "slug": "sacs-a-main",
+        "parent": "accessoires_sacs",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "sacs_dos",
+        "name": "Sacs à dos",
+        "slug": "sacs-a-dos",
+        "parent": "accessoires_sacs",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "sacs_banane",
+        "name": "Sacs banane",
+        "slug": "sacs-banane",
+        "parent": "accessoires_sacs",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "portefeuilles",
+        "name": "Portefeuilles",
+        "slug": "portefeuilles",
+        "parent": "accessoires_sacs",
+        "level": 2,
+        "isFeatured": false
+    },
+    // Bijoux
+    {
+        "_id": "colliers",
+        "name": "Colliers",
+        "slug": "colliers",
+        "parent": "accessoires_bijoux",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "bracelets",
+        "name": "Bracelets",
+        "slug": "bracelets",
+        "parent": "accessoires_bijoux",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "boucles_oreilles",
+        "name": "Boucles d’oreilles",
+        "slug": "boucles-oreilles",
+        "parent": "accessoires_bijoux",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "bagues",
+        "name": "Bagues",
+        "slug": "bagues",
+        "parent": "accessoires_bijoux",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "parures",
+        "name": "Parures",
+        "slug": "parures",
+        "parent": "accessoires_bijoux",
+        "level": 2,
+        "isFeatured": false
+    },
+    // Capillaires
+    {
+        "_id": "perruques",
+        "name": "Perruques",
+        "slug": "perruques",
+        "parent": "accessoires_capillaires",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "extensions",
+        "name": "Extensions",
+        "slug": "extensions",
+        "parent": "accessoires_capillaires",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "postiches",
+        "name": "Postiches",
+        "slug": "postiches",
+        "parent": "accessoires_capillaires",
+        "level": 2,
+        "isFeatured": false
+    },
+    {
+        "_id": "accessoires_perruques",
+        "name": "Accessoires perruques",
+        "slug": "accessoires-perruques",
+        "parent": "accessoires_capillaires",
+        "level": 2,
+        "isFeatured": false
+    }
+]

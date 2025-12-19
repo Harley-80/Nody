@@ -44,15 +44,9 @@ const creerAdminInitial = async () => {
         if (adminExiste) {
             console.log('Un administrateur existe déjà:');
             console.log('Email:', adminExiste.email);
-            console.log(
-                'Nom:',
-                `${adminExiste.prenom} ${adminExiste.nom}`
-            );
+            console.log('Nom:', `${adminExiste.prenom} ${adminExiste.nom}`);
             console.log('Rôle:', adminExiste.role);
-            console.log(
-                'Créé le:',
-                adminExiste.createdAt.toLocaleDateString()
-            );
+            console.log('Créé le:', adminExiste.createdAt.toLocaleDateString());
             await mongoose.connection.close();
             return;
         }

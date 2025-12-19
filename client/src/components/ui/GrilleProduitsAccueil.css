@@ -2,7 +2,9 @@
 
 /* Élément 1 : Effets de Survol (Hover Effects) Épurés sur les Cartes Produit */
 .card-hover {
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transition douce pour l'élévation et l'ombre */
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease; /* Transition douce pour l'élévation et l'ombre */
     cursor: pointer; /* Indique que la carte est cliquable */
 }
 

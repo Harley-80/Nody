@@ -1,5 +1,5 @@
-@use '../../../styles/variables' as *; 
-@use '../../../styles/mixins' as *;   
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
 
 .footer {
     background-color: $primary-color;
@@ -19,12 +19,14 @@
         margin: 0 -15px;
     }
 
-    .col-md-3, .col-md-2 {
+    .col-md-3,
+    .col-md-2 {
         padding: 0 15px;
         margin-bottom: 1rem;
     }
 
-    h5, h6 {
+    h5,
+    h6 {
         font-family: $font-modern;
         font-weight: bold;
         margin-bottom: 1rem;
@@ -70,14 +72,16 @@
     }
 
     @include respond-to(medium) {
-        .col-md-3, .col-md-2 {
+        .col-md-3,
+        .col-md-2 {
             flex: 0 0 50%;
             max-width: 50%;
         }
     }
 
     @include respond-to(small) {
-        .col-md-3, .col-md-2 {
+        .col-md-3,
+        .col-md-2 {
             flex: 0 0 100%;
             max-width: 100%;
         }

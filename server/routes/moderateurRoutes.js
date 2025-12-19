@@ -1,41 +1,42 @@
 import express from 'express';
+import { proteger, autoriser } from '../middleware/authMiddleware.js';
 import {
-    getStatistiques,
-    getProduitsEnAttente,
+    obtenirStatistiquesModerateurDashboard,
+    obtenirDemandes,
     validerProduit,
-    rejeterProduit,
-    getVendeursEnAttente,
-    verifierVendeur,
-    rejeterVendeur,
-    getUtilisateurs,
-    suspendreUtilisateur,
-    activerUtilisateur,
+    validerVendeur,
+    obtenirUtilisateurs,
+    modifierStatutUtilisateur,
+    obtenirHistorique,
 } from '../controllers/moderateurController.js';
-import { proteger } from '../middleware/authMiddleware.js';
-import { estModerateur } from '../middleware/roleMiddleware.js';
 
-const router = express.Router();
+const routeur = express.Router();
 
-// Routes protégées modérateur
-router.use(proteger);
-router.use(estModerateur);
+// PROTECTION GLOBALE
+// Toutes les routes nécessitent :
+// 1. Authentification (proteger)
+// 2. Rôle 'moderateur' (autoriser)
+routeur.use(proteger);
+routeur.use(autoriser('moderateur'));
 
-// Statistiques
-router.get('/statistiques', getStatistiques);
+// DASHBOARD MODÉRATEUR
+routeur.get('/dashboard', obtenirStatistiquesModerateurDashboard);
 
-// Gestion des produits
-router.get('/produits/en-attente', getProduitsEnAttente);
-router.put('/produits/:id/valider', validerProduit);
-router.put('/produits/:id/rejeter', rejeterProduit);
+// DEMANDES DE VALIDATION
+routeur.get('/demandes', obtenirDemandes);
 
-// Gestion des vendeurs
-router.get('/vendeurs/en-attente', getVendeursEnAttente);
-router.put('/vendeurs/:id/verifier', verifierVendeur);
-router.put('/vendeurs/:id/rejeter', rejeterVendeur);
+// VALIDATION PRODUITS
+routeur.put('/produits/:id/valider', validerProduit);
 
-// Gestion des utilisateurs
-router.get('/utilisateurs', getUtilisateurs);
-router.put('/utilisateurs/:id/suspendre', suspendreUtilisateur);
-router.put('/utilisateurs/:id/activer', activerUtilisateur);
+// VALIDATION VENDEURS
+routeur.put('/vendeurs/:id/valider', validerVendeur);
 
-export default router;
+// GESTION UTILISATEURS (LIMITÉE)
+routeur.get('/utilisateurs', obtenirUtilisateurs);
+routeur.patch('/utilisateurs/:id/statut', modifierStatutUtilisateur);
+
+// HISTORIQUE DES ACTIONS
+routeur.get('/historique', obtenirHistorique);
+
+// EXPORT
+export default routeur;

@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Charge les variables d'environnement depuis le fichier .env
-dotenv.config({ path: path.resolve(__dirname, '..', '..', '.env') });
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
 // --- Validation des variables critiques ---
 // Vérifie si les variables d'environnement essentielles sont définies AVANT de continuer.
@@ -40,7 +40,7 @@ const config = {
 
     // --- Base de données (MongoDB) ---
     // URI de connexion à la base de données
-    mongodbUri: process.env.MONGODB_URI || 'mongodb://localhost:27017/nody_db',
+    mongoUri: process.env.MONGODB_URI || 'mongodb://localhost:27017/nody_db',
 
     // --- JSON Web Token (JWT) ---
     // Clé secrète pour la signature des tokens
@@ -82,9 +82,15 @@ const config = {
 
     // --- Limitation du débit (Rate Limiting) ---
     // Fenêtre de temps pour la limitation du débit en millisecondes (15 minutes par défaut)
-    rateLimitWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000,
-    // Nombre maximum de requêtes autorisées par fenêtre
-    rateLimitMaxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+    // Utilisation de 15 * 60 * 1000 pour 15 minutes, comme dans votre demande.
+    rateLimitWindowMs:
+        parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+
+    // Nombre maximum de requêtes autorisées par fenêtre, différencié par environnement
+    rateLimitMaxRequests:
+        process.env.NODE_ENV === 'development'
+            ? parseInt(process.env.RATE_LIMIT_MAX_REQUESTS_DEV) || 1000 // Plus permissif en dev
+            : parseInt(process.env.RATE_LIMIT_MAX_REQUESTS_PROD) || 100, // Plus strict en prod
 };
 
 export default config;

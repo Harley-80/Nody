@@ -1,4 +1,3 @@
-// Importation des modules
 import mongoose from 'mongoose';
 import 'dotenv/config'; // Utilisation de l'import direct pour charger les variables d'environnement
 import chalk from 'chalk'; // Améliore la lisibilité des logs
@@ -56,7 +55,7 @@ const importerDonnees = async () => {
 
         console.log(
             chalk.green.bold(
-                '\n✅ Peuplement de la base de données terminé avec succès !'
+                '\n Peuplement de la base de données terminé avec succès !'
             )
         );
         console.log(
@@ -120,7 +119,7 @@ const executer = async () => {
                 await seeders[cible].peupler();
                 console.log(
                     chalk.green.bold(
-                        `✅ Collection ${cible} peuplée avec succès.`
+                        ` Collection ${cible} peuplée avec succès.`
                     )
                 );
             } else if (!cible) {
@@ -147,18 +146,18 @@ const executer = async () => {
         } else {
             console.log(
                 chalk.yellow(`
-    UTILISATION DU SEEDER NODY :
-    -------------------------
-    Action globale :
-      npm run seed            (Peuple toutes les collections)
-      npm run seed:destroy    (Vide toutes les collections)
+                UTILISATION DU SEEDER NODY :
+                -------------------------
+                Action globale :
+                    npm run seed            (Peuple toutes les collections)
+                    npm run seed:destroy    (Vide toutes les collections)
 
-    Action ciblée (exemples) :
-      npm run seed:categories
-      npm run seed:destroy produits
+                Action ciblée (exemples) :
+                    npm run seed:categories
+                    npm run seed:destroy produits
 
-    Cibles disponibles : ${Object.keys(seeders).join(', ')}
-            `)
+                Cibles disponibles : ${Object.keys(seeders).join(', ')}
+                        `)
             );
         }
     } catch (error) {

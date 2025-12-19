@@ -1,4 +1,3 @@
-// Importation des modules nécessaires
 import Stripe from 'stripe';
 import config from '../config/env.js';
 import logger from '../utils/logger.js';
@@ -67,9 +66,8 @@ const creerIntentPaiement = async (
  */
 const confirmerPaiement = async idIntentPaiement => {
     try {
-        const intentPaiement = await stripe.paymentIntents.retrieve(
-            idIntentPaiement
-        );
+        const intentPaiement =
+            await stripe.paymentIntents.retrieve(idIntentPaiement);
         return intentPaiement;
     } catch (erreur) {
         logger.error('Erreur lors de la confirmation du paiement:', erreur);

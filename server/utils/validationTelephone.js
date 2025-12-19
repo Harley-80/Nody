@@ -1,4 +1,3 @@
-// Importation des constantes des pays
 import { PAYS_PRIORITAIRES, TOUS_LES_PAYS } from '../constants/pays.js';
 
 /**

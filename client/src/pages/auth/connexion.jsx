@@ -16,7 +16,7 @@ const Connexion = () => {
     const { addToast } = useToast();
     const navigate = useNavigate();
     const location = useLocation();
-    
+
     const [email, setEmail] = useState(
         () => localStorage.getItem('nodyRememberEmail') || ''
     );
@@ -34,8 +34,13 @@ const Connexion = () => {
     // Rediriger si déjà connecté
     useEffect(() => {
         if (user) {
-            if (user.isAdmin) {
+            // Redirection intelligente selon le rôle
+            if (user.role === 'admin' || user.isAdmin) {
                 navigate('/admin', { replace: true });
+            } else if (user.role === 'moderateur' || user.isModerateur) {
+                navigate('/moderateur/dashboard', { replace: true });
+            } else if (user.role === 'vendeur' || user.isVendeur) {
+                navigate('/vendeur/dashboard', { replace: true });
             } else {
                 navigate(from, { replace: true });
             }
@@ -50,32 +55,39 @@ const Connexion = () => {
 
         try {
             const response = await login(email, motDePasse);
-            
+
             if (remember) {
                 localStorage.setItem('nodyRememberEmail', email);
             } else {
                 localStorage.removeItem('nodyRememberEmail');
             }
-            
+
             addToast({
                 type: 'success',
                 title: 'Connexion réussie',
                 message: 'Bienvenue sur Nody !',
             });
 
-            // CORRECTION: Redirection intelligente basée sur le rôle
+            // Redirection intelligente basée sur le rôle
             const userData = response.userData || response.donnees || response;
-            if (userData.isAdmin) {
-                // Rediriger l'admin vers le dashboard admin
-                setTimeout(() => {
+
+            setTimeout(() => {
+                if (userData.role === 'admin' || userData.isAdmin) {
                     navigate('/admin', { replace: true });
-                }, 1000);
-            } else {
-                // Rediriger les autres utilisateurs vers la page d'origine ou le profil
-                setTimeout(() => {
-                    navigate(from, { replace: true });
-                }, 1000);
-            }
+                } else if (
+                    userData.role === 'moderateur' ||
+                    userData.isModerateur
+                ) {
+                    navigate('/moderateur/dashboard', { replace: true });
+                } else if (userData.role === 'vendeur' || userData.isVendeur) {
+                    navigate('/vendeur/dashboard', { replace: true });
+                } else {
+                    // Client ou autre rôle
+                    navigate(from !== '/connexion' ? from : '/', {
+                        replace: true,
+                    });
+                }
+            }, 1000);
         } catch (err) {
             let msg = 'Connexion échouée. Veuillez vérifier vos informations.';
             if (err.response?.data?.message) {
@@ -243,8 +255,8 @@ const Connexion = () => {
 
                 {/* Lien spécial pour les admins */}
                 <div className="text-center mt-2">
-                    <Link 
-                        to="/admin-login" 
+                    <Link
+                        to="/admin-login"
                         className="text-decoration-none text-muted small"
                     >
                         Accès administrateur

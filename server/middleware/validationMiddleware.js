@@ -1,4 +1,3 @@
-// Importation des modules nécessaires pour la validation
 import { body, param, query, validationResult } from 'express-validator';
 import { isValidObjectId } from 'mongoose';
 import { validerTelephone } from '../utils/validationTelephone.js';
@@ -15,7 +14,7 @@ const gererErreursValidation = (req, res, next) => {
 
     if (!erreurs.isEmpty()) {
         const messagesErreur = erreurs.array().map(erreur => ({
-            champ: erreur.param,
+            champ: erreur.path || erreur.param,
             message: erreur.msg,
             valeur: erreur.value,
         }));
@@ -48,8 +47,9 @@ const validerObjectId = paramName => {
 // Validations pour l'authentification
 const validerConnexion = [
     body('email')
+        .trim()
+        .toLowerCase()
         .isEmail()
-        .normalizeEmail()
         .withMessage('Veuillez fournir un email valide'),
     body('motDePasse')
         .isLength({ min: 6 })
@@ -68,8 +68,9 @@ const validerInscription = [
         .isLength({ min: 2, max: 50 })
         .withMessage('Le prénom doit contenir entre 2 et 50 caractères'),
     body('email')
+        .trim()
+        .toLowerCase()
         .isEmail()
-        .normalizeEmail()
         .withMessage('Veuillez fournir un email valide'),
     body('motDePasse')
         .isLength({ min: 6 })
@@ -108,8 +109,9 @@ const validerInscriptionVendeur = [
         .isLength({ min: 2, max: 50 })
         .withMessage('Le prénom doit contenir entre 2 et 50 caractères'),
     body('email')
+        .trim()
+        .toLowerCase()
         .isEmail()
-        .normalizeEmail()
         .withMessage('Veuillez fournir un email valide'),
     body('motDePasse')
         .isLength({ min: 6 })
@@ -158,8 +160,9 @@ const validerInscriptionInvitation = [
         .isLength({ min: 2, max: 50 })
         .withMessage('Le prénom doit contenir entre 2 et 50 caractères'),
     body('email')
+        .trim()
+        .toLowerCase()
         .isEmail()
-        .normalizeEmail()
         .withMessage('Veuillez fournir un email valide'),
     body('motDePasse')
         .isLength({ min: 6 })
@@ -246,16 +249,22 @@ const validerCommande = [
 const validerPagination = [
     query('page')
         .optional()
+        .toInt()
         .isInt({ min: 1 })
         .withMessage('Le numéro de page doit être un entier positif'),
     query('limite')
         .optional()
+        .toInt()
         .isInt({ min: 1, max: 100 })
         .withMessage('La limite doit être entre 1 et 100'),
     query('tri')
         .optional()
         .isString()
         .withMessage('Le champ de tri doit être une chaîne'),
+    query('search')
+        .optional()
+        .isString()
+        .withMessage('Le terme de recherche doit être une chaîne'),
     gererErreursValidation,
 ];
 

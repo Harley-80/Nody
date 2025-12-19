@@ -1,4 +1,3 @@
-// Seeder pour les produits
 import Produit from '../../models/produitModel.js';
 import { faker } from '@faker-js/faker';
 
@@ -37,7 +36,7 @@ const produitSeeder = {
                     prix: faker.commerce.price({ min: 10, max: 200 }),
                     categorie: faker.helpers.arrayElement(categories)._id,
                     stock: faker.number.int({ min: 0, max: 100 }),
-                    // CORRECTION : Le champ 'images' attend un tableau d'objets, pas de strings.
+                    
                     // Chaque image doit être un objet avec une propriété 'url'.
                     images: [
                         {

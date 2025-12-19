@@ -1,4 +1,3 @@
-// Seeder pour les commandes
 import Commande from '../../models/commandeModel.js';
 import { faker } from '@faker-js/faker';
 
@@ -28,8 +27,7 @@ const commandeSeeder = {
 
             const commandesData = [];
             const NOMBRE_COMMANDES = 40;
-
-            // CORRECTION : Utiliser des valeurs valides pour les enums
+            
             // Alignement complet avec le modèle commandeModel.js
             const statutsValides = [
                 'en_attente',
@@ -74,7 +72,7 @@ const commandeSeeder = {
                 });
 
                 commandesData.push({
-                    // CORRECTION : Fournir un client
+                    // Fournir un client
                     client: faker.helpers.arrayElement(utilisateurs)._id,
                     articles: articlesCommandes,
                     adresseLivraison: {
@@ -83,7 +81,7 @@ const commandeSeeder = {
                         codePostal: faker.location.zipCode(),
                         pays: faker.location.country(),
                     },
-                    // CORRECTION : Fournir une méthode de paiement
+                    // Fournir une méthode de paiement
                     paiement: {
                         methode: faker.helpers.arrayElement(
                             methodesPaiementValides
@@ -93,7 +91,7 @@ const commandeSeeder = {
                     sousTotal: parseFloat(sousTotal.toFixed(2)),
                     total: parseFloat((sousTotal + fraisLivraison).toFixed(2)),
                     livraison: fraisLivraison,
-                    // CORRECTION : Utiliser une valeur d'enum valide
+                    // Utiliser une valeur d'enum valide
                     statut: faker.helpers.arrayElement(statutsValides),
                 });
             }

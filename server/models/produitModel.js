@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import slugify from 'slugify';
+
 const avisSchema = new mongoose.Schema(
     {
         utilisateur: {
@@ -115,14 +116,14 @@ const produitSchema = new mongoose.Schema(
         },
         statut: {
             type: String,
-            enum: ['en_attente', 'actif', 'rejete', 'inactif'],
-            default: 'en_attente'
+            enum: ['en_attente', 'actif', 'approuve', 'rejete', 'inactif'],
+            default: 'en_attente',
         },
         raisonRejet: String,
         dateValidation: Date,
         moderateur: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Utilisateur'
+            ref: 'Utilisateur',
         },
         images: [
             {
@@ -210,14 +211,12 @@ const produitSchema = new mongoose.Schema(
     }
 );
 
-// Virtual pour le statut du stock
 produitSchema.virtual('statutStock').get(function () {
     if (this.quantite === 0) return 'rupture_stock';
     if (this.quantite <= this.seuilStockFaible) return 'stock_faible';
     return 'en_stock';
 });
 
-// Virtual pour le pourcentage de réduction
 produitSchema.virtual('pourcentageRemise').get(function () {
     if (this.prixComparaison && this.prixComparaison > this.prix) {
         return Math.round(
@@ -227,7 +226,6 @@ produitSchema.virtual('pourcentageRemise').get(function () {
     return 0;
 });
 
-// Middleware pour générer un slug unique
 produitSchema.pre('save', async function (next) {
     try {
         if (this.isModified('nom')) {
@@ -252,7 +250,6 @@ produitSchema.pre('save', async function (next) {
     }
 });
 
-// Middleware pour mettre à jour la note moyenne
 produitSchema.methods.recalculerNoteMoyenne = function () {
     if (this.avis && this.avis.length > 0) {
         const total = this.avis.reduce((sum, avis) => sum + avis.note, 0);
@@ -264,7 +261,6 @@ produitSchema.methods.recalculerNoteMoyenne = function () {
     }
 };
 
-// Déclaration des index (uniquement ici)
 produitSchema.index({
     nom: 'text',
     description: 'text',
@@ -276,10 +272,8 @@ produitSchema.index({ prix: 1, estActif: 1 });
 produitSchema.index({ 'evaluations.moyenne': -1 });
 produitSchema.index({ nombreVentes: -1, estActif: 1 });
 produitSchema.index({ createdAt: -1 });
-produitSchema.index({ slug: 1 }, { unique: true }); // Index unique pour le slug
+produitSchema.index({ slug: 1 }, { unique: true });
 
-// Création du modèle Produit
 const Produit = mongoose.model('Produit', produitSchema);
 
-// Exportation du modèle
 export default Produit;

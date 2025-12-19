@@ -17,10 +17,10 @@ const Boutique = () => {
         mettreAJourFiltre,
         reinitialiserFiltres,
     } = useProduits();
-    
+
     const [filtresOuverts, setFiltresOuverts] = useState(false);
     const [tri, setTri] = useState(searchParams.get('sort') || 'createdAt');
-    
+
     useEffect(() => {
         chargerProduitsAvecFiltres();
     }, [searchParams]);
@@ -66,11 +66,11 @@ const Boutique = () => {
 
         setSearchParams(nouveauxParams);
     };
-    
+
     const totalProduits = pagination?.total || 0;
     const pageActuelle = parseInt(searchParams.get('page')) || 1;
     const totalPages = pagination?.pages || 1;
-    
+
     return (
         <div className="page-boutique">
             <div className="container-fluid">

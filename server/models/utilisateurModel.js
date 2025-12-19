@@ -1,6 +1,6 @@
-// Importation des modules nécessaires
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import mongoosePaginate from 'mongoose-paginate-v2';
 import { ROLES } from '../constants/roles.js';
 
 // Définition du schéma pour les utilisateurs
@@ -62,7 +62,7 @@ const utilisateurSchema = new mongoose.Schema(
         },
         statutVerification: {
             type: String,
-            enum: ['en_attente', 'verifie', 'rejete', 'en_revision'],
+            enum: ['en_attente', 'verifie', 'rejete', 'approuve'], 
             default: 'en_attente',
         },
         dateVerification: {
@@ -220,14 +220,16 @@ const utilisateurSchema = new mongoose.Schema(
 );
 
 // Index pour améliorer les performances
-utilisateurSchema.index({ email: 1 });
+//utilisateurSchema.index({ email: 1 });
 utilisateurSchema.index({ role: 1 });
 utilisateurSchema.index({ 'adresses.pays': 1 });
 utilisateurSchema.index({ createdAt: -1 });
 utilisateurSchema.index({ role: 1, statutVerification: 1 });
+utilisateurSchema.plugin(mongoosePaginate);
 
 // Middleware pour hacher le mot de passe avant la sauvegarde
 utilisateurSchema.pre('save', async function (next) {
+    // Si le mot de passe n'a pas été modifié, on passe au middleware suivant
     if (!this.isModified('motDePasse')) return next();
 
     try {

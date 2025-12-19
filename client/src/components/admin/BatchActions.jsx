@@ -1,11 +1,16 @@
 import React from 'react';
 import { STATUTS } from '../../constants/statuts';
 
-export default function BatchActions({ selectedIds = [], onDelete, onChangeStatus }) {
+export default function BatchActions({
+    selectedIds = [],
+    onDelete,
+    onChangeStatus,
+}) {
     return (
         <div className="bg-light border rounded p-3 mb-3 d-flex flex-wrap gap-3 align-items-center">
             <span className="mb-0 fw-semibold">
-                {selectedIds.length} sélectionné{selectedIds.length !== 1 && 's'}
+                {selectedIds.length} sélectionné
+                {selectedIds.length !== 1 && 's'}
             </span>
 
             <button onClick={onDelete} className="btn btn-sm btn-danger">

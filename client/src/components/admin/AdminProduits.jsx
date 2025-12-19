@@ -8,7 +8,7 @@ import { saveAs } from 'file-saver';
 
 export default function AdminProduits() {
     const navigate = useNavigate();
-    
+
     const [produits, setProduits] = useState(() => {
         const saved = localStorage.getItem('nodyProduits');
         return saved ? JSON.parse(saved) : produitsMock;
@@ -29,7 +29,10 @@ export default function AdminProduits() {
 
     const { search, category, minPrix, maxPrix, page } = filters;
 
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+    const [sortConfig, setSortConfig] = useState({
+        key: null,
+        direction: 'asc',
+    });
     const [devise, setDevise] = useState('XOF');
     const [selectedIds, setSelectedIds] = useState([]);
     const [showFilters, setShowFilters] = useState(false);
@@ -39,18 +42,19 @@ export default function AdminProduits() {
 
     const categoriesUniques = [...new Set(produits.map(p => p.categories))];
 
-    const formatPrix = (prix) =>
-    devise === 'XOF'
-    ? `${prix.toLocaleString()} XOF`
-    : `${(prix / tauxConversion).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+    const formatPrix = prix =>
+        devise === 'XOF'
+            ? `${prix.toLocaleString()} XOF`
+            : `${(prix / tauxConversion).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
 
     const produitsFiltres = useMemo(() => {
         let resultats = [...produits];
 
         if (search) {
-            resultats = resultats.filter(p =>
-                p.nom.toLowerCase().includes(search.toLowerCase()) ||
-                p.description?.toLowerCase().includes(search.toLowerCase())
+            resultats = resultats.filter(
+                p =>
+                    p.nom.toLowerCase().includes(search.toLowerCase()) ||
+                    p.description?.toLowerCase().includes(search.toLowerCase())
             );
         }
         if (category) {
@@ -66,8 +70,10 @@ export default function AdminProduits() {
             resultats.sort((a, b) => {
                 const aValue = a[sortConfig.key];
                 const bValue = b[sortConfig.key];
-                if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-                if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+                if (aValue < bValue)
+                    return sortConfig.direction === 'asc' ? -1 : 1;
+                if (aValue > bValue)
+                    return sortConfig.direction === 'asc' ? 1 : -1;
                 return 0;
             });
         }
@@ -80,42 +86,55 @@ export default function AdminProduits() {
         return produitsFiltres.slice(start, start + itemsPerPage);
     }, [produitsFiltres, page]);
 
-    const requestSort = (key) =>
+    const requestSort = key =>
         setSortConfig(prev => ({
             key,
-            direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
+            direction:
+                prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
         }));
 
-        const updateFilter = (key, value) =>
-            setFilters({ ...filters, [key]: value, page: 1 });
+    const updateFilter = (key, value) =>
+        setFilters({ ...filters, [key]: value, page: 1 });
 
-        const resetFilters = () =>
-            setFilters({ search: '', category: '', minPrix: '', maxPrix: '', page: 1 });
+    const resetFilters = () =>
+        setFilters({
+            search: '',
+            category: '',
+            minPrix: '',
+            maxPrix: '',
+            page: 1,
+        });
 
-        const handleBulkDelete = () => {
-            if (window.confirm(`Supprimer ${selectedIds.length} produit(s) ?`)) {
-                setProduits(prev => prev.filter(p => !selectedIds.includes(p.id)));
-                setSelectedIds([]);
-            }
-        };
+    const handleBulkDelete = () => {
+        if (window.confirm(`Supprimer ${selectedIds.length} produit(s) ?`)) {
+            setProduits(prev => prev.filter(p => !selectedIds.includes(p.id)));
+            setSelectedIds([]);
+        }
+    };
 
-    const handleBulkStatusChange = (statut) => {
-        setProduits(prev => prev.map(p => 
-            selectedIds.includes(p.id) ? { ...p, statut } : p
-        ));
+    const handleBulkStatusChange = statut => {
+        setProduits(prev =>
+            prev.map(p => (selectedIds.includes(p.id) ? { ...p, statut } : p))
+        );
         setSelectedIds([]);
     };
 
     const handleExportCSV = () => {
         const csvContent = [
             'ID,Nom,Catégorie,Prix,Stock,Statut',
-            ...produits.map(p => 
-                `${p.id},${p.nom},${p.categories},${p.prix},${p.stock},${p.statut}`
-            )
+            ...produits.map(
+                p =>
+                    `${p.id},${p.nom},${p.categories},${p.prix},${p.stock},${p.statut}`
+            ),
         ].join('\n');
-    
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        saveAs(blob, `produits_nody_${new Date().toISOString().slice(0, 10)}.csv`);
+
+        const blob = new Blob([csvContent], {
+            type: 'text/csv;charset=utf-8;',
+        });
+        saveAs(
+            blob,
+            `produits_nody_${new Date().toISOString().slice(0, 10)}.csv`
+        );
     };
 
     const tableColumns = [
@@ -124,74 +143,86 @@ export default function AdminProduits() {
             header: (
                 <input
                     type="checkbox"
-                    checked={produitsPage.length > 0 && produitsPage.every(p => selectedIds.includes(p.id))}
-                    onChange={(e) => {
+                    checked={
+                        produitsPage.length > 0 &&
+                        produitsPage.every(p => selectedIds.includes(p.id))
+                    }
+                    onChange={e => {
                         const ids = produitsPage.map(p => p.id);
                         setSelectedIds(current =>
-                        e.target.checked
-                            ? [...new Set([...current, ...ids])]
-                            : current.filter(id => !ids.includes(id))
+                            e.target.checked
+                                ? [...new Set([...current, ...ids])]
+                                : current.filter(id => !ids.includes(id))
                         );
                     }}
                 />
             ),
             width: '40px',
-            render: (item) => (
+            render: item => (
                 <input
                     type="checkbox"
                     checked={selectedIds.includes(item.id)}
                     onChange={() =>
                         setSelectedIds(prev =>
-                        prev.includes(item.id)
-                            ? prev.filter(id => id !== item.id)
-                            : [...prev, item.id]
+                            prev.includes(item.id)
+                                ? prev.filter(id => id !== item.id)
+                                : [...prev, item.id]
                         )
                     }
                 />
-            )
+            ),
         },
         { key: 'id', header: 'ID', sortable: true, width: '80px' },
         { key: 'nom', header: 'Nom', sortable: true, width: '25%' },
-        { key: 'categories', header: 'Catégorie', sortable: true, width: '15%' },
+        {
+            key: 'categories',
+            header: 'Catégorie',
+            sortable: true,
+            width: '15%',
+        },
         {
             key: 'prix',
             header: `Prix (${devise})`,
             ortable: true,
             width: '15%',
-            render: (item) => formatPrix(item.prix)
+            render: item => formatPrix(item.prix),
         },
         {
             key: 'stock',
             header: 'Stock',
             sortable: true,
             width: '100px',
-            render: (item) => (
+            render: item => (
                 <span className={item.stock < 10 ? 'text-danger fw-bold' : ''}>
-                {item.stock}
+                    {item.stock}
                 </span>
-            )
+            ),
         },
         {
             key: 'statut',
             header: 'Statut',
             sortable: true,
             width: '100px',
-            render: (item) => (
+            render: item => (
                 <span
-                className={`badge ${
-                    item.statut === 'actif' ? 'bg-success' : item.statut === 'inactif' ? 'bg-secondary' : 'bg-warning'
-                }`}
+                    className={`badge ${
+                        item.statut === 'actif'
+                            ? 'bg-success'
+                            : item.statut === 'inactif'
+                              ? 'bg-secondary'
+                              : 'bg-warning'
+                    }`}
                 >
-                {item.statut || 'actif'}
+                    {item.statut || 'actif'}
                 </span>
-            )
+            ),
         },
         {
             key: 'actions',
             header: 'Actions',
             actions: true,
             width: '120px',
-            render: (item) => (
+            render: item => (
                 <div className="d-flex gap-2">
                     <button
                         className="btn btn-sm btn-outline-primary"
@@ -208,15 +239,15 @@ export default function AdminProduits() {
                         <i className="bi bi-trash" />
                     </button>
                 </div>
-            )
-        }
+            ),
+        },
     ];
 
     return (
         <div className="container py-4">
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
                 <div className="d-flex align-items-center gap-3">
-                    <button 
+                    <button
                         className="btn btn-outline-secondary"
                         onClick={() => navigate('/admin')}
                     >
@@ -226,14 +257,26 @@ export default function AdminProduits() {
                 </div>
 
                 <div className="d-flex gap-2">
-                    <button onClick={handleExportCSV} className="btn btn-success">
+                    <button
+                        onClick={handleExportCSV}
+                        className="btn btn-success"
+                    >
                         <i className="bi bi-file-earmark-excel me-1" /> Exporter
                     </button>
-                    <button onClick={() => console.log('Ajouter')} className="btn btn-primary">
+                    <button
+                        onClick={() => console.log('Ajouter')}
+                        className="btn btn-primary"
+                    >
                         <i className="bi bi-plus-circle me-1" /> Ajouter
                     </button>
-                    <button onClick={() => setShowFilters(!showFilters)} className="btn btn-outline-secondary">
-                        <i className={`bi bi-funnel${showFilters ? '-fill' : ''} me-1`} /> Filtres
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className="btn btn-outline-secondary"
+                    >
+                        <i
+                            className={`bi bi-funnel${showFilters ? '-fill' : ''} me-1`}
+                        />{' '}
+                        Filtres
                     </button>
                 </div>
             </div>
@@ -249,7 +292,9 @@ export default function AdminProduits() {
                                     className="form-control"
                                     placeholder="Nom ou description..."
                                     value={search}
-                                    onChange={e => updateFilter('search', e.target.value)}
+                                    onChange={e =>
+                                        updateFilter('search', e.target.value)
+                                    }
                                 />
                             </div>
 
@@ -258,45 +303,74 @@ export default function AdminProduits() {
                                 <select
                                     className="form-select"
                                     value={category}
-                                    onChange={e => updateFilter('category', e.target.value)}
+                                    onChange={e =>
+                                        updateFilter('category', e.target.value)
+                                    }
                                 >
                                     <option value="">Toutes catégories</option>
                                     {categoriesUniques.map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
+                                        <option key={cat} value={cat}>
+                                            {cat}
+                                        </option>
                                     ))}
                                 </select>
                             </div>
                             {showAdvanced && (
                                 <>
                                     <div className="col-md-6">
-                                        <label className="form-label">Prix minimum ({devise})</label>
+                                        <label className="form-label">
+                                            Prix minimum ({devise})
+                                        </label>
                                         <input
                                             type="number"
                                             min="0"
                                             className="form-control"
                                             placeholder="Prix min"
                                             value={minPrix}
-                                            onChange={e => updateFilter('minPrix', e.target.value)}
+                                            onChange={e =>
+                                                updateFilter(
+                                                    'minPrix',
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label">Prix maximum ({devise})</label>
+                                        <label className="form-label">
+                                            Prix maximum ({devise})
+                                        </label>
                                         <input
                                             type="number"
                                             min="0"
                                             className="form-control"
                                             placeholder="Prix max"
                                             value={maxPrix}
-                                            onChange={e => updateFilter('maxPrix', e.target.value)}
+                                            onChange={e =>
+                                                updateFilter(
+                                                    'maxPrix',
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     </div>
                                 </>
                             )}
                             <div className="col-12 d-flex justify-content-between">
-                                <button className="btn btn-sm btn-link" onClick={() => setShowAdvanced(!showAdvanced)}>
-                                    {showAdvanced ? 'Moins de filtres' : 'Plus de filtres'}...
+                                <button
+                                    className="btn btn-sm btn-link"
+                                    onClick={() =>
+                                        setShowAdvanced(!showAdvanced)
+                                    }
+                                >
+                                    {showAdvanced
+                                        ? 'Moins de filtres'
+                                        : 'Plus de filtres'}
+                                    ...
                                 </button>
-                                <button className="btn btn-sm btn-outline-danger" onClick={resetFilters}>
+                                <button
+                                    className="btn btn-sm btn-outline-danger"
+                                    onClick={resetFilters}
+                                >
                                     Réinitialiser
                                 </button>
                             </div>
@@ -306,8 +380,14 @@ export default function AdminProduits() {
             )}
 
             <div className="d-flex justify-content-between align-items-center mb-3">
-                <p className="text-muted mb-0">{produitsFiltres.length} produit(s) trouvé(s)</p>
-                <select className="form-select form-select-sm w-auto" value={devise} onChange={e => setDevise(e.target.value)}>
+                <p className="text-muted mb-0">
+                    {produitsFiltres.length} produit(s) trouvé(s)
+                </p>
+                <select
+                    className="form-select form-select-sm w-auto"
+                    value={devise}
+                    onChange={e => setDevise(e.target.value)}
+                >
                     <option value="XOF">XOF</option>
                     <option value="EUR">EUR</option>
                 </select>
@@ -336,33 +416,57 @@ export default function AdminProduits() {
 
             {totalPages > 1 && (
                 <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3 gap-2">
-                    <span className="text-muted">Page {page} sur {totalPages}</span>
+                    <span className="text-muted">
+                        Page {page} sur {totalPages}
+                    </span>
                     <div className="d-flex gap-2">
-                        <button className="btn btn-outline-primary" onClick={() => updateFilter('page', 1)} disabled={page <= 1}>
+                        <button
+                            className="btn btn-outline-primary"
+                            onClick={() => updateFilter('page', 1)}
+                            disabled={page <= 1}
+                        >
                             <i className="bi bi-chevron-bar-left"></i>
                         </button>
-                        <button className="btn btn-outline-primary" onClick={() => updateFilter('page', page - 1)} disabled={page <= 1}>
+                        <button
+                            className="btn btn-outline-primary"
+                            onClick={() => updateFilter('page', page - 1)}
+                            disabled={page <= 1}
+                        >
                             <i className="bi bi-chevron-left"></i>
                         </button>
-                        {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
-                            const pageNum =
-                                page <= 3 ? i + 1
-                                : page >= totalPages - 2 ? totalPages - 4 + i
-                                : page - 2 + i;
+                        {Array.from({ length: Math.min(5, totalPages) }).map(
+                            (_, i) => {
+                                const pageNum =
+                                    page <= 3
+                                        ? i + 1
+                                        : page >= totalPages - 2
+                                          ? totalPages - 4 + i
+                                          : page - 2 + i;
                                 return pageNum >= 1 && pageNum <= totalPages ? (
                                     <button
                                         key={i}
                                         className={`btn ${page === pageNum ? 'btn-primary' : 'btn-outline-secondary'}`}
-                                        onClick={() => updateFilter('page', pageNum)}
+                                        onClick={() =>
+                                            updateFilter('page', pageNum)
+                                        }
                                     >
                                         {pageNum}
                                     </button>
                                 ) : null;
-                        })}
-                        <button className="btn btn-outline-primary" onClick={() => updateFilter('page', page + 1)} disabled={page >= totalPages}>
+                            }
+                        )}
+                        <button
+                            className="btn btn-outline-primary"
+                            onClick={() => updateFilter('page', page + 1)}
+                            disabled={page >= totalPages}
+                        >
                             <i className="bi bi-chevron-right"></i>
                         </button>
-                        <button className="btn btn-outline-primary" onClick={() => updateFilter('page', totalPages)} disabled={page >= totalPages}>
+                        <button
+                            className="btn btn-outline-primary"
+                            onClick={() => updateFilter('page', totalPages)}
+                            disabled={page >= totalPages}
+                        >
                             <i className="bi bi-chevron-bar-right"></i>
                         </button>
                     </div>

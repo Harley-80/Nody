@@ -1,22 +1,22 @@
-import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import Layout from '../components/common/layout/Layout'
-import CarrouselAccueil from '../components/ui/CarrouselAccueil'
-import GrilleProduitsAccueil from '../components/ui/GrilleProduitsAccueil'
-import { useProduits } from '../contexts/ProduitsContext'
-import CarrouselHero from '../components/ui/CarrouselHero'
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Layout from '../components/common/layout/Layout';
+import CarrouselAccueil from '../components/ui/CarrouselAccueil';
+import GrilleProduitsAccueil from '../components/ui/GrilleProduitsAccueil';
+import { useProduits } from '../contexts/ProduitsContext';
+import CarrouselHero from '../components/ui/CarrouselHero';
 
 export default function Accueil() {
-    const { produits, chargerProduits, loading, error } = useProduits()
-    const navigate = useNavigate()
+    const { produits, chargerProduits, loading, error } = useProduits();
+    const navigate = useNavigate();
 
     useEffect(() => {
-        chargerProduits()
-    }, [chargerProduits])
+        chargerProduits();
+    }, []);
 
     const handleNavigation = path => {
-        navigate(path)
-    }
+        navigate(path);
+    };
 
     if (loading) {
         return (
@@ -27,7 +27,7 @@ export default function Accueil() {
                     </div>
                 </div>
             </Layout>
-        )
+        );
     }
 
     if (error) {
@@ -45,7 +45,7 @@ export default function Accueil() {
                     </div>
                 </div>
             </Layout>
-        )
+        );
     }
 
     return (
@@ -126,5 +126,5 @@ export default function Accueil() {
                 </div>
             </section>
         </Layout>
-    )
+    );
 }

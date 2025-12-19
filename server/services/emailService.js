@@ -1,4 +1,3 @@
-// Importation des modules nécessaires
 import nodemailer from 'nodemailer';
 import fs from 'fs';
 import path from 'path';
@@ -114,4 +113,4 @@ const envoyerEmailNotificationAdmin = async options => {
 
 // Exportation des fonctions
 export default envoyerEmail;
-export { envoyerEmailNotificationAdmin }; 
+export { envoyerEmailNotificationAdmin };

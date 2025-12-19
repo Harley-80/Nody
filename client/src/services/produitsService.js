@@ -1,24 +1,142 @@
-import { produitsMock } from '../data/produits.data';
+import { api } from './api';
 
 /**
- * Simule un appel API vers la liste des produits.
- * @param {string|null} category - catégorie à filtrer
- * @returns {Promise<{produits: Array, categories: Array}>}
+ * Service pour les opérations liées aux produits
  */
-export async function fakeApiGetProduits(category = null) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve({
-                produits: category
-                ? produitsMock.filter(p => p.categories?.includes(category))
-                : produitsMock,
-                categories: [
-                    { id: 'homme', name: 'Mode Homme' },
-                    { id: 'femme', name: 'Mode Femme' },
-                    { id: 'enfant', name: 'Mode Enfant' },
-                    { id: 'montres', name: 'Montres' }
-                ]
+export const produitsService = {
+    /**
+     * Récupérer tous les produits
+     */
+    async getProduits(params = {}) {
+        try {
+            const response = await api.get('/produits', { params });
+            return response.data;
+        } catch (error) {
+            console.error(
+                'Erreur lors de la récupération des produits:',
+                error
+            );
+            throw error;
+        }
+    },
+
+    /**
+     * Récupérer un produit par son ID ou slug
+     */
+    async getProduitById(id) {
+        try {
+            const response = await api.get(`/produits/${id}`);
+            return response.data;
+        } catch (error) {
+            console.error('Erreur lors de la récupération du produit:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Récupérer les nouveaux produits
+     */
+    async getNouveauxProduits() {
+        try {
+            const response = await api.get('/produits/nouveaux');
+            return response.data;
+        } catch (error) {
+            console.error(
+                'Erreur lors de la récupération des nouveaux produits:',
+                error
+            );
+            throw error;
+        }
+    },
+
+    /**
+     * Récupérer les produits par catégorie
+     */
+    async getProduitsByCategory(categoryId, params = {}) {
+        try {
+            const response = await api.get(
+                `/produits/categorie/${categoryId}`,
+                { params }
+            );
+            return response.data;
+        } catch (error) {
+            console.error(
+                'Erreur lors de la récupération des produits par catégorie:',
+                error
+            );
+            throw error;
+        }
+    },
+
+    /**
+     * Rechercher des produits
+     */
+    async searchProduits(searchTerm, params = {}) {
+        try {
+            const response = await api.get('/produits/search', {
+                params: { q: searchTerm, ...params },
             });
-        }, 800); // délai simulé
-    });
-}
+            return response.data;
+        } catch (error) {
+            console.error('Erreur lors de la recherche de produits:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Créer un nouveau produit (admin)
+     */
+    async createProduit(produitData) {
+        try {
+            const response = await api.post('/produits', produitData);
+            return response.data;
+        } catch (error) {
+            console.error('Erreur lors de la création du produit:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Mettre à jour un produit (admin)
+     */
+    async updateProduit(id, produitData) {
+        try {
+            const response = await api.put(`/produits/${id}`, produitData);
+            return response.data;
+        } catch (error) {
+            console.error('Erreur lors de la mise à jour du produit:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Supprimer un produit (admin)
+     */
+    async deleteProduit(id) {
+        try {
+            const response = await api.delete(`/produits/${id}`);
+            return response.data;
+        } catch (error) {
+            console.error('Erreur lors de la suppression du produit:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Obtenir les produits en vedette
+     */
+    async getFeaturedProduits() {
+        try {
+            const response = await api.get('/produits/featured');
+            return response.data;
+        } catch (error) {
+            console.error(
+                'Erreur lors de la récupération des produits en vedette:',
+                error
+            );
+            throw error;
+        }
+    },
+};
+
+export default produitsService;

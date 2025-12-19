@@ -1,0 +1,1398 @@
+// Variables de couleur basées sur #16213e
+$primary-color: #16213e;
+$primary-light: #1d2a4d;
+$primary-dark: #0f1729;
+$secondary-color: #2d4263;
+$accent-color: #e94560;
+$success-color: #28a745;
+$warning-color: #ffc107;
+$info-color: #17a2b8;
+$light-color: #f8f9fa;
+$dark-color: #343a40;
+$border-color: rgba(22, 33, 62, 0.1);
+
+// Mixins
+@mixin transition($property: all, $duration: 0.3s, $timing: ease) {
+    transition: $property $duration $timing;
+}
+
+@mixin box-shadow($level: 1) {
+    @if $level == 1 {
+        box-shadow: 0 2px 8px rgba($primary-color, 0.08);
+    } @else if $level == 2 {
+        box-shadow: 0 4px 16px rgba($primary-color, 0.12);
+    } @else if $level == 3 {
+        box-shadow: 0 8px 32px rgba($primary-color, 0.16);
+    } @else if $level == 4 {
+        box-shadow: 0 16px 48px rgba($primary-color, 0.2);
+    }
+}
+
+@mixin gradient-bg($color1, $color2) {
+    background: linear-gradient(135deg, $color1, $color2);
+}
+
+@mixin card-style {
+    background: white;
+    border-radius: 16px;
+    @include box-shadow(2);
+    overflow: hidden;
+}
+
+@mixin icon-button($color, $hover-color) {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 2px solid rgba($color, 0.2);
+    background: white;
+    color: $color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    @include transition;
+    @include box-shadow(1);
+    font-size: 1.1rem;
+
+    &:hover {
+        background: $color;
+        color: white;
+        transform: translateY(-2px);
+        @include box-shadow(2);
+        border-color: $color;
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+// Animations
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+// Styles
+.clients-container {
+    padding: 2rem;
+    min-height: calc(100vh - 80px);
+    background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f5 100%);
+    animation: fadeIn 0.5s ease;
+
+    // En-tête
+    .page-header {
+        @include card-style;
+        padding: 1.5rem 2rem;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-left: 5px solid $primary-color;
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(
+                45deg,
+                rgba($primary-color, 0.05),
+                transparent
+            );
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: $primary-color;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(
+                90deg,
+                $primary-color,
+                $secondary-color
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+
+            i {
+                font-size: 1.5rem;
+                color: $accent-color;
+                background: rgba($accent-color, 0.1);
+                width: 50px;
+                height: 50px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                @include box-shadow(1);
+                @include transition;
+
+                &:hover {
+                    transform: rotate(20deg);
+                    @include box-shadow(2);
+                }
+            }
+        }
+
+        .btn-add {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(
+                135deg,
+                $primary-color,
+                $secondary-color
+            );
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            @include transition;
+            @include box-shadow(2);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 0.3px;
+
+            &:hover {
+                transform: translateY(-2px);
+                @include box-shadow(3);
+                background: linear-gradient(
+                    135deg,
+                    darken($primary-color, 5%),
+                    darken($secondary-color, 5%)
+                );
+                animation: pulse 0.3s ease;
+
+                i {
+                    transform: rotate(90deg);
+                }
+            }
+
+            &:active {
+                transform: translateY(0);
+            }
+
+            i {
+                font-size: 1.1rem;
+                @include transition(transform, 0.3s);
+            }
+        }
+    }
+
+    // Statistiques
+    .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+
+        .stat-card {
+            @include card-style;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            @include transition;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+
+            &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(
+                    90deg,
+                    $primary-color,
+                    $secondary-color
+                );
+                @include transition;
+            }
+
+            &:hover {
+                transform: translateY(-5px);
+                @include box-shadow(3);
+
+                &::before {
+                    height: 6px;
+                }
+
+                .stat-icon {
+                    transform: scale(1.1);
+                    @include box-shadow(2);
+                }
+
+                .stat-info h3 {
+                    color: $accent-color;
+                }
+            }
+
+            .stat-icon {
+                width: 70px;
+                height: 70px;
+                border-radius: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.8rem;
+                @include box-shadow(1);
+                flex-shrink: 0;
+                @include transition;
+
+                &.total {
+                    background: linear-gradient(
+                        135deg,
+                        rgba($primary-color, 0.1),
+                        rgba($secondary-color, 0.1)
+                    );
+                    color: $primary-color;
+                }
+
+                &.actifs {
+                    background: linear-gradient(
+                        135deg,
+                        rgba($success-color, 0.1),
+                        rgba($success-color, 0.2)
+                    );
+                    color: $success-color;
+                }
+
+                &.inactifs {
+                    background: linear-gradient(
+                        135deg,
+                        rgba($accent-color, 0.1),
+                        rgba($accent-color, 0.2)
+                    );
+                    color: $accent-color;
+                }
+            }
+
+            .stat-info {
+                flex: 1;
+
+                h3 {
+                    font-size: 2.5rem;
+                    font-weight: 800;
+                    margin: 0 0 0.25rem 0;
+                    color: $primary-color;
+                    line-height: 1;
+                    @include transition;
+                }
+
+                p {
+                    margin: 0;
+                    color: lighten($primary-color, 30%);
+                    font-size: 0.95rem;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+            }
+        }
+    }
+
+    // Carte principale
+    .clients-card {
+        @include card-style;
+        margin-bottom: 2rem;
+        overflow: visible;
+
+        .card-header {
+            padding: 1.5rem;
+            background: linear-gradient(90deg, $primary-color, $primary-light);
+            color: white;
+            position: relative;
+            overflow: hidden;
+            border-bottom: none;
+
+            &::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 2rem;
+                right: 2rem;
+                height: 2px;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(white, 0.3),
+                    transparent
+                );
+            }
+
+            h2 {
+                margin: 0;
+                font-size: 1.25rem;
+                font-weight: 800;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                position: relative;
+                z-index: 1;
+
+                i {
+                    font-size: 1.2rem;
+                    color: rgba(white, 0.9);
+                    @include transition;
+
+                    &:hover {
+                        color: $accent-color;
+                        transform: rotate(20deg);
+                    }
+                }
+            }
+        }
+
+        .card-body {
+            padding: 0;
+            position: relative;
+
+            // États
+            .loading-state,
+            .error-state,
+            .empty-state {
+                padding: 3rem 1.5rem;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 300px;
+
+                i {
+                    font-size: 3rem;
+                    margin-bottom: 1.5rem;
+                    display: block;
+                }
+
+                p {
+                    color: lighten($primary-color, 30%);
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    margin: 0 0 1rem 0;
+                    max-width: 400px;
+                    line-height: 1.6;
+                }
+            }
+
+            .loading-state {
+                i {
+                    color: $primary-color;
+                    animation: spin 1s linear infinite;
+                }
+            }
+
+            .error-state {
+                i {
+                    color: $accent-color;
+                    animation: pulse 2s infinite;
+                }
+
+                .btn-retry {
+                    @include icon-button($primary-color, $primary-light);
+                    width: auto;
+                    padding: 0.75rem 1.5rem;
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    margin-top: 1rem;
+
+                    &:hover {
+                        animation: pulse 0.5s ease;
+                    }
+                }
+            }
+
+            .empty-state {
+                i {
+                    color: lighten($primary-color, 50%);
+                    font-size: 4rem;
+                    margin-bottom: 1rem;
+                    opacity: 0.5;
+                }
+
+                p {
+                    font-size: 1.2rem;
+                }
+            }
+
+            // Table modernisée
+            .table-responsive {
+                overflow-x: auto;
+                border-radius: 0 0 16px 16px;
+
+                &::-webkit-scrollbar {
+                    height: 8px;
+                }
+
+                &::-webkit-scrollbar-track {
+                    background: rgba($primary-color, 0.05);
+                    border-radius: 4px;
+                }
+
+                &::-webkit-scrollbar-thumb {
+                    background: rgba($primary-color, 0.2);
+                    border-radius: 4px;
+
+                    &:hover {
+                        background: rgba($primary-color, 0.3);
+                    }
+                }
+
+                table {
+                    width: 100%;
+                    border-collapse: separate;
+                    border-spacing: 0;
+                    min-width: 800px;
+
+                    thead {
+                        background: linear-gradient(
+                            90deg,
+                            rgba($primary-color, 0.1),
+                            rgba($secondary-color, 0.1)
+                        );
+
+                        th {
+                            padding: 1.25rem 1.5rem;
+                            text-align: left;
+                            font-weight: 700;
+                            color: $primary-color;
+                            font-size: 0.85rem;
+                            border-bottom: 2px solid rgba($primary-color, 0.1);
+                            white-space: nowrap;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            position: sticky;
+                            top: 0;
+                            z-index: 10;
+                            backdrop-filter: blur(10px);
+                            background: rgba(white, 0.95);
+
+                            &:first-child {
+                                border-top-left-radius: 16px;
+                            }
+
+                            &:last-child {
+                                border-top-right-radius: 16px;
+                            }
+                        }
+                    }
+
+                    tbody {
+                        tr {
+                            border-bottom: 1px solid rgba($primary-color, 0.05);
+                            @include transition;
+                            animation: slideInRight 0.3s ease backwards;
+
+                            @for $i from 1 through 10 {
+                                &:nth-child(#{$i}) {
+                                    animation-delay: #{$i * 0.05}s;
+                                }
+                            }
+
+                            &:hover {
+                                background: rgba($primary-color, 0.02);
+                                transform: translateX(4px);
+                                @include box-shadow(1);
+                            }
+
+                            &:last-child {
+                                border-bottom: none;
+
+                                td {
+                                    &:first-child {
+                                        border-bottom-left-radius: 16px;
+                                    }
+
+                                    &:last-child {
+                                        border-bottom-right-radius: 16px;
+                                    }
+                                }
+                            }
+
+                            td {
+                                padding: 1.25rem 1.5rem;
+                                vertical-align: middle;
+                                border-bottom: 1px solid
+                                    rgba($primary-color, 0.05);
+                                @include transition;
+
+                                // Informations client
+                                .client-info {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 1rem;
+
+                                    .avatar {
+                                        width: 50px;
+                                        height: 50px;
+                                        border-radius: 12px;
+                                        object-fit: cover;
+                                        border: 2px solid
+                                            rgba($primary-color, 0.1);
+                                        @include box-shadow(1);
+                                        @include transition;
+
+                                        &:hover {
+                                            transform: scale(1.1);
+                                            @include box-shadow(2);
+                                            border-color: $accent-color;
+                                        }
+                                    }
+
+                                    .avatar-placeholder {
+                                        width: 50px;
+                                        height: 50px;
+                                        border-radius: 12px;
+                                        background: linear-gradient(
+                                            135deg,
+                                            $primary-color,
+                                            $secondary-color
+                                        );
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        color: white;
+                                        font-weight: 700;
+                                        font-size: 1.2rem;
+                                        @include box-shadow(1);
+                                        @include transition;
+
+                                        &:hover {
+                                            transform: scale(1.1);
+                                            @include box-shadow(2);
+                                            background: linear-gradient(
+                                                135deg,
+                                                $secondary-color,
+                                                $primary-color
+                                            );
+                                        }
+                                    }
+
+                                    .info {
+                                        .name {
+                                            font-weight: 700;
+                                            color: $primary-color;
+                                            font-size: 1rem;
+                                            margin-bottom: 0.25rem;
+                                            @include transition;
+
+                                            &:hover {
+                                                color: $accent-color;
+                                            }
+                                        }
+
+                                        .email {
+                                            color: lighten($primary-color, 30%);
+                                            font-size: 0.9rem;
+                                            font-weight: 500;
+                                        }
+                                    }
+                                }
+
+                                // Badge de statut
+                                .badge {
+                                    padding: 0.5rem 1rem;
+                                    border-radius: 20px;
+                                    font-size: 0.8rem;
+                                    font-weight: 700;
+                                    text-transform: uppercase;
+                                    letter-spacing: 0.3px;
+                                    display: inline-flex;
+                                    align-items: center;
+                                    gap: 0.5rem;
+                                    @include box-shadow(1);
+                                    @include transition;
+
+                                    &::before {
+                                        content: '•';
+                                        font-size: 1.2rem;
+                                    }
+
+                                    &.actif {
+                                        background: linear-gradient(
+                                            135deg,
+                                            rgba($success-color, 0.1),
+                                            rgba($success-color, 0.2)
+                                        );
+                                        color: $success-color;
+                                        border: 1px solid
+                                            rgba($success-color, 0.3);
+
+                                        &:hover {
+                                            background: $success-color;
+                                            color: white;
+                                            transform: translateY(-2px);
+                                            @include box-shadow(2);
+                                        }
+                                    }
+
+                                    &.inactif {
+                                        background: linear-gradient(
+                                            135deg,
+                                            rgba($accent-color, 0.1),
+                                            rgba($accent-color, 0.2)
+                                        );
+                                        color: $accent-color;
+                                        border: 1px solid
+                                            rgba($accent-color, 0.3);
+
+                                        &:hover {
+                                            background: $accent-color;
+                                            color: white;
+                                            transform: translateY(-2px);
+                                            @include box-shadow(2);
+                                        }
+                                    }
+                                }
+
+                                // Date
+                                &.date {
+                                    color: lighten($primary-color, 30%);
+                                    font-weight: 500;
+                                    font-size: 0.9rem;
+                                    white-space: nowrap;
+                                }
+
+                                // Actions avec icônes seulement
+                                .actions {
+                                    display: flex;
+                                    gap: 0.5rem;
+
+                                    button {
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        border: none;
+                                        cursor: pointer;
+                                        @include transition;
+                                        border-radius: 10px;
+                                        @include box-shadow(1);
+
+                                        // Bouton Modifier
+                                        &.btn-edit {
+                                            @include icon-button(
+                                                $info-color,
+                                                darken($info-color, 10%)
+                                            );
+                                        }
+
+                                        // Bouton Bloquer/Débloquer
+                                        &.btn-warning {
+                                            @include icon-button(
+                                                $warning-color,
+                                                darken($warning-color, 10%)
+                                            );
+                                            background: linear-gradient(
+                                                135deg,
+                                                rgba($warning-color, 0.1),
+                                                rgba($warning-color, 0.2)
+                                            );
+                                            color: darken($warning-color, 20%);
+
+                                            &:hover {
+                                                background: $warning-color;
+                                                color: white;
+                                            }
+                                        }
+
+                                        &.btn-success {
+                                            @include icon-button(
+                                                $success-color,
+                                                darken($success-color, 10%)
+                                            );
+                                            background: linear-gradient(
+                                                135deg,
+                                                rgba($success-color, 0.1),
+                                                rgba($success-color, 0.2)
+                                            );
+                                            color: $success-color;
+
+                                            &:hover {
+                                                background: $success-color;
+                                                color: white;
+                                            }
+                                        }
+
+                                        // Bouton Supprimer
+                                        &.btn-delete {
+                                            @include icon-button(
+                                                $accent-color,
+                                                darken($accent-color, 10%)
+                                            );
+                                        }
+
+                                        // Retirer le texte des boutons
+                                        span {
+                                            display: none;
+                                        }
+
+                                        i {
+                                            font-size: 1rem;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // PAGINATION
+            .pagination {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 1.5rem;
+                gap: 0.5rem;
+                background: linear-gradient(
+                    90deg,
+                    rgba($primary-color, 0.02),
+                    rgba($secondary-color, 0.02)
+                );
+                border-top: 1px solid rgba($primary-color, 0.1);
+
+                button {
+                    min-width: 44px;
+                    height: 44px;
+                    border: 2px solid rgba($primary-color, 0.1);
+                    border-radius: 10px;
+                    background: white;
+                    color: $primary-color;
+                    font-weight: 700;
+                    font-size: 0.95rem;
+                    cursor: pointer;
+                    @include transition;
+                    @include box-shadow(1);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    &:hover:not(:disabled) {
+                        background: $primary-color;
+                        color: white;
+                        border-color: $primary-color;
+                        transform: translateY(-2px);
+                        @include box-shadow(2);
+
+                        i {
+                            transform: scale(1.2);
+                        }
+                    }
+
+                    &:disabled {
+                        opacity: 0.5;
+                        cursor: not-allowed;
+                        transform: none;
+                        @include box-shadow(0);
+                    }
+
+                    i {
+                        font-size: 1rem;
+                        @include transition;
+                    }
+
+                    // Styles pour les boutons de navigation
+                    &:first-of-type,
+                    &:last-of-type {
+                        min-width: 50px;
+                        font-weight: 800;
+                    }
+                }
+
+                span {
+                    color: lighten($primary-color, 30%);
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                    margin: 0 1rem;
+                    padding: 0.5rem 1rem;
+                    background: rgba($primary-color, 0.05);
+                    border-radius: 8px;
+                    @include box-shadow(1);
+
+                    &::before {
+                        content: '';
+                        margin-right: 0.5rem;
+                        font-size: 1rem;
+                    }
+                }
+
+                // Style pour la pagination avancée
+                .page-numbers {
+                    display: flex;
+                    gap: 0.25rem;
+
+                    .page-number {
+                        min-width: 40px;
+                        height: 40px;
+                        border-radius: 8px;
+                        border: 2px solid rgba($primary-color, 0.1);
+                        background: white;
+                        color: $primary-color;
+                        font-weight: 700;
+                        font-size: 0.9rem;
+                        cursor: pointer;
+                        @include transition;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+
+                        &:hover {
+                            background: rgba($primary-color, 0.1);
+                            border-color: $primary-color;
+                            transform: translateY(-2px);
+                        }
+
+                        &.active {
+                            background: $primary-color;
+                            color: white;
+                            border-color: $primary-color;
+                            @include box-shadow(2);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Modal
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        padding: 2rem;
+        backdrop-filter: blur(5px);
+        animation: fadeIn 0.3s ease;
+
+        .modal-content {
+            @include card-style;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 1px solid rgba($primary-color, 0.1);
+            overflow: hidden;
+
+            .modal-header {
+                padding: 1.5rem 2rem;
+                background: linear-gradient(
+                    90deg,
+                    $primary-color,
+                    $primary-light
+                );
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                position: relative;
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 2rem;
+                    right: 2rem;
+                    height: 2px;
+                    background: linear-gradient(
+                        90deg,
+                        transparent,
+                        rgba(white, 0.3),
+                        transparent
+                    );
+                }
+
+                h2 {
+                    margin: 0;
+                    font-size: 1.25rem;
+                    font-weight: 800;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+
+                    i {
+                        font-size: 1.2rem;
+                        color: rgba(white, 0.9);
+                        @include transition;
+
+                        &:hover {
+                            color: $accent-color;
+                            transform: rotate(20deg);
+                        }
+                    }
+                }
+
+                .close-btn {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 8px;
+                    border: none;
+                    background: rgba(white, 0.2);
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    @include transition;
+
+                    &:hover {
+                        background: rgba(white, 0.3);
+                        transform: rotate(90deg);
+                    }
+                }
+            }
+
+            .modal-body {
+                padding: 2rem;
+                overflow-y: auto;
+                background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+
+                form {
+                    .form-group {
+                        margin-bottom: 1.5rem;
+                        animation: slideInRight 0.3s ease backwards;
+
+                        @for $i from 1 through 6 {
+                            &:nth-child(#{$i}) {
+                                animation-delay: #{$i * 0.05}s;
+                            }
+                        }
+
+                        label {
+                            display: block;
+                            font-weight: 700;
+                            color: $primary-color;
+                            margin-bottom: 0.5rem;
+                            font-size: 0.95rem;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.5rem;
+
+                            &::before {
+                                content: '•';
+                                color: $accent-color;
+                                font-size: 1.2rem;
+                            }
+
+                            small {
+                                font-weight: 400;
+                                color: lighten($primary-color, 30%);
+                                font-size: 0.85rem;
+                                margin-left: 0.25rem;
+                            }
+                        }
+
+                        input,
+                        select {
+                            width: 100%;
+                            padding: 1rem 1.25rem;
+                            border: 2px solid rgba($primary-color, 0.1);
+                            border-radius: 10px;
+                            font-size: 0.95rem;
+                            font-weight: 600;
+                            color: $primary-color;
+                            background: white;
+                            @include transition;
+
+                            &:focus {
+                                outline: none;
+                                border-color: $primary-color;
+                                @include box-shadow(1);
+                                transform: translateY(-1px);
+                            }
+
+                            &:disabled {
+                                background: rgba($primary-color, 0.05);
+                                color: lighten($primary-color, 30%);
+                                cursor: not-allowed;
+                            }
+
+                            &::placeholder {
+                                color: lighten($primary-color, 50%);
+                            }
+                        }
+
+                        select {
+                            appearance: none;
+                            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2316213e' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+                            background-repeat: no-repeat;
+                            background-position: right 1.25rem center;
+                            background-size: 12px;
+                            padding-right: 2.5rem;
+                        }
+                    }
+
+                    .form-actions {
+                        display: flex;
+                        gap: 1rem;
+                        margin-top: 2rem;
+                        animation: slideInRight 0.3s ease backwards;
+                        animation-delay: 0.3s;
+
+                        button {
+                            flex: 1;
+                            padding: 1rem 1.5rem;
+                            border-radius: 10px;
+                            font-weight: 700;
+                            font-size: 0.95rem;
+                            cursor: pointer;
+                            @include transition;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 0.75rem;
+                            letter-spacing: 0.3px;
+
+                            &.btn-submit {
+                                border: none;
+                                background: linear-gradient(
+                                    135deg,
+                                    $primary-color,
+                                    $secondary-color
+                                );
+                                color: white;
+
+                                &:hover:not(:disabled) {
+                                    transform: translateY(-2px);
+                                    @include box-shadow(2);
+                                    background: linear-gradient(
+                                        135deg,
+                                        darken($primary-color, 5%),
+                                        darken($secondary-color, 5%)
+                                    );
+                                    animation: pulse 0.3s ease;
+                                }
+
+                                &:disabled {
+                                    opacity: 0.5;
+                                    cursor: not-allowed;
+                                    transform: none;
+                                    @include box-shadow(0);
+                                }
+                            }
+
+                            &.btn-cancel {
+                                border: 2px solid rgba($primary-color, 0.2);
+                                background: white;
+                                color: $primary-color;
+
+                                &:hover {
+                                    background: rgba($primary-color, 0.05);
+                                    border-color: $primary-color;
+                                    transform: translateY(-2px);
+                                    @include box-shadow(1);
+                                }
+
+                                &:disabled {
+                                    opacity: 0.5;
+                                    cursor: not-allowed;
+                                    transform: none;
+                                    @include box-shadow(0);
+                                }
+                            }
+
+                            i {
+                                font-size: 1.1rem;
+                                @include transition;
+
+                                &.fa-spinner {
+                                    animation: spin 1s linear infinite;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Responsive
+@media (max-width: 1200px) {
+    .clients-container {
+        padding: 1.5rem;
+
+        .page-header {
+            padding: 1.25rem;
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .stats-cards {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .clients-container {
+        padding: 1rem;
+
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1.5rem;
+
+            h1 {
+                font-size: 1.25rem;
+                justify-content: center;
+                text-align: center;
+
+                i {
+                    width: 40px;
+                    height: 40px;
+                    font-size: 1.2rem;
+                }
+            }
+
+            .btn-add {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .stats-cards {
+            grid-template-columns: 1fr;
+        }
+
+        .clients-card {
+            .card-body {
+                .table-responsive {
+                    table {
+                        thead {
+                            display: none;
+                        }
+
+                        tbody {
+                            tr {
+                                display: block;
+                                margin-bottom: 1rem;
+                                border: 1px solid rgba($primary-color, 0.1);
+                                border-radius: 12px;
+                                padding: 1rem;
+                                @include box-shadow(1);
+
+                                &:hover {
+                                    transform: none;
+                                    background: rgba($primary-color, 0.02);
+                                }
+
+                                td {
+                                    display: block;
+                                    padding: 0.75rem 0;
+                                    border: none;
+
+                                    &::before {
+                                        content: attr(data-label);
+                                        font-weight: 700;
+                                        color: lighten($primary-color, 20%);
+                                        display: block;
+                                        margin-bottom: 0.25rem;
+                                        font-size: 0.75rem;
+                                        text-transform: uppercase;
+                                        letter-spacing: 0.5px;
+                                    }
+
+                                    .actions {
+                                        justify-content: center;
+                                        margin-top: 0.5rem;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .pagination {
+                    flex-direction: column;
+                    gap: 1rem;
+                    padding: 1rem;
+
+                    span {
+                        order: -1;
+                        margin: 0;
+                    }
+
+                    .page-numbers {
+                        flex-wrap: wrap;
+                        justify-content: center;
+
+                        .page-number {
+                            min-width: 36px;
+                            height: 36px;
+                            font-size: 0.8rem;
+                        }
+                    }
+                }
+            }
+        }
+
+        .modal-overlay {
+            padding: 1rem;
+
+            .modal-content {
+                max-height: 95vh;
+
+                .modal-body {
+                    padding: 1.5rem;
+
+                    .form-actions {
+                        flex-direction: column;
+
+                        button {
+                            width: 100%;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .clients-container {
+        .page-header {
+            h1 {
+                font-size: 1.1rem;
+
+                i {
+                    display: none;
+                }
+            }
+        }
+
+        .stats-cards {
+            .stat-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+
+                .stat-icon {
+                    width: 60px;
+                    height: 60px;
+                    font-size: 1.5rem;
+                }
+
+                .stat-info {
+                    h3 {
+                        font-size: 2rem;
+                    }
+                }
+            }
+        }
+
+        .clients-card {
+            .card-body {
+                .table-responsive {
+                    table {
+                        tbody {
+                            tr {
+                                td {
+                                    .actions {
+                                        flex-wrap: wrap;
+                                        gap: 0.25rem;
+
+                                        button {
+                                            width: 36px;
+                                            height: 36px;
+                                            font-size: 0.9rem;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .pagination {
+                    button {
+                        min-width: 36px;
+                        height: 36px;
+                        font-size: 0.85rem;
+                    }
+
+                    span {
+                        font-size: 0.8rem;
+                    }
+                }
+            }
+        }
+    }
+}

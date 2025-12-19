@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Produit Rejeté - Nody</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                margin: 0;
+                padding: 0;
+                background-color: #f5f5f5;
+            }
+            .email-container {
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            }
+            .header {
+                background: linear-gradient(135deg, #f56565 0%, #ed8936 100%);
+                color: white;
+                padding: 40px 30px;
+                text-align: center;
+            }
+            .header h1 {
+                margin: 0;
+                font-size: 28px;
+                font-weight: 600;
+            }
+            .header p {
+                margin: 10px 0 0;
+                font-size: 16px;
+                opacity: 0.9;
+            }
+            .content {
+                padding: 40px 30px;
+            }
+            .warning-icon {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .warning-icon i {
+                font-size: 60px;
+                color: #f56565;
+            }
+            .message {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .message h2 {
+                color: #2d3748;
+                margin-bottom: 15px;
+                font-size: 24px;
+            }
+            .message p {
+                color: #4a5568;
+                font-size: 16px;
+                margin-bottom: 10px;
+            }
+            .product-info {
+                background-color: #fff5f5;
+                border-radius: 8px;
+                padding: 25px;
+                margin: 30px 0;
+                border-left: 4px solid #fc8181;
+            }
+            .product-info h3 {
+                color: #2d3748;
+                margin-top: 0;
+                margin-bottom: 15px;
+                font-size: 18px;
+            }
+            .info-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #fed7d7;
+            }
+            .info-row:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+            .label {
+                color: #718096;
+                font-weight: 500;
+            }
+            .value {
+                color: #2d3748;
+                font-weight: 600;
+            }
+            .rejection-reason {
+                background-color: #feebc8;
+                border-radius: 8px;
+                padding: 20px;
+                margin: 20px 0;
+                border-left: 4px solid #dd6b20;
+            }
+            .rejection-reason h4 {
+                color: #dd6b20;
+                margin-top: 0;
+                margin-bottom: 10px;
+                font-size: 16px;
+            }
+            .rejection-reason p {
+                color: #c05621;
+                margin: 0;
+                font-style: italic;
+            }
+            .actions {
+                margin: 40px 0;
+                text-align: center;
+            }
+            .action-button {
+                display: inline-block;
+                padding: 12px 25px;
+                background-color: #4299e1;
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+                font-weight: 600;
+                margin: 0 10px;
+                transition: background-color 0.3s ease;
+            }
+            .action-button:hover {
+                background-color: #3182ce;
+            }
+            .action-button.secondary {
+                background-color: #a0aec0;
+            }
+            .action-button.secondary:hover {
+                background-color: #718096;
+            }
+            .guidance {
+                background-color: #e6fffa;
+                border-radius: 8px;
+                padding: 20px;
+                margin: 30px 0;
+                border-left: 4px solid #38b2ac;
+            }
+            .guidance h4 {
+                color: #285e61;
+                margin-top: 0;
+                margin-bottom: 10px;
+            }
+            .guidance ul {
+                margin: 0;
+                padding-left: 20px;
+                color: #4a5568;
+            }
+            .guidance li {
+                margin-bottom: 8px;
+            }
+            .footer {
+                background-color: #edf2f7;
+                padding: 25px 30px;
+                text-align: center;
+                color: #718096;
+                font-size: 14px;
+            }
+            .footer-links {
+                margin-top: 15px;
+            }
+            .footer-links a {
+                color: #667eea;
+                text-decoration: none;
+                margin: 0 10px;
+            }
+            .contact-info {
+                margin-top: 20px;
+                padding-top: 20px;
+                border-top: 1px solid #e2e8f0;
+                color: #4a5568;
+            }
+            @media only screen and (max-width: 600px) {
+                .email-container {
+                    border-radius: 0;
+                }
+                .content {
+                    padding: 30px 20px;
+                }
+                .product-info, .rejection-reason, .guidance {
+                    padding: 20px;
+                }
+                .action-button {
+                    display: block;
+                    margin: 10px auto;
+                    width: 80%;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="email-container">
+            <div class="header">
+                <h1>Nody Marketplace</h1>
+                <p>Mise à jour concernant votre produit</p>
+            </div>
+            
+            <div class="content">
+                <div class="warning-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                
+                <div class="message">
+                    <h2>Notification importante</h2>
+                    <p>Votre produit a été <strong style="color: #f56565;">rejeté</strong> par notre équipe de modération.</p>
+                </div>
+                
+                <div class="product-info">
+                    <h3>Détails du produit</h3>
+                    <div class="info-row">
+                        <span class="label">Nom du produit :</span>
+                        <span class="value">{{produitNom}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Date de soumission :</span>
+                        <span class="value">{{dateSoumission}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Date de rejet :</span>
+                        <span class="value">{{dateRejet}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Statut :</span>
+                        <span class="value" style="color: #f56565;">Rejeté</span>
+                    </div>
+                </div>
+                
+                <div class="rejection-reason">
+                    <h4>Raison du rejet :</h4>
+                    <p>"{{raison}}"</p>
+                </div>
+                
+                <div class="guidance">
+                    <h4>Que faire ensuite ?</h4>
+                    <ul>
+                        <li>Corrigez les problèmes mentionnés ci-dessus</li>
+                        <li>Assurez-vous que votre produit respecte nos conditions d'utilisation</li>
+                        <li>Les images doivent être claires et de bonne qualité</li>
+                        <li>La description doit être complète et précise</li>
+                        <li>Le prix doit être compétitif et réaliste</li>
+                    </ul>
+                </div>
+                
+                <div class="actions">
+                    <a href="{{urlModifierProduit}}" class="action-button">
+                        <i class="fas fa-edit"></i> Modifier le produit
+                    </a>
+                    <a href="{{urlGuide}}" class="action-button secondary">
+                        <i class="fas fa-book"></i> Voir le guide
+                    </a>
+                </div>
+                
+                <p style="text-align: center; color: #4a5568; font-size: 14px;">
+                    Si vous avez des questions concernant cette décision, n'hésitez pas à contacter notre support.
+                </p>
+            </div>
+            
+            <div class="footer">
+                <p>© 2025 Nody Mode et Accessoires. Tous droits réservés.</p>
+                <div class="footer-links">
+                    <a href="{{urlSupport}}">Support</a>
+                    <a href="{{urlConditions}}">Conditions d'utilisation</a>
+                    <a href="{{urlGuideVendeurs}}">Guide des vendeurs</a>
+                </div>
+                <div class="contact-info">
+                    <p>Équipe de modération Nody</p>
+                    <p>Email : moderation@nody.sn | Tél : +221 33 XXX XX XX</p>
+                </div>
+            </div>
+        </div>
+        
+        <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    </body>
+</html>

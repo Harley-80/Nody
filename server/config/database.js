@@ -19,7 +19,7 @@ const connectDatabase = async () => {
 
     try {
         // Tente de se connecter à la base de données en utilisant l'URI de configuration
-        const connexion = await mongoose.connect(config.mongodbUri);
+        const connexion = await mongoose.connect(config.mongoUri);
 
         // Affiche un message de succès avec le nom de l'hôte de la connexion
         logger.info(`MongoDB est connecté : ${connexion.connection.host}`);

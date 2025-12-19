@@ -8,7 +8,7 @@ export default function SearchBar({ className = '' }) {
     const [query, setQuery] = useState('');
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = e => {
         e.preventDefault();
         if (query.trim().length >= 2) {
             navigate(`/produits?search=${encodeURIComponent(query.trim())}`);
@@ -22,7 +22,7 @@ export default function SearchBar({ className = '' }) {
                 type="search"
                 placeholder="Rechercher des produits..."
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={e => setQuery(e.target.value)}
                 minLength="2"
                 required
             />

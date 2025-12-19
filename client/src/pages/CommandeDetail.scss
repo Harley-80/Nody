@@ -1,0 +1,482 @@
+$primary-color: #2c3e50;
+$secondary-color: #e74c3c;
+$accent-color: #3498db;
+$success-color: #27ae60;
+$warning-color: #f39c12;
+$danger-color: #e74c3c;
+$light-color: #ecf0f1;
+$dark-color: #2c3e50;
+$text-color: #333;
+$text-muted: #6c757d;
+$border-color: #e9ecef;
+$background-light: #f8f9fa;
+$shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+$shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+$border-radius: 12px;
+$transition: all 0.3s ease;
+
+// Couleurs fixes
+$primary-dark: #1a252f;
+$accent-light: #4fa3e3;
+$accent-dark: #2980b9;
+$success-dark: #219653;
+$warning-dark: #e67e22;
+$danger-dark: #c0392b;
+$text-muted-dark: #5a6268;
+
+// MIXINS
+@mixin card-style {
+    background: white;
+    border-radius: $border-radius;
+    box-shadow: $shadow;
+    border: 1px solid $border-color;
+    transition: $transition;
+
+    &:hover {
+        box-shadow: $shadow-hover;
+    }
+}
+
+@mixin gradient-bg($color1, $color2) {
+    background: linear-gradient(135deg, $color1 0%, $color2 100%);
+}
+
+@mixin badge-style($color, $dark-color) {
+    background: linear-gradient(135deg, $color 0%, $dark-color 100%);
+    color: white;
+    border: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+
+// CONTENEUR PRINCIPAL
+.commande-detail-page {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+// EN-TÊTE
+.detail-header {
+    margin-bottom: 2rem;
+
+    .btn-back {
+        background: white;
+        border: 2px solid $accent-color;
+        color: $accent-color;
+        padding: 0.75rem 1.5rem;
+        border-radius: $border-radius;
+        font-weight: 600;
+        transition: $transition;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        &:hover {
+            background: $accent-color;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: $shadow;
+        }
+    }
+
+    h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: $dark-color;
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        .order-number {
+            @include gradient-bg($accent-color, $accent-dark);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    }
+}
+
+// ÉTAT DE CHARGEMENT
+.loading-state,
+.error-state {
+    padding: 4rem 2rem;
+    text-align: center;
+    @include card-style;
+
+    i {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        display: block;
+    }
+
+    h5 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    p {
+        color: $text-muted;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .btn {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: $border-radius;
+        transition: $transition;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: $shadow;
+        }
+    }
+}
+
+.loading-state i {
+    color: $accent-color;
+    animation: spin 1s linear infinite;
+}
+
+.error-state i {
+    color: $danger-color;
+}
+
+// INFORMATIONS COMMANDE
+.commande-info {
+    @include card-style;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        @include gradient-bg($accent-color, $primary-color);
+    }
+
+    h4 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: $primary-color;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        &::before {
+            content: '';
+            font-size: 1.3rem;
+        }
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem 0;
+        border-bottom: 1px solid $border-color;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        strong {
+            color: $dark-color;
+            font-weight: 600;
+        }
+
+        span {
+            color: $text-color;
+        }
+
+        .badge {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+
+            &.bg-success {
+                @include badge-style($success-color, $success-dark);
+            }
+
+            &.bg-warning {
+                @include badge-style($warning-color, $warning-dark);
+            }
+
+            &.bg-danger {
+                @include badge-style($danger-color, $danger-dark);
+            }
+
+            &.bg-secondary {
+                @include badge-style($text-muted, $text-muted-dark);
+            }
+        }
+    }
+}
+
+// INFORMATIONS CLIENT
+.client-info {
+    @include card-style;
+    padding: 2rem;
+    margin-bottom: 2rem;
+
+    h4 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: $primary-color;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        &::before {
+            content: '';
+            font-size: 1.3rem;
+        }
+    }
+
+    p {
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+
+        strong {
+            min-width: 100px;
+            color: $dark-color;
+            font-weight: 600;
+        }
+
+        span {
+            color: $text-color;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+// PRODUITS DE LA COMMANDE
+.produits-commande {
+    @include card-style;
+    padding: 0;
+    overflow: hidden;
+
+    .card-header {
+        @include gradient-bg($accent-color, $accent-dark);
+        color: white;
+        padding: 1.5rem 2rem;
+        border: none;
+
+        h4 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            &::before {
+                content: '';
+                font-size: 1.3rem;
+            }
+        }
+    }
+
+    .card-body {
+        padding: 2rem;
+        background: #fafbfc;
+
+        .list-group {
+            .list-group-item {
+                border: none;
+                border-left: 3px solid $accent-color;
+                margin-bottom: 1rem;
+                border-radius: 8px;
+                padding: 1.5rem;
+                background: white;
+                transition: $transition;
+
+                &:hover {
+                    transform: translateX(5px);
+                    box-shadow: $shadow;
+                }
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+
+                .d-flex {
+                    align-items: center;
+                    gap: 1rem;
+
+                    strong {
+                        color: $dark-color;
+                        font-size: 1.1rem;
+                        flex: 1;
+                    }
+
+                    .badge {
+                        @include badge-style($text-muted, $text-muted-dark);
+                        font-size: 0.85rem;
+                    }
+                }
+
+                small {
+                    color: $text-muted;
+                    display: block;
+                    margin-top: 0.5rem;
+                    font-size: 0.95rem;
+                }
+            }
+        }
+    }
+
+    .card-footer {
+        background: white;
+        border-top: 2px solid $border-color;
+        padding: 1.5rem 2rem;
+
+        .total-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            h4 {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: $dark-color;
+                margin: 0;
+            }
+
+            .total-amount {
+                font-size: 1.8rem;
+                font-weight: 700;
+                @include gradient-bg($success-color, $success-dark);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+        }
+    }
+}
+
+// ANIMATIONS
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+// RESPONSIVE
+@media (max-width: 768px) {
+    .commande-detail-page {
+        padding: 1rem 0;
+    }
+
+    .detail-header {
+        h2 {
+            font-size: 1.5rem;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    .commande-info,
+    .client-info {
+        padding: 1.5rem;
+
+        h4 {
+            font-size: 1.3rem;
+        }
+
+        .info-row {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        p {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    .produits-commande {
+        .card-header {
+            padding: 1rem 1.5rem;
+
+            h4 {
+                font-size: 1.3rem;
+            }
+        }
+
+        .card-body {
+            padding: 1.5rem;
+
+            .list-group-item {
+                padding: 1rem;
+
+                .d-flex {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+            }
+        }
+
+        .card-footer {
+            padding: 1rem 1.5rem;
+
+            .total-section {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    .container {
+        padding: 0.5rem !important;
+    }
+
+    .detail-header {
+        h2 {
+            font-size: 1.3rem;
+        }
+    }
+
+    .commande-info,
+    .client-info,
+    .produits-commande .card-body {
+        padding: 1rem;
+    }
+}

@@ -1,6 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserShield, faUserCircle, faBox, faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons';
+import {
+    faUserShield,
+    faUserCircle,
+    faBox,
+    faSignOutAlt,
+    faUser,
+} from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function UserDropdown() {
@@ -15,7 +21,9 @@ export default function UserDropdown() {
     return (
         <div className="user-dropdown dropdown">
             <button className="dropdown-toggle" aria-expanded="false">
-                <FontAwesomeIcon icon={user.isAdmin ? faUserShield : faUserCircle} />
+                <FontAwesomeIcon
+                    icon={user.isAdmin ? faUserShield : faUserCircle}
+                />
                 <span className="user-name">{user?.name || 'Utilisateur'}</span>
             </button>
             <div className="dropdown-menu">

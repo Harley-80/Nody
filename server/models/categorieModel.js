@@ -1,4 +1,3 @@
-// models/categorieModel.js
 import mongoose from 'mongoose';
 import slugify from 'slugify';
 
@@ -13,6 +12,7 @@ const categorieSchema = new mongoose.Schema(
         slug: {
             type: String,
             lowercase: true,
+            unique: true, // OK pour slug
         },
         description: {
             type: String,
@@ -43,9 +43,31 @@ const categorieSchema = new mongoose.Schema(
             default: 0,
             min: 0,
         },
+        estActif: {
+            type: Boolean,
+            default: true,
+        },
+        enVedette: {
+            type: Boolean,
+            default: false,
+        },
+        ordre: {
+            type: Number,
+            default: 0,
+        },
+        icone: {
+            type: String,
+            default: null,
+        },
+        image: {
+            type: String,
+            default: null,
+        },
     },
     {
         timestamps: true,
+        // Désactiver la création automatique d'index
+        autoIndex: false,
     }
 );
 
@@ -75,10 +97,12 @@ categorieSchema.pre('save', async function (next) {
     }
 });
 
-// Index pour optimiser les recherches par parent et niveau
-categorieSchema.index({ slug: 1 }, { unique: true }); // Slug doit être globalement unique
+// Créer les index MANUELLEMENT si besoin (après l'import)
+categorieSchema.index({ slug: 1 }, { unique: true });
 categorieSchema.index({ parent: 1 });
 categorieSchema.index({ niveau: 1 });
+categorieSchema.index({ estActif: 1 });
+categorieSchema.index({ ordre: 1 });
 
 const Categorie = mongoose.model('Categorie', categorieSchema);
 

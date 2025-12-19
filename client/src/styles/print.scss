@@ -1,10 +1,13 @@
-@media print {
+// Styles d'impression
+/@media print {
     body {
         background: white !important;
         color: black !important;
     }
 
-    .btn, nav, footer {
+    .btn,
+    nav,
+    footer {
         display: none !important;
     }
 

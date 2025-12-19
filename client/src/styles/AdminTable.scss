@@ -22,7 +22,8 @@
         /* } */
 
         /* To prevent a complete style break, replace the mixin block with standard CSS (example): */
-        @media (max-width: 991.98px) { // lg breakpoint is typically 992px
+        @media (max-width: 991.98px) {
+            // lg breakpoint is typically 992px
             position: fixed;
             top: 0;
             left: 0;
@@ -46,7 +47,7 @@
         background: rgba(0, 0, 0, 0.5);
         /* z-index: v.$z-index-modal-backdrop; */ // REMOVED: Requires 'v' namespace variable
         /* To prevent a complete style break, use a hardcoded value instead: */
-        z-index: 1040; 
+        z-index: 1040;
     }
 
     .boutique-header {

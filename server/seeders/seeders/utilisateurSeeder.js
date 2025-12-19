@@ -1,4 +1,3 @@
-// Seeder pour les utilisateurs
 import Utilisateur from '../../models/utilisateurModel.js';
 import { faker } from '@faker-js/faker';
 
@@ -29,9 +28,8 @@ const utilisateurSeeder = {
                 });
             }
 
-            const utilisateursCrees = await Utilisateur.insertMany(
-                utilisateursData
-            );
+            const utilisateursCrees =
+                await Utilisateur.insertMany(utilisateursData);
 
             console.log(`${utilisateursCrees.length} utilisateurs insérés.`);
             return utilisateursCrees;

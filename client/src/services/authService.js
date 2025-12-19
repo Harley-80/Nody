@@ -26,20 +26,33 @@ export const authService = {
      */
     async login(email, motDePasse) {
         try {
+            console.log('[authService] Tentative de connexion:', email);
+
             const response = await api.post('/auth/connexion', {
                 email,
                 motDePasse,
             });
 
+            console.log('[authService] Réponse backend:', response.data);
+
             if (response.data.succes && response.data.donnees) {
                 const userData = response.data.donnees;
                 userData.isAdmin = userData.role === 'admin';
-                localStorage.setItem('nodyUser', JSON.stringify(userData));
-                localStorage.setItem('nodyToken', userData.token);
+
+                // Utiliser "token" au lieu de "nodyToken"
+                localStorage.setItem('user', JSON.stringify(userData));
+                localStorage.setItem('token', userData.token);
+
+                console.log(
+                    '[authService] Token sauvegardé:',
+                    userData.token.substring(0, 50) + '...'
+                );
+                console.log('[authService] User sauvegardé:', userData);
             }
 
             return response.data;
         } catch (error) {
+            console.error('[authService] Erreur connexion:', error);
             handleApiError(
                 error,
                 'Erreur lors de la connexion. Veuillez vérifier vos identifiants.'
@@ -59,8 +72,10 @@ export const authService = {
             if (response.data.succes && response.data.donnees) {
                 const userData = response.data.donnees;
                 userData.isAdmin = userData.role === 'admin';
-                localStorage.setItem('nodyUser', JSON.stringify(userData));
-                localStorage.setItem('nodyToken', userData.token);
+
+                // CORRECTION : Utiliser "token" au lieu de "nodyToken"
+                localStorage.setItem('user', JSON.stringify(userData));
+                localStorage.setItem('token', userData.token);
             }
 
             return response.data;
@@ -104,7 +119,9 @@ export const authService = {
             if (response.data.succes && response.data.donnees) {
                 const userData = response.data.donnees;
                 userData.isAdmin = userData.role === 'admin';
-                localStorage.setItem('nodyUser', JSON.stringify(userData));
+
+                // CORRECTION : Utiliser "user" au lieu de "nodyUser"
+                localStorage.setItem('user', JSON.stringify(userData));
             }
 
             return response.data;
@@ -120,7 +137,7 @@ export const authService = {
      */
     isAuthenticated() {
         const user = this.getCurrentUser();
-        const token = localStorage.getItem('nodyToken');
+        const token = this.getToken();
         return !!(user && token);
     },
 
@@ -130,7 +147,10 @@ export const authService = {
      */
     getCurrentUser() {
         try {
-            const userStr = localStorage.getItem('nodyUser');
+            // CORRECTION : Essayer "user" d'abord, puis "nodyUser" (rétrocompatibilité)
+            const userStr =
+                localStorage.getItem('user') ||
+                localStorage.getItem('nodyUser');
             if (!userStr) return null;
 
             const user = JSON.parse(userStr);
@@ -146,7 +166,10 @@ export const authService = {
      * @description Récupère le token d'authentification
      */
     getToken() {
-        return localStorage.getItem('nodyToken');
+        // CORRECTION : Essayer "token" d'abord, puis "nodyToken" (rétrocompatibilité)
+        return (
+            localStorage.getItem('token') || localStorage.getItem('nodyToken')
+        );
     },
 
     /**
@@ -154,7 +177,10 @@ export const authService = {
      * @description Nettoie toutes les données d'authentification
      */
     clearAuth() {
+        // CORRECTION : Nettoyer les deux formats
+        localStorage.removeItem('user');
         localStorage.removeItem('nodyUser');
+        localStorage.removeItem('token');
         localStorage.removeItem('nodyToken');
     },
 

@@ -1,5 +1,4 @@
 // VARIABLES ET MIXINS
-
 // Variables de couleurs
 $top-bar-bg: #0f0f23;
 $main-nav-bg: #16213e;
@@ -240,7 +239,7 @@ $mobile-breakpoint: 992px;
         }
     }
 
-    button[type="submit"] {
+    button[type='submit'] {
         position: absolute;
         right: 3.2rem;
         top: 50%;
@@ -308,7 +307,11 @@ $mobile-breakpoint: 992px;
         }
 
         .cart-badge {
-            background: linear-gradient(135deg, $secondary-color 0%, color.scale($secondary-color, $lightness: -15%) 100%);
+            background: linear-gradient(
+                135deg,
+                $secondary-color 0%,
+                color.scale($secondary-color, $lightness: -15%) 100%
+            );
             color: $white;
             border-radius: 50%;
             width: 20px;
@@ -332,12 +335,18 @@ $mobile-breakpoint: 992px;
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
-// DROPDOWN DE CONFIGURATION (LANGUE/DEVISE) 
+// DROPDOWN DE CONFIGURATION (LANGUE/DEVISE)
 
 // Conteneur du dropdown pour les écrans de bureau (non visible sur mobile)
 .desktop-config {
@@ -445,13 +454,17 @@ $mobile-breakpoint: 992px;
     }
 
     &.active {
-        background: rgba($accent-color, 0.12); // Fond bleu pour l'option sélectionnée
+        background: rgba(
+            $accent-color,
+            0.12
+        ); // Fond bleu pour l'option sélectionnée
         color: $accent-color; // Couleur d'accentuation pour le texte
         font-weight: 600;
     }
 
     // Styles pour les drapeaux et symboles de devise
-    .flag, .currency-symbol {
+    .flag,
+    .currency-symbol {
         font-size: 1.1rem;
         min-width: 30px; // Assure un alignement propre
     }
@@ -505,7 +518,11 @@ $mobile-breakpoint: 992px;
 
 // DEUXIÈME LIGNE - NAVIGATION SECONDAIRE
 .secondary-nav {
-    background: linear-gradient(135deg, color.scale($main-nav-bg, $lightness: 5%) 0%, color.scale($main-nav-bg, $lightness: -5%) 100%);
+    background: linear-gradient(
+        135deg,
+        color.scale($main-nav-bg, $lightness: 5%) 0%,
+        color.scale($main-nav-bg, $lightness: -5%) 100%
+    );
     border-top: 1px solid rgba($white, 0.05);
     padding: 0.5rem 0;
 
@@ -565,7 +582,11 @@ $mobile-breakpoint: 992px;
     left: -100%;
     width: 85%;
     height: 100vh;
-    background: linear-gradient(135deg, $main-nav-bg 0%, color.scale($main-nav-bg, $lightness: -10%) 100%);
+    background: linear-gradient(
+        135deg,
+        $main-nav-bg 0%,
+        color.scale($main-nav-bg, $lightness: -10%) 100%
+    );
     flex-direction: column;
     padding: 2rem 1.5rem;
     box-shadow: 2px 0 20px rgba(0, 0, 0, 0.4);
@@ -583,7 +604,7 @@ $mobile-breakpoint: 992px;
     }
 }
 
-// Section mobile contenant le sélecteur de langue/devise 
+// Section mobile contenant le sélecteur de langue/devise
 .mobile-config {
     margin-bottom: 2rem;
     border-bottom: 1px solid rgba($white, 0.1);
@@ -616,7 +637,11 @@ $mobile-breakpoint: 992px;
             cursor: pointer;
 
             .cart-badge {
-                background: linear-gradient(135deg, $secondary-color 0%, color.scale($secondary-color, $lightness: -15%) 100%);
+                background: linear-gradient(
+                    135deg,
+                    $secondary-color 0%,
+                    color.scale($secondary-color, $lightness: -15%) 100%
+                );
                 color: $white;
                 border-radius: 50%;
                 width: 22px;
@@ -643,7 +668,8 @@ $mobile-breakpoint: 992px;
     padding-top: 2rem;
     border-top: 1px solid rgba($white, 0.1);
 
-    .nav-link, .login-btn {
+    .nav-link,
+    .login-btn {
         color: $white;
         @include hover-effect($secondary-color, $white);
         font-size: 1rem;
@@ -674,13 +700,13 @@ $mobile-breakpoint: 992px;
         text-decoration: none;
         color: $white;
         transition: $transition;
-        
+
         &:hover {
             background: rgba($white, 0.2);
             transform: translateY(-2px);
             color: $white;
         }
-        
+
         .user-name {
             max-width: 120px;
             overflow: hidden;
@@ -708,8 +734,12 @@ $mobile-breakpoint: 992px;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .image-search-panel {
@@ -843,7 +873,11 @@ $mobile-breakpoint: 992px;
     .camera-button {
         margin-top: 1.5rem;
         padding: 0.8rem 1.5rem;
-        background: linear-gradient(135deg, $accent-color 0%, color.scale($accent-color, $lightness: -10%) 100%);
+        background: linear-gradient(
+            135deg,
+            $accent-color 0%,
+            color.scale($accent-color, $lightness: -10%) 100%
+        );
         color: $white;
         border: none;
         border-radius: 25px;
@@ -916,7 +950,11 @@ $mobile-breakpoint: 992px;
             }
 
             &.primary {
-                background: linear-gradient(135deg, $accent-color 0%, color.scale($accent-color, $lightness: -10%) 100%);
+                background: linear-gradient(
+                    135deg,
+                    $accent-color 0%,
+                    color.scale($accent-color, $lightness: -10%) 100%
+                );
                 color: $white;
                 border-color: $accent-color;
                 box-shadow: 0 4px 15px rgba($accent-color, 0.3);
@@ -959,8 +997,12 @@ $mobile-breakpoint: 992px;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .image-search-error {

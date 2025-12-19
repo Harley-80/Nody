@@ -1,100 +1,191 @@
+import http from 'http';
+import https from 'https';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
 import initializeApp from './app.js';
 import config from './config/env.js';
 import logger from './utils/logger.js';
-import mongoose from 'mongoose';
+import { fermerRedis } from './config/configRedis.js';
+import { initialiserWebSocket } from './services/websocketService.js';
 
-// AJOUT: Importer les routes admin
-import adminRoutes from './routes/adminRoutes.js';
+// Constantes pour ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+const PORT = config.port || 5000;
+const HOST = config.host || '0.0.0.0';
 let server;
 
-/**
- * Fonction principale pour démarrer le serveur.
- */
-async function startServer() {
-    try {
-        const app = await initializeApp();
-        const PORT = config.port;
+// Vérifier les prérequis système
+function verifierPreRequis() {
+    const uploadsDir = path.join(__dirname, 'uploads');
 
-        // AJOUT: Monter les routes admin
-        app.use('/api/admin', adminRoutes);
+    // Créer le dossier uploads s'il n'existe pas
+    if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+    }
 
-        server = app.listen(PORT, () => {
-            logger.info(
-                `Serveur démarré en mode ${config.nodeEnv} sur le port ${PORT}`
-            );
-            logger.info(`URL du serveur: ${config.serverUrl}`);
-            logger.info(`Connexion MongoDB: ${config.mongodbUri}`);
+    // Créer les sous-dossiers nécessaires
+    const sousDossiers = ['produits', 'avatars', 'categories', 'temp'];
+    sousDossiers.forEach(dossier => {
+        const chemin = path.join(uploadsDir, dossier);
+        if (!fs.existsSync(chemin)) {
+            fs.mkdirSync(chemin, { recursive: true });
+        }
+    });
+}
 
-            // AJOUT: Log des routes disponibles
-            logger.info('Routes disponibles:');
-            logger.info('Auth: /api/auth/*');
-            logger.info('Admin: /api/admin/*');
-            logger.info('Users: /api/utilisateurs/*');
+// Créer un serveur HTTP ou HTTPS
+function creerServeur(app) {
+    if (config.nodeEnv === 'production' && config.sslEnabled) {
+        try {
+            const options = {
+                key: fs.readFileSync(config.sslKeyPath),
+                cert: fs.readFileSync(config.sslCertPath),
+            };
+            return https.createServer(options, app);
+        } catch (error) {
+            logger.error('Erreur certificats SSL:', error);
+            logger.warn('Fallback vers HTTP');
+        }
+    }
+    return http.createServer(app);
+}
 
-            if (config.nodeEnv === 'development') {
-                logger.warn('Mode développement actif - Sécurité réduite');
-            }
-        });
-    } catch (error) {
-        logger.error('Échec du démarrage du serveur.', { error });
-        process.exit(1);
+// Afficher les informations de démarrage
+function afficherInformationsDemarrage() {
+    logger.info('Serveur Nody démarré');
+    logger.info(`Port: ${PORT}`);
+    logger.info(`Environnement: ${config.nodeEnv}`);
+    logger.info(`URL Serveur: ${config.serverUrl}`);
+    logger.info(`URL Client: ${config.clientUrl}`);
+    logger.info(
+        `MongoDB: ${mongoose.connection.readyState === 1 ? 'Connecté' : 'Déconnecté'}`
+    );
+
+    if (config.nodeEnv === 'development') {
+        logger.info('Mode développement');
+        logger.info(
+            `Debug images: http://localhost:${PORT}/debug/uploads/produits/[nom-fichier]`
+        );
     }
 }
 
-// --- Gestion de l'arrêt progressif (Graceful Shutdown) ---
-
-/**
- * Arrête le serveur de manière propre.
- * @param {string} signal - Le signal qui a déclenché l'arrêt.
- * @param {Error} [error] - L'erreur éventuelle qui a causé l'arrêt.
- */
-const gracefulShutdown = (signal, error) => {
+// Arrêt progressif du serveur
+async function arretProgressif(signal, error = null) {
     if (error) {
-        logger.error(`Erreur non gérée détectée : ${error.name}`, error);
+        logger.error(
+            `${signal ? `Signal ${signal} reçu` : 'Erreur'}`,
+            error.message
+        );
+    } else {
+        logger.info(`Signal ${signal} reçu - Arrêt en cours`);
     }
-    // Si le serveur n'a pas encore démarré, on quitte directement.
+
     if (!server) {
-        logger.info('Arrêt du processus avant le démarrage du serveur.');
+        logger.info('Serveur non démarré');
         process.exit(error ? 1 : 0);
     }
-    logger.info(`Signal ${signal} reçu. Arrêt progressif du serveur...`);
 
-    server.close(() => {
-        logger.info('Serveur HTTP fermé.');
-        // Ferme la connexion à la base de données
-        mongoose.connection.close(false, () => {
-            logger.info('Connexion MongoDB fermée.');
-            // Quitte le processus avec un code de succès (0) si pas d'erreur, sinon échec (1)
-            process.exit(error ? 1 : 0);
-        });
+    // Fermer le serveur
+    server.close(async () => {
+        logger.info('Serveur HTTP fermé');
+
+        try {
+            await fermerRedis();
+            logger.info('Redis fermé');
+        } catch (err) {
+            logger.error('Erreur fermeture Redis:', err);
+        }
+
+        try {
+            await mongoose.connection.close(false);
+            logger.info('MongoDB fermé');
+        } catch (err) {
+            logger.error('Erreur fermeture MongoDB:', err);
+        }
+
+        logger.info('Arrêt complet du serveur');
+        process.exit(error ? 1 : 0);
     });
-};
 
-// Écoute les signaux d'arrêt standards (SIGTERM et SIGINT)
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+    // Timeout d'arrêt forcé
+    setTimeout(() => {
+        logger.error('Arrêt forcé après timeout');
+        process.exit(1);
+    }, 10000);
+}
 
-// --- Gestion des erreurs non capturées ---
+// Fonction principale pour démarrer le serveur
+async function demarrerServeur() {
+    try {
+        // Vérifier les prérequis
+        verifierPreRequis();
 
-// Gère les rejets de promesses non gérés
+        // Initialiser l'application Express
+        logger.info("Initialisation de l'application Express...");
+        const app = await initializeApp();
+
+        // Créer le serveur
+        server = creerServeur(app);
+
+        // Initialiser WebSocket
+        initialiserWebSocket(server);
+        logger.info('WebSocket initialisé');
+
+        // Gestion des erreurs du serveur
+        server.on('error', error => {
+            if (error.code === 'EADDRINUSE') {
+                logger.error(`Le port ${PORT} est déjà utilisé`);
+                process.exit(1);
+            } else {
+                logger.error('Erreur du serveur:', error);
+                process.exit(1);
+            }
+        });
+
+        // Démarrer le serveur
+        server.listen(PORT, HOST, () => {
+            afficherInformationsDemarrage();
+        });
+
+        return server;
+    } catch (error) {
+        logger.error('Erreur démarrage serveur:', error);
+        await arretProgressif('STARTUP_ERROR', error);
+    }
+}
+
+// Gestion des signaux
+process.on('SIGINT', () => arretProgressif('SIGINT'));
+process.on('SIGTERM', () => arretProgressif('SIGTERM'));
+
 process.on('unhandledRejection', (reason, promise) => {
-    // Tente de convertir la raison en erreur si ce n'est pas déjà le cas
     const error =
         reason instanceof Error
             ? reason
-            : new Error(`Rejet de promesse non géré: ${reason}`);
-    logger.error('Rejet de promesse non géré :', { error, promise });
-    gracefulShutdown('unhandledRejection', error);
+            : new Error(`Rejet de promesse: ${reason}`);
+    logger.error('Rejet de promesse non géré:', error.message);
+
+    if (config.nodeEnv === 'production') {
+        arretProgressif('UNHANDLED_REJECTION', error);
+    }
 });
 
-// Gère les exceptions non capturées
-process.on('uncaughtException', err => {
-    logger.error('Exception non capturée :', err);
-    gracefulShutdown('uncaughtException', err);
+process.on('uncaughtException', error => {
+    logger.error('Exception non capturée:', error.message);
+    arretProgressif('UNCAUGHT_EXCEPTION', error);
 });
 
-// Point d'entrée de l'application (IIFE asynchrone pour l'initialisation)
+// Démarrer le serveur
 (async () => {
-    await startServer();
+    try {
+        logger.info('Démarrage du serveur Nody...');
+        await demarrerServeur();
+    } catch (error) {
+        logger.error('Échec du démarrage:', error);
+        process.exit(1);
+    }
 })();
