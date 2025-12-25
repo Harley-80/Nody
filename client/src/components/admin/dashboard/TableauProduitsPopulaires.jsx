@@ -25,76 +25,71 @@ const TableauProduitsPopulaires = ({ produits }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {produits.map((produit, index) => (
-                            <tr
-                                key={
-                                    produit._id ||
-                                    produit.id ||
-                                    `produit-${index}`
-                                }
-                            >
-                                {/* Utiliser _id (MongoDB) avec fallbacks */}
-                                <td>
-                                    <div className="produit-info">
-                                        <div className="produit-rang">
-                                            {index + 1}
-                                        </div>
-                                        <div className="produit-image">
-                                            {produit.image ||
-                                            produit.images?.[0] ? (
+                        {produits.map((produit, index) => {
+                            // Extraction propre de l'URL de l'image
+                            const imagePath =
+                                produit.image ||
+                                produit.images?.[0]?.url ||
+                                '/uploads/produits/default-product.jpg';
+
+                            return (
+                                <tr key={produit._id || `produit-${index}`}>
+                                    <td>
+                                        <div className="produit-info">
+                                            <div className="produit-rang">
+                                                {index + 1}
+                                            </div>
+                                            <div className="produit-image">
                                                 <img
-                                                    src={
-                                                        produit.image ||
-                                                        produit.images[0]
-                                                    }
+                                                    src={imagePath}
                                                     alt={produit.nom}
                                                     onError={e => {
+                                                        // En cas d'erreur, on affiche l'icône FontAwesome cachée derrière
                                                         e.target.style.display =
                                                             'none';
-                                                        e.target.nextSibling.style.display =
-                                                            'flex';
+                                                        if (
+                                                            e.target.nextSibling
+                                                        ) {
+                                                            e.target.nextSibling.style.display =
+                                                                'flex';
+                                                        }
                                                     }}
                                                 />
-                                            ) : null}
-                                            <i
-                                                className="fas fa-image"
-                                                style={{
-                                                    display:
-                                                        produit.image ||
-                                                        produit.images?.[0]
-                                                            ? 'none'
-                                                            : 'flex',
-                                                }}
-                                            ></i>
+                                                <i
+                                                    className="fas fa-image"
+                                                    style={{ display: 'none' }}
+                                                ></i>
+                                            </div>
+                                            <div className="produit-nom">
+                                                {produit.nom ||
+                                                    'Produit sans nom'}
+                                            </div>
                                         </div>
-                                        <div className="produit-nom">
-                                            {produit.nom ||
-                                                produit.titre ||
-                                                'Produit sans nom'}
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span className="badge bg-light text-dark">
-                                        {produit.categorie ||
-                                            produit.categorie?.nom ||
-                                            'Non catégorisé'}
-                                    </span>
-                                </td>
-                                <td className="text-end fw-bold text-primary">
-                                    {formaterNombre(
-                                        produit.ventes ||
-                                            produit.nombreVentes ||
-                                            0
-                                    )}
-                                </td>
-                                <td className="text-end fw-bold">
-                                    {formaterMontant(
-                                        produit.prix || produit.prixVente || 0
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
+                                    </td>
+                                    <td>
+                                        <span className="badge bg-light text-dark">
+                                            {produit.categorie?.nom ||
+                                                produit.categorie ||
+                                                'Non catégorisé'}
+                                        </span>
+                                    </td>
+                                    <td className="text-end fw-bold text-primary">
+                                        {formaterNombre(
+                                            produit.ventes ||
+                                                produit.nombreVentes ||
+                                                0
+                                        )}
+                                    </td>
+                                    <td className="text-end fw-bold">
+                                        {formaterMontant(
+                                            produit.prix ||
+                                                produit.prixVente ||
+                                                0
+                                        )}
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>

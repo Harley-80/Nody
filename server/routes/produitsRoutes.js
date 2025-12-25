@@ -71,13 +71,10 @@ routeur.post(
     }
 );
 
-// ROUTES PUBLIQUES - ORDRE CRITIQUE
+// LES ROUTES PUBLIQUES 
 routeur.route('/').get(validerPagination, obtenirProduits);
-
 routeur.route('/stats').get(obtenirStatistiquesProduits);
-
 routeur.route('/populaires').get(obtenirProduitsPopulaires);
-
 routeur.route('/nouveaux').get(obtenirNouveauxProduits);
 
 routeur

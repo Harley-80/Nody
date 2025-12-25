@@ -20,6 +20,7 @@ import {
     Stepper,
     Step,
     StepLabel,
+    CircularProgress,
 } from '@mui/material';
 import {
     CloudUpload as UploadIcon,
@@ -27,6 +28,7 @@ import {
     Add as AddIcon,
     ArrowBack as BackIcon,
     Save as SaveIcon,
+    Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../contexts/ToastContext';
@@ -46,7 +48,12 @@ const AjouterProduit = () => {
     const { addToast } = useToast();
     const [activeStep, setActiveStep] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [categories, setCategories] = useState([]);
+    const [chargementCategories, setChargementCategories] = useState(false);
+    const [chargementSousCategories, setChargementSousCategories] =
+        useState(false);
+    const [toutesCategories, setToutesCategories] = useState([]);
+    const [categoriesRacines, setCategoriesRacines] = useState([]);
+    const [sousCategories, setSousCategories] = useState([]);
     const [formData, setFormData] = useState({
         nom: '',
         description: '',
@@ -83,25 +90,153 @@ const AjouterProduit = () => {
     }, []);
 
     const chargerCategories = async () => {
+        setChargementCategories(true);
         try {
             const response = await categoriesService.getCategories();
-            setCategories(response.data || []);
+
+            let categoriesData = [];
+
+            if (response.data && response.data.donnees) {
+                categoriesData = response.data.donnees;
+            } else if (response.data && response.data.data) {
+                categoriesData = response.data.data;
+            } else if (response.data && Array.isArray(response.data)) {
+                categoriesData = response.data;
+            } else if (response.donnees) {
+                categoriesData = response.donnees;
+            } else if (response.data) {
+                categoriesData = response.data;
+            } else if (Array.isArray(response)) {
+                categoriesData = response;
+            }
+
+            console.log(
+                'Catégories chargées:',
+                categoriesData.map(c => ({
+                    nom: c.nom,
+                    id: c._id,
+                    sousCategoriesCount: c.sousCategories?.length || 0,
+                }))
+            );
+
+            // Les catégories racines sont celles sans parent
+            const racines = categoriesData.filter(
+                cat => !cat.parent || cat.parent === null
+            );
+            console.log(
+                'Catégories racines trouvées:',
+                racines.map(r => r.nom)
+            );
+
+            setToutesCategories(categoriesData);
+            setCategoriesRacines(racines);
+
+            if (racines.length === 0) {
+                addToast({
+                    type: 'warning',
+                    title: 'Aucune catégorie',
+                    message:
+                        "Aucune catégorie disponible. Contactez l'administrateur.",
+                });
+            }
         } catch (error) {
             console.error('Erreur chargement catégories:', error);
             addToast({
                 type: 'error',
-                title: 'Erreur',
-                message: 'Erreur lors du chargement des catégories',
+                title: 'Erreur API',
+                message: 'Impossible de charger les catégories',
             });
+        } finally {
+            setChargementCategories(false);
+        }
+    };
+
+    const chargerSousCategories = async categorieId => {
+        if (!categorieId) {
+            setSousCategories([]);
+            return;
+        }
+
+        setChargementSousCategories(true);
+
+        try {
+            console.log(
+                'Chargement sous-catégories pour catégorie ID:',
+                categorieId
+            );
+
+            // 1. D'abord, chercher dans les données locales (sousCategories incluses)
+            const categorieLocale = toutesCategories.find(
+                cat => cat._id === categorieId || cat.id === categorieId
+            );
+
+            if (
+                categorieLocale &&
+                categorieLocale.sousCategories &&
+                categorieLocale.sousCategories.length > 0
+            ) {
+                console.log(
+                    'Sous-catégories trouvées localement pour:',
+                    categorieLocale.nom
+                );
+                console.log(
+                    'Sous-catégories:',
+                    categorieLocale.sousCategories.map(sc => sc.nom)
+                );
+                setSousCategories(categorieLocale.sousCategories);
+            } else {
+                // 2. Fallback : utiliser l'API
+                console.log('Aucune sous-catégorie locale, utilisation API...');
+                try {
+                    const response =
+                        await categoriesService.getSousCategories(categorieId);
+
+                    let sousCategoriesData = [];
+                    if (response.donnees) {
+                        sousCategoriesData = response.donnees;
+                    } else if (response.data) {
+                        sousCategoriesData = response.data;
+                    } else if (Array.isArray(response)) {
+                        sousCategoriesData = response;
+                    }
+
+                    console.log('Sous-catégories API:', sousCategoriesData);
+                    setSousCategories(sousCategoriesData);
+                } catch (apiError) {
+                    console.error('Erreur API sous-catégories:', apiError);
+                    setSousCategories([]);
+                }
+            }
+        } catch (error) {
+            console.error('Erreur chargement sous-catégories:', error);
+            setSousCategories([]);
+        } finally {
+            setChargementSousCategories(false);
         }
     };
 
     const handleChange = e => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value,
-        }));
+
+        if (name === 'categorie') {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value,
+                sousCategorie: '', // Réinitialiser la sous-catégorie
+            }));
+
+            if (value) {
+                chargerSousCategories(value);
+            } else {
+                setSousCategories([]);
+            }
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value,
+            }));
+        }
+
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: null }));
         }
@@ -256,14 +391,12 @@ const AjouterProduit = () => {
         try {
             const formDataToSend = new FormData();
 
-            // Ajoute tous les champs
             formDataToSend.append('nom', formData.nom);
             formDataToSend.append('description', formData.description);
             formDataToSend.append('prix', formData.prix);
             formDataToSend.append('categorie', formData.categorie);
             formDataToSend.append('stock', formData.stock);
 
-            // Champs optionnels
             if (formData.marque)
                 formDataToSend.append('marque', formData.marque);
             if (formData.prixPromo)
@@ -295,14 +428,11 @@ const AjouterProduit = () => {
                     JSON.stringify(formData.dimensions)
                 );
 
-            // Images
             images.forEach((image, index) => {
                 formDataToSend.append('images', image);
             });
 
-            // Utilise le service vendeur
-            const response =
-                await vendeurService.ajouterProduit(formDataToSend);
+            const response = await vendeurService.creerProduit(formDataToSend);
 
             addToast({
                 type: 'success',
@@ -358,7 +488,11 @@ const AjouterProduit = () => {
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <FormControl fullWidth error={!!errors.categorie}>
+                            <FormControl
+                                fullWidth
+                                error={!!errors.categorie}
+                                disabled={chargementCategories}
+                            >
                                 <InputLabel>Catégorie *</InputLabel>
                                 <Select
                                     name="categorie"
@@ -366,27 +500,138 @@ const AjouterProduit = () => {
                                     onChange={handleChange}
                                     label="Catégorie *"
                                 >
-                                    {categories.map(cat => (
-                                        <MenuItem key={cat._id} value={cat._id}>
-                                            {cat.nom}
+                                    {chargementCategories ? (
+                                        <MenuItem value="">
+                                            <CircularProgress
+                                                size={20}
+                                                style={{ marginRight: 8 }}
+                                            />
+                                            Chargement des catégories...
                                         </MenuItem>
-                                    ))}
+                                    ) : categoriesRacines.length === 0 ? (
+                                        <MenuItem value="">
+                                            Aucune catégorie disponible
+                                        </MenuItem>
+                                    ) : (
+                                        <MenuItem value="">
+                                            Sélectionner une catégorie
+                                        </MenuItem>
+                                    )}
+
+                                    {!chargementCategories &&
+                                        categoriesRacines.map(cat => {
+                                            const categorieId =
+                                                cat._id || cat.id || cat.value;
+                                            const categorieNom =
+                                                cat.nom ||
+                                                cat.name ||
+                                                cat.label ||
+                                                'Catégorie sans nom';
+
+                                            return (
+                                                <MenuItem
+                                                    key={categorieId}
+                                                    value={categorieId}
+                                                >
+                                                    {categorieNom}
+                                                </MenuItem>
+                                            );
+                                        })}
                                 </Select>
                                 {errors.categorie && (
                                     <FormHelperText>
                                         {errors.categorie}
                                     </FormHelperText>
                                 )}
+                                {chargementCategories && (
+                                    <FormHelperText>
+                                        <CircularProgress
+                                            size={12}
+                                            style={{ marginRight: 8 }}
+                                        />
+                                        Chargement en cours...
+                                    </FormHelperText>
+                                )}
                             </FormControl>
+                            <IconButton
+                                onClick={chargerCategories}
+                                disabled={chargementCategories}
+                                size="small"
+                                title="Recharger les catégories"
+                                sx={{ ml: 1, mt: 1 }}
+                            >
+                                {chargementCategories ? (
+                                    <CircularProgress size={20} />
+                                ) : (
+                                    <RefreshIcon fontSize="small" />
+                                )}
+                            </IconButton>
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField
+                            <FormControl
                                 fullWidth
-                                label="Sous-catégorie"
-                                name="sousCategorie"
-                                value={formData.sousCategorie}
-                                onChange={handleChange}
-                            />
+                                disabled={
+                                    !formData.categorie ||
+                                    chargementSousCategories
+                                }
+                            >
+                                <InputLabel>Sous-catégorie</InputLabel>
+                                <Select
+                                    name="sousCategorie"
+                                    value={formData.sousCategorie}
+                                    onChange={handleChange}
+                                    label="Sous-catégorie"
+                                >
+                                    {!formData.categorie ? (
+                                        <MenuItem value="">
+                                            Sélectionnez d'abord une catégorie
+                                        </MenuItem>
+                                    ) : chargementSousCategories ? (
+                                        <MenuItem value="">
+                                            <CircularProgress
+                                                size={20}
+                                                style={{ marginRight: 8 }}
+                                            />
+                                            Chargement des sous-catégories...
+                                        </MenuItem>
+                                    ) : sousCategories.length === 0 ? (
+                                        <MenuItem value="">
+                                            Aucune sous-catégorie disponible
+                                        </MenuItem>
+                                    ) : (
+                                        <MenuItem value="">
+                                            Sélectionner une sous-catégorie
+                                        </MenuItem>
+                                    )}
+
+                                    {!chargementSousCategories &&
+                                        sousCategories.map(sousCat => {
+                                            const sousCategorieId =
+                                                sousCat._id ||
+                                                sousCat.id ||
+                                                sousCat.value;
+                                            const sousCategorieNom =
+                                                sousCat.nom ||
+                                                sousCat.name ||
+                                                sousCat.label ||
+                                                'Sous-catégorie sans nom';
+
+                                            return (
+                                                <MenuItem
+                                                    key={sousCategorieId}
+                                                    value={sousCategorieId}
+                                                >
+                                                    {sousCategorieNom}
+                                                </MenuItem>
+                                            );
+                                        })}
+                                </Select>
+                                <FormHelperText>
+                                    {formData.categorie &&
+                                        sousCategories.length === 0 &&
+                                        "Cette catégorie n'a pas de sous-catégories"}
+                                </FormHelperText>
+                            </FormControl>
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
@@ -861,6 +1106,59 @@ const AjouterProduit = () => {
                                                 {images.length} images
                                             </Typography>
                                         </div>
+                                        <div className="summary-item">
+                                            <Typography
+                                                variant="body2"
+                                                color="text.secondary"
+                                                className="summary-label"
+                                            >
+                                                Catégorie
+                                            </Typography>
+                                            <Typography
+                                                variant="body1"
+                                                className="summary-value"
+                                            >
+                                                {categoriesRacines.find(cat => {
+                                                    const catId =
+                                                        cat._id ||
+                                                        cat.id ||
+                                                        cat.value;
+                                                    return (
+                                                        catId ===
+                                                        formData.categorie
+                                                    );
+                                                })?.nom || formData.categorie}
+                                            </Typography>
+                                        </div>
+                                        {formData.sousCategorie && (
+                                            <div className="summary-item">
+                                                <Typography
+                                                    variant="body2"
+                                                    color="text.secondary"
+                                                    className="summary-label"
+                                                >
+                                                    Sous-catégorie
+                                                </Typography>
+                                                <Typography
+                                                    variant="body1"
+                                                    className="summary-value"
+                                                >
+                                                    {sousCategories.find(
+                                                        cat => {
+                                                            const catId =
+                                                                cat._id ||
+                                                                cat.id ||
+                                                                cat.value;
+                                                            return (
+                                                                catId ===
+                                                                formData.sousCategorie
+                                                            );
+                                                        }
+                                                    )?.nom ||
+                                                        formData.sousCategorie}
+                                                </Typography>
+                                            </div>
+                                        )}
                                         <div className="summary-item highlighted">
                                             <Typography
                                                 variant="body2"
@@ -901,7 +1199,6 @@ const AjouterProduit = () => {
                 </div>
             )}
 
-            {/* Header */}
             <Box className="page-header">
                 <Box className="header-content">
                     <IconButton
@@ -916,7 +1213,6 @@ const AjouterProduit = () => {
                 </Box>
             </Box>
 
-            {/* Stepper */}
             <Card className="stepper-container">
                 <CardContent>
                     <Stepper activeStep={activeStep}>
@@ -929,14 +1225,12 @@ const AjouterProduit = () => {
                 </CardContent>
             </Card>
 
-            {/* Formulaire */}
             <Card className="form-container">
                 <CardContent>
                     {renderStepContent(activeStep)}
 
                     {loading && <LinearProgress className="loading-progress" />}
 
-                    {/* Navigation */}
                     <Box className="action-buttons">
                         <Button
                             disabled={activeStep === 0 || loading}

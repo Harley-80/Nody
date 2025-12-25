@@ -1,4 +1,3 @@
-// Données des produits pour le peuplement de la base de données
 const produitsData = [
     {
         nom: 'T-shirt Homme Basique',

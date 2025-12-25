@@ -188,4 +188,4 @@ process.on('uncaughtException', error => {
         logger.error('Échec du démarrage:', error);
         process.exit(1);
     }
-})();
+})(); // super  

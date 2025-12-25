@@ -29,12 +29,19 @@ export const CategoriesProvider = ({ children }) => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await categoriesService.getCategories();
-            const data = response.donnees || response.data || response;
+            const response =
+                await categoriesService.getCategoriesAvecHierarchie();
+
+            // Analyse de la structure envoyée par votre contrôleur :
+            // response.data contient { succes: true, donnees: [...] }
+            // On extrait donc explicitement 'donnees'
+            const data = response?.donnees || [];
+
             setCategories(data);
         } catch (err) {
             console.error('Erreur lors du chargement des catégories:', err);
             setError(err.message || 'Erreur de chargement');
+            setCategories([]);
         } finally {
             setIsLoading(false);
         }

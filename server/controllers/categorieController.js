@@ -36,36 +36,43 @@ const obtenirCategories = asyncHandler(async (req, res) => {
     });
 });
 
-// Obtenir une catégorie
+// Obtenir une catégorie par ID
 const obtenirCategorie = asyncHandler(async (req, res) => {
-    const { id } = req.params;
     let categorie;
 
-    if (id.match(/^[0-9a-fA-F]{24}$/)) {
-        categorie = await Categorie.findById(id).populate('parent', 'nom slug');
-    } else {
-        categorie = await Categorie.findOne({ slug: id }).populate(
+    if (req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+        categorie = await Categorie.findById(req.params.id).populate(
             'parent',
             'nom slug'
         );
+    } else {
+        categorie = await Categorie.findOne({
+            $or: [
+                { slug: req.params.id },
+                { nom: { $regex: new RegExp(req.params.id, 'i') } },
+            ],
+        }).populate('parent', 'nom slug');
     }
 
-    if (!categorie || !categorie.estActif) {
+    if (!categorie) {
         res.status(404);
         throw new Error('Catégorie non trouvée');
     }
 
+    // Récupérer les sous-catégories
     const sousCategories = await Categorie.find({
         parent: categorie._id,
         estActif: true,
     }).sort({ ordre: 1, nom: 1 });
 
+    const categorieAvecSous = {
+        ...categorie.toObject(),
+        sousCategories: sousCategories,
+    };
+
     res.json({
         succes: true,
-        donnees: {
-            ...categorie.toObject(),
-            sousCategories,
-        },
+        donnees: categorieAvecSous,
     });
 });
 
@@ -364,28 +371,24 @@ const obtenirStatistiques = asyncHandler(async (req, res) => {
 
 // Obtenir les sous-catégories d'une catégorie spécifique
 const obtenirSousCategories = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    let categorie;
+    const { parentId } = req.params;
 
-    if (id.match(/^[0-9a-fA-F]{24}$/)) {
-        categorie = await Categorie.findById(id);
-    } else {
-        categorie = await Categorie.findOne({ slug: id });
-    }
-
-    if (!categorie || !categorie.estActif) {
-        res.status(404);
-        throw new Error('Catégorie non trouvée');
+    if (!parentId) {
+        res.status(400);
+        throw new Error('ID parent requis');
     }
 
     const sousCategories = await Categorie.find({
-        parent: categorie._id,
+        parent: parentId,
         estActif: true,
-    }).sort({ ordre: 1, nom: 1 });
+    })
+        .sort({ ordre: 1, nom: 1 })
+        .select('_id nom description slug niveau estActif');
 
     res.json({
         succes: true,
         donnees: sousCategories,
+        message: 'Sous-catégories récupérées avec succès',
     });
 });
 
@@ -438,4 +441,4 @@ export {
     obtenirStatistiques,
     obtenirSousCategories,
     obtenirCheminCategorie,
-};
+};//

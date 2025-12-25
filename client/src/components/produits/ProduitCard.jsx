@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import './ProduitCard.scss'; 
 
 export default function ProduitCard({ produit }) {
     const [addedToCart, setAddedToCart] = useState(false);
@@ -10,73 +11,136 @@ export default function ProduitCard({ produit }) {
         e.stopPropagation();
         setAddedToCart(true);
         setTimeout(() => setAddedToCart(false), 2000);
+        // TODO: Ajouter au panier via contexte
     };
 
     const handleToggleFavorite = e => {
         e.preventDefault();
         e.stopPropagation();
         setIsFavorite(!isFavorite);
+        // TODO: Gérer les favoris
     };
 
-    let badgeClass = 'bg-primary';
-    if (produit.status === 'Nouveau') badgeClass = 'bg-info';
-    else if (produit.status === 'Promo') badgeClass = 'bg-danger';
-    else if (produit.status === 'Exclusif') badgeClass = 'bg-warning text-dark';
+    // Formater le prix
+    const formatPrix = prix => {
+        return new Intl.NumberFormat('fr-FR').format(prix) + ' XOF';
+    };
+
+    // Obtenir l'URL de l'image
+    const getImageUrl = () => {
+        if (!produit.images || produit.images.length === 0) {
+            return '/images/placeholder.jpg';
+        }
+
+        const image = produit.images[0];
+        if (typeof image === 'string') {
+            return image;
+        }
+        if (image.url) {
+            return image.url; 
+        }
+        return '/images/placeholder.jpg';
+    };
+
+    // Vérifier si produit est nouveau (moins de 7 jours)
+    const isNewProduct = () => {
+        if (!produit.createdAt) return false;
+        const createdDate = new Date(produit.createdAt);
+        const now = new Date();
+        const diffDays = Math.floor(
+            (now - createdDate) / (1000 * 60 * 60 * 24)
+        );
+        return diffDays < 7;
+    };
 
     return (
         <Link
-            to={`/produit/${produit.id}`}
-            className="text-decoration-none text-dark"
+            to={`/produit/${produit._id || produit.id}`}
+            className="produit-card-link"
         >
-            <div className="card h-100 shadow-sm card-hover overflow-hidden position-relative">
-                {produit.status && (
-                    <span
-                        className={`badge ${badgeClass} position-absolute top-0 start-0 m-2`}
-                    >
-                        {produit.status}
-                    </span>
-                )}
+            <div className="produit-card">
+                {/* Badges */}
+                <div className="card-badges">
+                    {isNewProduct() && (
+                        <span className="badge new">Nouveau</span>
+                    )}
+                    {produit.prixComparaison &&
+                        produit.prixComparaison > produit.prix && (
+                            <span className="badge discount">
+                                -
+                                {Math.round(
+                                    ((produit.prixComparaison - produit.prix) /
+                                        produit.prixComparaison) *
+                                        100
+                                )}
+                                %
+                            </span>
+                        )}
+                    {produit.quantite === 0 && (
+                        <span className="badge out-of-stock">Rupture</span>
+                    )}
+                </div>
 
-                {/* Image avec lazy loading */}
-                <img
-                    src={produit.image}
-                    alt={produit.nom}
-                    className="card-img-top"
-                    loading="lazy"
-                    style={{ objectFit: 'cover', height: '250px' }}
-                />
+                {/* Image */}
+                <div className="card-image">
+                    <img
+                        src={getImageUrl()}
+                        alt={produit.nom}
+                        loading="lazy"
+                        onError={e => {
+                            e.target.src = '/images/placeholder.jpg';
+                        }}
+                    />
+                </div>
 
-                <div className="card-body d-flex flex-column">
-                    <h5 className="card-title">{produit.nom}</h5>
-                    <p className="card-text small text-muted mb-2">
-                        {produit.description.length > 70
-                            ? `${produit.description.substring(0, 70)}...`
-                            : produit.description}
+                {/* Infos */}
+                <div className="card-content">
+                    <h3 className="product-title">{produit.nom}</h3>
+                    <p className="product-description">
+                        {produit.description?.substring(0, 70)}...
                     </p>
 
-                    <div className="d-flex justify-content-between align-items-center mt-auto">
-                        <p className="text-primary fw-bold mb-0">
-                            {produit.prix.toLocaleString()} XOF
-                        </p>
-                        <button
-                            className={`btn btn-link ${isFavorite ? 'text-danger' : 'text-secondary'} p-0`}
-                            onClick={handleToggleFavorite}
-                        >
-                            <i
-                                className={`fas fa-heart ${isFavorite ? 'fa-beat' : ''}`}
-                            ></i>
-                        </button>
+                    <div className="product-meta">
+                        <div className="price-section">
+                            <span className="current-price">
+                                {formatPrix(produit.prix)}
+                            </span>
+                            {produit.prixComparaison &&
+                                produit.prixComparaison > produit.prix && (
+                                    <span className="old-price">
+                                        {formatPrix(produit.prixComparaison)}
+                                    </span>
+                                )}
+                        </div>
+
+                        <div className="stock-info">
+                            {produit.quantite > 0 ? (
+                                <span className="in-stock">
+                                    {produit.quantite} en stock
+                                </span>
+                            ) : (
+                                <span className="out-of-stock">
+                                    Rupture de stock
+                                </span>
+                            )}
+                        </div>
                     </div>
 
-                    <button
-                        className={`btn ${addedToCart ? 'btn-success' : 'btn-dark'} mt-3`}
-                        onClick={handleAddToCart}
-                    >
-                        <i
-                            className={`fas ${addedToCart ? 'fa-check' : 'fa-cart-plus'} me-2`}
-                        ></i>
-                        {addedToCart ? 'Ajouté !' : 'Ajouter au panier'}
-                    </button>
+                    {/* Actions */}
+                    <div className="card-actions">
+                        <button
+                            className={`btn-add-to-cart ${addedToCart ? 'added' : ''}`}
+                            onClick={handleAddToCart}
+                        >
+                            {addedToCart ? '✓ Ajouté' : 'Ajouter au panier'}
+                        </button>
+                        <button
+                            className={`btn-favorite ${isFavorite ? 'active' : ''}`}
+                            onClick={handleToggleFavorite}
+                        >
+                            {isFavorite ? '❤️' : '🤍'}
+                        </button>
+                    </div>
                 </div>
             </div>
         </Link>

@@ -87,6 +87,39 @@ const MesProduits = () => {
     });
     const [aiSuggestions, setAiSuggestions] = useState([]);
 
+    // Fonction utilitaire pour obtenir l'URL de l'image
+    const getProductImageUrl = produit => {
+        if (!produit?.images || produit.images.length === 0) {
+            return '/images/default-product.jpg';
+        }
+
+        const firstImage = produit.images[0];
+
+        // Si l'image a une propriété url
+        if (firstImage && firstImage.url) {
+            let imageUrl = firstImage.url;
+            // Ajouter l'URL du serveur si c'est un chemin relatif
+            if (
+                imageUrl &&
+                !imageUrl.startsWith('http') &&
+                imageUrl.startsWith('/')
+            ) {
+                imageUrl = `http://localhost:5000${imageUrl}`;
+            }
+            return imageUrl;
+        }
+
+        // SI PAS DE URL, générer une URL basée sur l'ID (si c'est ainsi que vos fichiers sont nommés)
+        // Cette logique dépend de comment vous stockez les fichiers
+        if (firstImage && firstImage._id) {
+            // Exemple : si vos fichiers sont nommés avec l'ID
+            return `http://localhost:5000/uploads/produits/${firstImage._id}.jpg`;
+        }
+
+        // Fallback
+        return '/images/default-product.jpg';
+    };
+
     // Chargement initial
     useEffect(() => {
         fetchProduits();
@@ -151,7 +184,7 @@ const MesProduits = () => {
 
     // Recherche avec debounce
     const handleSearch = useCallback(
-        (value) => {
+        value => {
             const timeoutId = setTimeout(() => {
                 handleFilterChange('recherche', value);
             }, 500);
@@ -161,7 +194,7 @@ const MesProduits = () => {
     );
 
     // Sélection multiple
-    const toggleSelectProduit = (id) => {
+    const toggleSelectProduit = id => {
         const newSelected = new Set(selectedProduits);
         if (newSelected.has(id)) {
             newSelected.delete(id);
@@ -175,12 +208,12 @@ const MesProduits = () => {
         if (selectedProduits.size === produits.length) {
             setSelectedProduits(new Set());
         } else {
-            setSelectedProduits(new Set(produits.map((p) => p._id)));
+            setSelectedProduits(new Set(produits.map(p => p._id)));
         }
     };
 
     // Actions batch
-    const handleBatchAction = async (action) => {
+    const handleBatchAction = async action => {
         if (selectedProduits.size === 0) {
             addToast({
                 type: 'warning',
@@ -216,7 +249,7 @@ const MesProduits = () => {
     };
 
     // Supprimer un produit
-    const handleDeleteProduit = async (produit) => {
+    const handleDeleteProduit = async produit => {
         const confirmed = await confirmAction({
             title: 'Supprimer ce produit ?',
             message: `Le produit "${produit.nom}" sera définitivement supprimé`,
@@ -264,7 +297,7 @@ const MesProduits = () => {
     };
 
     // Dupliquer un produit
-    const handleDuplicateProduit = async (produit) => {
+    const handleDuplicateProduit = async produit => {
         try {
             const produitData = {
                 ...produit,
@@ -292,7 +325,7 @@ const MesProduits = () => {
     };
 
     // Exporter les produits
-    const handleExport = (format) => {
+    const handleExport = format => {
         addToast({
             type: 'info',
             title: 'Export en cours',
@@ -309,7 +342,7 @@ const MesProduits = () => {
     };
 
     // Formatage
-    const formatCurrency = (amount) => {
+    const formatCurrency = amount => {
         return new Intl.NumberFormat('fr-FR', {
             style: 'currency',
             currency: 'CFA',
@@ -317,7 +350,7 @@ const MesProduits = () => {
         }).format(amount);
     };
 
-    const formatDate = (date) => {
+    const formatDate = date => {
         return new Date(date).toLocaleDateString('fr-FR', {
             day: 'numeric',
             month: 'short',
@@ -326,7 +359,7 @@ const MesProduits = () => {
     };
 
     // Obtenir la classe de statut
-    const getStatutClass = (statut) => {
+    const getStatutClass = statut => {
         switch (statut) {
             case 'actif':
                 return 'success';
@@ -342,7 +375,7 @@ const MesProduits = () => {
     };
 
     // Obtenir l'icône de statut
-    const getStatutIcon = (statut) => {
+    const getStatutIcon = statut => {
         switch (statut) {
             case 'actif':
                 return faCheckCircle;
@@ -385,7 +418,10 @@ const MesProduits = () => {
                 <div className="header-main">
                     <div className="title-section">
                         <h1 className="page-title">
-                            <FontAwesomeIcon icon={faBox} className="title-icon" />
+                            <FontAwesomeIcon
+                                icon={faBox}
+                                className="title-icon"
+                            />
                             Mes Produits
                             <span className="title-badge">
                                 {stats.total} produits
@@ -436,18 +472,27 @@ const MesProduits = () => {
                 {/* BARRE DE RECHERCHE ET FILTRES */}
                 <div className="search-filter-bar">
                     <div className="search-container">
-                        <FontAwesomeIcon icon={faSearch} className="search-icon" />
+                        <FontAwesomeIcon
+                            icon={faSearch}
+                            className="search-icon"
+                        />
                         <input
                             type="text"
                             placeholder="Rechercher un produit, une référence..."
                             className="search-input"
-                            onChange={(e) => handleSearch(e.target.value)}
+                            onChange={e => handleSearch(e.target.value)}
                         />
                         <div className="search-tools">
-                            <button className="search-tool" title="Recherche avancée">
+                            <button
+                                className="search-tool"
+                                title="Recherche avancée"
+                            >
                                 <FontAwesomeIcon icon={faRobot} />
                             </button>
-                            <button className="search-tool" title="Filtrer par IA">
+                            <button
+                                className="search-tool"
+                                title="Filtrer par IA"
+                            >
                                 <FontAwesomeIcon icon={faMagic} />
                             </button>
                         </div>
@@ -461,7 +506,7 @@ const MesProduits = () => {
                             <FontAwesomeIcon icon={faFilter} />
                             <span>Filtres</span>
                             {Object.values(filters).some(
-                                (f) => f && f !== 'tous'
+                                f => f && f !== 'tous'
                             ) && <span className="filter-indicator"></span>}
                         </button>
 
@@ -507,21 +552,32 @@ const MesProduits = () => {
                             <div className="filter-group">
                                 <label>Statut</label>
                                 <div className="filter-buttons">
-                                    {['tous', 'actif', 'en_attente', 'rejete', 'approuve'].map((statut) => (
+                                    {[
+                                        'tous',
+                                        'actif',
+                                        'en_attente',
+                                        'rejete',
+                                        'approuve',
+                                    ].map(statut => (
                                         <button
                                             key={statut}
                                             className={`filter-btn ${filters.statut === statut ? 'active' : ''}`}
-                                            onClick={() => handleFilterChange('statut', statut)}
+                                            onClick={() =>
+                                                handleFilterChange(
+                                                    'statut',
+                                                    statut
+                                                )
+                                            }
                                         >
                                             {statut === 'tous'
                                                 ? 'Tous'
                                                 : statut === 'actif'
-                                                    ? 'Actifs'
-                                                    : statut === 'en_attente'
-                                                        ? 'En attente'
-                                                        : statut === 'rejete'
-                                                            ? 'Rejetés'
-                                                            : 'Approuvés'}
+                                                  ? 'Actifs'
+                                                  : statut === 'en_attente'
+                                                    ? 'En attente'
+                                                    : statut === 'rejete'
+                                                      ? 'Rejetés'
+                                                      : 'Approuvés'}
                                         </button>
                                     ))}
                                 </div>
@@ -534,7 +590,12 @@ const MesProduits = () => {
                                         type="number"
                                         placeholder="Min"
                                         value={filters.prixMin}
-                                        onChange={(e) => handleFilterChange('prixMin', e.target.value)}
+                                        onChange={e =>
+                                            handleFilterChange(
+                                                'prixMin',
+                                                e.target.value
+                                            )
+                                        }
                                         className="price-input"
                                     />
                                     <span className="range-separator">—</span>
@@ -542,7 +603,12 @@ const MesProduits = () => {
                                         type="number"
                                         placeholder="Max"
                                         value={filters.prixMax}
-                                        onChange={(e) => handleFilterChange('prixMax', e.target.value)}
+                                        onChange={e =>
+                                            handleFilterChange(
+                                                'prixMax',
+                                                e.target.value
+                                            )
+                                        }
                                         className="price-input"
                                     />
                                 </div>
@@ -552,16 +618,31 @@ const MesProduits = () => {
                                 <label>Tri</label>
                                 <select
                                     value={filters.tri}
-                                    onChange={(e) => handleFilterChange('tri', e.target.value)}
+                                    onChange={e =>
+                                        handleFilterChange(
+                                            'tri',
+                                            e.target.value
+                                        )
+                                    }
                                     className="sort-select"
                                 >
-                                    <option value="date_desc">Plus récents</option>
-                                    <option value="date_asc">Plus anciens</option>
-                                    <option value="prix_desc">Prix décroissant</option>
-                                    <option value="prix_asc">Prix croissant</option>
+                                    <option value="date_desc">
+                                        Plus récents
+                                    </option>
+                                    <option value="date_asc">
+                                        Plus anciens
+                                    </option>
+                                    <option value="prix_desc">
+                                        Prix décroissant
+                                    </option>
+                                    <option value="prix_asc">
+                                        Prix croissant
+                                    </option>
                                     <option value="nom_asc">Nom A-Z</option>
                                     <option value="nom_desc">Nom Z-A</option>
-                                    <option value="ventes_desc">Plus vendus</option>
+                                    <option value="ventes_desc">
+                                        Plus vendus
+                                    </option>
                                 </select>
                             </div>
 
@@ -655,7 +736,8 @@ const MesProduits = () => {
                                     <input
                                         type="checkbox"
                                         checked={
-                                            selectedProduits.size === produits.length &&
+                                            selectedProduits.size ===
+                                                produits.length &&
                                             produits.length > 0
                                         }
                                         onChange={selectAll}
@@ -666,7 +748,10 @@ const MesProduits = () => {
                             </div>
                             <div className="card-body">
                                 <div className="add-product-placeholder">
-                                    <FontAwesomeIcon icon={faPlus} className="add-icon" />
+                                    <FontAwesomeIcon
+                                        icon={faPlus}
+                                        className="add-icon"
+                                    />
                                     <h3>Ajouter un produit</h3>
                                     <p>Créez une nouvelle fiche produit</p>
                                 </div>
@@ -681,219 +766,314 @@ const MesProduits = () => {
                         </div>
 
                         {/* PRODUITS */}
-                        {produits.map((produit) => (
-                            <div
-                                key={produit._id}
-                                className={`produit-card ${selectedProduits.has(produit._id) ? 'selected' : ''}`}
-                                onClick={() => toggleSelectProduit(produit._id)}
-                            >
-                                {/* BADGE DE STATUT */}
-                                <div className={`status-badge ${getStatutClass(produit.statut)}`}>
-                                    <FontAwesomeIcon icon={getStatutIcon(produit.statut)} />
-                                    <span>
-                                        {produit.statut === 'actif'
-                                            ? 'Actif'
-                                            : produit.statut === 'en_attente'
-                                                ? 'En attente'
-                                                : produit.statut === 'rejete'
+                        {produits.map(produit => {
+                            const imageUrl = getProductImageUrl(produit);
+
+                            return (
+                                <div
+                                    key={produit._id}
+                                    className={`produit-card ${selectedProduits.has(produit._id) ? 'selected' : ''}`}
+                                    onClick={() =>
+                                        toggleSelectProduit(produit._id)
+                                    }
+                                >
+                                    {/* BADGE DE STATUT */}
+                                    <div
+                                        className={`status-badge ${getStatutClass(produit.statut)}`}
+                                    >
+                                        <FontAwesomeIcon
+                                            icon={getStatutIcon(produit.statut)}
+                                        />
+                                        <span>
+                                            {produit.statut === 'actif'
+                                                ? 'Actif'
+                                                : produit.statut ===
+                                                    'en_attente'
+                                                  ? 'En attente'
+                                                  : produit.statut === 'rejete'
                                                     ? 'Rejeté'
                                                     : 'Approuvé'}
-                                    </span>
-                                </div>
+                                        </span>
+                                    </div>
 
-                                {/* CHECKBOX */}
-                                <div className="card-header">
-                                    <label className="checkbox-container" onClick={(e) => e.stopPropagation()}>
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedProduits.has(produit._id)}
-                                            onChange={() => toggleSelectProduit(produit._id)}
-                                            className="checkbox-input"
-                                        />
-                                        <span className="checkbox-custom"></span>
-                                    </label>
-                                </div>
-
-                                {/* IMAGE */}
-                                <div className="card-image">
-                                    {produit.images && produit.images.length > 0 ? (
-                                        <img
-                                            src={produit.images[0].url || produit.images[0]}
-                                            alt={produit.nom}
-                                            className="product-image"
-                                        />
-                                    ) : (
-                                        <div className="image-placeholder">
-                                            <FontAwesomeIcon icon={faImage} />
-                                        </div>
-                                    )}
-
-                                    {/* BADGE DISCOUNT */}
-                                    {produit.prixComparaison && produit.prixComparaison > produit.prix && (
-                                        <div className="discount-badge">
-                                            -{calculateDiscount(produit.prix, produit.prixComparaison)}%
-                                        </div>
-                                    )}
-
-                                    {/* BADGE BEST SELLER */}
-                                    {produit.estMeilleureVente && (
-                                        <div className="best-seller-badge">
-                                            <FontAwesomeIcon icon={faCrown} />
-                                            Best-seller
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* INFOS */}
-                                <div className="card-body">
-                                    <div className="product-info">
-                                        <h3 className="product-name">{produit.nom}</h3>
-                                        <p className="product-description">
-                                            {produit.description?.substring(0, 80)}...
-                                        </p>
-
-                                        <div className="product-meta">
-                                            <div className="meta-item">
-                                                <FontAwesomeIcon icon={faEuroSign} />
-                                                <span className="meta-value">
-                                                    {formatCurrency(produit.prix)}
-                                                </span>
-                                                {produit.prixComparaison && produit.prixComparaison > produit.prix && (
-                                                    <span className="meta-comparison">
-                                                        {formatCurrency(produit.prixComparaison)}
-                                                    </span>
+                                    {/* CHECKBOX */}
+                                    <div className="card-header">
+                                        <label
+                                            className="checkbox-container"
+                                            onClick={e => e.stopPropagation()}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedProduits.has(
+                                                    produit._id
                                                 )}
-                                            </div>
+                                                onChange={() =>
+                                                    toggleSelectProduit(
+                                                        produit._id
+                                                    )
+                                                }
+                                                className="checkbox-input"
+                                            />
+                                            <span className="checkbox-custom"></span>
+                                        </label>
+                                    </div>
 
-                                            <div className="meta-item">
-                                                <FontAwesomeIcon icon={faBox} />
-                                                <span className="meta-value">
-                                                    {produit.quantite || 0} en stock
-                                                </span>
-                                                {produit.quantite <= (produit.seuilStockFaible || 5) && (
-                                                    <span className="stock-warning">
-                                                        <FontAwesomeIcon icon={faExclamationTriangle} />
-                                                    </span>
+                                    {/* IMAGE */}
+                                    <div className="card-image">
+                                        {imageUrl ? (
+                                            <img
+                                                src={imageUrl}
+                                                alt={produit.nom}
+                                                className="product-image"
+                                                onError={e => {
+                                                    e.target.src =
+                                                        '/images/default-product.jpg';
+                                                    e.target.onerror = null;
+                                                }}
+                                            />
+                                        ) : (
+                                            <div className="image-placeholder">
+                                                <FontAwesomeIcon
+                                                    icon={faImage}
+                                                />
+                                            </div>
+                                        )}
+
+                                        {/* BADGE DISCOUNT */}
+                                        {produit.prixComparaison &&
+                                            produit.prixComparaison >
+                                                produit.prix && (
+                                                <div className="discount-badge">
+                                                    -
+                                                    {calculateDiscount(
+                                                        produit.prix,
+                                                        produit.prixComparaison
+                                                    )}
+                                                    %
+                                                </div>
+                                            )}
+
+                                        {/* BADGE BEST SELLER */}
+                                        {produit.estMeilleureVente && (
+                                            <div className="best-seller-badge">
+                                                <FontAwesomeIcon
+                                                    icon={faCrown}
+                                                />
+                                                Best-seller
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* INFOS */}
+                                    <div className="card-body">
+                                        <div className="product-info">
+                                            <h3 className="product-name">
+                                                {produit.nom}
+                                            </h3>
+                                            <p className="product-description">
+                                                {produit.description?.substring(
+                                                    0,
+                                                    80
                                                 )}
+                                                ...
+                                            </p>
+
+                                            <div className="product-meta">
+                                                <div className="meta-item">
+                                                    <FontAwesomeIcon
+                                                        icon={faEuroSign}
+                                                    />
+                                                    <span className="meta-value">
+                                                        {formatCurrency(
+                                                            produit.prix
+                                                        )}
+                                                    </span>
+                                                    {produit.prixComparaison &&
+                                                        produit.prixComparaison >
+                                                            produit.prix && (
+                                                            <span className="meta-comparison">
+                                                                {formatCurrency(
+                                                                    produit.prixComparaison
+                                                                )}
+                                                            </span>
+                                                        )}
+                                                </div>
+
+                                                <div className="meta-item">
+                                                    <FontAwesomeIcon
+                                                        icon={faBox}
+                                                    />
+                                                    <span className="meta-value">
+                                                        {produit.quantite || 0}{' '}
+                                                        en stock
+                                                    </span>
+                                                    {produit.quantite <=
+                                                        (produit.seuilStockFaible ||
+                                                            5) && (
+                                                        <span className="stock-warning">
+                                                            <FontAwesomeIcon
+                                                                icon={
+                                                                    faExclamationTriangle
+                                                                }
+                                                            />
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                <div className="meta-item">
+                                                    <FontAwesomeIcon
+                                                        icon={faTags}
+                                                    />
+                                                    <span className="meta-value">
+                                                        {produit.categorie
+                                                            ?.nom ||
+                                                            'Non catégorisé'}
+                                                    </span>
+                                                </div>
                                             </div>
 
-                                            <div className="meta-item">
-                                                <FontAwesomeIcon icon={faTags} />
-                                                <span className="meta-value">
-                                                    {produit.categorie?.nom || 'Non catégorisé'}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {/* STATISTIQUES */}
-                                        <div className="product-stats">
-                                            <div className="stat">
-                                                <FontAwesomeIcon icon={faEye} />
-                                                <span>{produit.nombreVues || 0} vues</span>
-                                            </div>
-                                            <div className="stat">
-                                                <FontAwesomeIcon icon={faChartLine} />
-                                                <span>{produit.nombreVentes || 0} ventes</span>
-                                            </div>
-                                            <div className="stat">
-                                                <FontAwesomeIcon icon={faStar} />
-                                                <span>{produit.evaluations?.moyenne || 0}/5</span>
+                                            {/* STATISTIQUES */}
+                                            <div className="product-stats">
+                                                <div className="stat">
+                                                    <FontAwesomeIcon
+                                                        icon={faEye}
+                                                    />
+                                                    <span>
+                                                        {produit.nombreVues ||
+                                                            0}{' '}
+                                                        vues
+                                                    </span>
+                                                </div>
+                                                <div className="stat">
+                                                    <FontAwesomeIcon
+                                                        icon={faChartLine}
+                                                    />
+                                                    <span>
+                                                        {produit.nombreVentes ||
+                                                            0}{' '}
+                                                        ventes
+                                                    </span>
+                                                </div>
+                                                <div className="stat">
+                                                    <FontAwesomeIcon
+                                                        icon={faStar}
+                                                    />
+                                                    <span>
+                                                        {produit.evaluations
+                                                            ?.moyenne || 0}
+                                                        /5
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* ACTIONS */}
-                                <div className="card-actions">
-                                    <button
-                                        className="action-btn view"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigate(`/produit/${produit._id}`);
-                                        }}
-                                        title="Voir"
-                                    >
-                                        <FontAwesomeIcon icon={faEye} />
-                                    </button>
-
-                                    <button
-                                        className="action-btn edit"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setEditingProduit(produit);
-                                            setShowAddModal(true);
-                                        }}
-                                        title="Éditer"
-                                    >
-                                        <FontAwesomeIcon icon={faEdit} />
-                                    </button>
-
-                                    <button
-                                        className="action-btn duplicate"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDuplicateProduit(produit);
-                                        }}
-                                        title="Dupliquer"
-                                    >
-                                        <FontAwesomeIcon icon={faCopy} />
-                                    </button>
-
-                                    <button
-                                        className="action-btn delete"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDeleteProduit(produit);
-                                        }}
-                                        title="Supprimer"
-                                    >
-                                        <FontAwesomeIcon icon={faTrash} />
-                                    </button>
-
-                                    <div className="action-menu">
-                                        <button className="action-more">
-                                            <FontAwesomeIcon icon={faEllipsisH} />
+                                    {/* ACTIONS */}
+                                    <div className="card-actions">
+                                        <button
+                                            className="action-btn view"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                navigate(
+                                                    `/produit/${produit._id}`
+                                                );
+                                            }}
+                                            title="Voir"
+                                        >
+                                            <FontAwesomeIcon icon={faEye} />
                                         </button>
-                                        <div className="action-dropdown">
-                                            <button className="dropdown-item">
-                                                <FontAwesomeIcon icon={faShare} />
-                                                Partager
+
+                                        <button
+                                            className="action-btn edit"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                setEditingProduit(produit);
+                                                setShowAddModal(true);
+                                            }}
+                                            title="Éditer"
+                                        >
+                                            <FontAwesomeIcon icon={faEdit} />
+                                        </button>
+
+                                        <button
+                                            className="action-btn duplicate"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                handleDuplicateProduit(produit);
+                                            }}
+                                            title="Dupliquer"
+                                        >
+                                            <FontAwesomeIcon icon={faCopy} />
+                                        </button>
+
+                                        <button
+                                            className="action-btn delete"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                handleDeleteProduit(produit);
+                                            }}
+                                            title="Supprimer"
+                                        >
+                                            <FontAwesomeIcon icon={faTrash} />
+                                        </button>
+
+                                        <div className="action-menu">
+                                            <button className="action-more">
+                                                <FontAwesomeIcon
+                                                    icon={faEllipsisH}
+                                                />
                                             </button>
-                                            <button className="dropdown-item">
-                                                <FontAwesomeIcon icon={faDownload} />
-                                                Exporter
-                                            </button>
-                                            <button className="dropdown-item">
-                                                <FontAwesomeIcon icon={faQrcode} />
-                                                Générer QR Code
-                                            </button>
+                                            <div className="action-dropdown">
+                                                <button className="dropdown-item">
+                                                    <FontAwesomeIcon
+                                                        icon={faShare}
+                                                    />
+                                                    Partager
+                                                </button>
+                                                <button className="dropdown-item">
+                                                    <FontAwesomeIcon
+                                                        icon={faDownload}
+                                                    />
+                                                    Exporter
+                                                </button>
+                                                <button className="dropdown-item">
+                                                    <FontAwesomeIcon
+                                                        icon={faQrcode}
+                                                    />
+                                                    Générer QR Code
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* INDICATEUR DE PERFORMANCE */}
-                                <div className="performance-indicator">
-                                    <div
-                                        className="performance-bar"
-                                        style={{
-                                            width: `${Math.min(
-                                                ((produit.nombreVentes || 0) / 100) * 100,
-                                                100
-                                            )}%`,
-                                            background:
-                                                produit.nombreVentes > 50
-                                                    ? 'linear-gradient(90deg, #4CAF50, #8BC34A)'
-                                                    : produit.nombreVentes > 20
-                                                        ? 'linear-gradient(90deg, #FF9800, #FFC107)'
-                                                        : 'linear-gradient(90deg, #f44336, #ff5252)',
-                                        }}
-                                    ></div>
-                                    <span className="performance-text">
-                                        {produit.nombreVentes || 0} ventes
-                                    </span>
+                                    {/* INDICATEUR DE PERFORMANCE */}
+                                    <div className="performance-indicator">
+                                        <div
+                                            className="performance-bar"
+                                            style={{
+                                                width: `${Math.min(
+                                                    ((produit.nombreVentes ||
+                                                        0) /
+                                                        100) *
+                                                        100,
+                                                    100
+                                                )}%`,
+                                                background:
+                                                    produit.nombreVentes > 50
+                                                        ? 'linear-gradient(90deg, #4CAF50, #8BC34A)'
+                                                        : produit.nombreVentes >
+                                                            20
+                                                          ? 'linear-gradient(90deg, #FF9800, #FFC107)'
+                                                          : 'linear-gradient(90deg, #f44336, #ff5252)',
+                                            }}
+                                        ></div>
+                                        <span className="performance-text">
+                                            {produit.nombreVentes || 0} ventes
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 ) : (
                     // VUE LISTE
@@ -906,7 +1086,8 @@ const MesProduits = () => {
                                             <input
                                                 type="checkbox"
                                                 checked={
-                                                    selectedProduits.size === produits.length &&
+                                                    selectedProduits.size ===
+                                                        produits.length &&
                                                     produits.length > 0
                                                 }
                                                 onChange={selectAll}
@@ -926,138 +1107,243 @@ const MesProduits = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {produits.map((produit) => (
-                                    <tr
-                                        key={produit._id}
-                                        className={selectedProduits.has(produit._id) ? 'selected' : ''}
-                                        onClick={() => toggleSelectProduit(produit._id)}
-                                    >
-                                        <td className="selection-column">
-                                            <label className="checkbox-container" onClick={(e) => e.stopPropagation()}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedProduits.has(produit._id)}
-                                                    onChange={() => toggleSelectProduit(produit._id)}
-                                                    className="checkbox-input"
-                                                />
-                                                <span className="checkbox-custom"></span>
-                                            </label>
-                                        </td>
+                                {produits.map(produit => {
+                                    const imageUrl =
+                                        getProductImageUrl(produit);
 
-                                        <td className="product-column">
-                                            <div className="product-cell">
-                                                <div className="product-image">
-                                                    {produit.images && produit.images.length > 0 ? (
-                                                        <img
-                                                            src={produit.images[0].url || produit.images[0]}
-                                                            alt={produit.nom}
-                                                        />
-                                                    ) : (
-                                                        <div className="image-placeholder">
-                                                            <FontAwesomeIcon icon={faBox} />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="product-details">
-                                                    <h4 className="product-name">{produit.nom}</h4>
-                                                    <p className="product-sku">SKU: {produit.sku || 'N/A'}</p>
-                                                    <div className="product-tags">
-                                                        <span className="product-category">
-                                                            {produit.categorie?.nom || 'Non catégorisé'}
-                                                        </span>
-                                                        {produit.etiquettes?.slice(0, 2).map((tag) => (
-                                                            <span key={tag} className="product-tag">
-                                                                {tag}
+                                    return (
+                                        <tr
+                                            key={produit._id}
+                                            className={
+                                                selectedProduits.has(
+                                                    produit._id
+                                                )
+                                                    ? 'selected'
+                                                    : ''
+                                            }
+                                            onClick={() =>
+                                                toggleSelectProduit(produit._id)
+                                            }
+                                        >
+                                            <td className="selection-column">
+                                                <label
+                                                    className="checkbox-container"
+                                                    onClick={e =>
+                                                        e.stopPropagation()
+                                                    }
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedProduits.has(
+                                                            produit._id
+                                                        )}
+                                                        onChange={() =>
+                                                            toggleSelectProduit(
+                                                                produit._id
+                                                            )
+                                                        }
+                                                        className="checkbox-input"
+                                                    />
+                                                    <span className="checkbox-custom"></span>
+                                                </label>
+                                            </td>
+
+                                            <td className="product-column">
+                                                <div className="product-cell">
+                                                    <div className="product-image">
+                                                        {imageUrl ? (
+                                                            <img
+                                                                src={imageUrl}
+                                                                alt={
+                                                                    produit.nom
+                                                                }
+                                                                onError={e => {
+                                                                    e.target.src =
+                                                                        '/images/default-product.jpg';
+                                                                    e.target.onerror =
+                                                                        null;
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <div className="image-placeholder">
+                                                                <FontAwesomeIcon
+                                                                    icon={faBox}
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="product-details">
+                                                        <h4 className="product-name">
+                                                            {produit.nom}
+                                                        </h4>
+                                                        <p className="product-sku">
+                                                            SKU:{' '}
+                                                            {produit.sku ||
+                                                                'N/A'}
+                                                        </p>
+                                                        <div className="product-tags">
+                                                            <span className="product-category">
+                                                                {produit
+                                                                    .categorie
+                                                                    ?.nom ||
+                                                                    'Non catégorisé'}
                                                             </span>
-                                                        ))}
+                                                            {produit.etiquettes
+                                                                ?.slice(0, 2)
+                                                                .map(tag => (
+                                                                    <span
+                                                                        key={
+                                                                            tag
+                                                                        }
+                                                                        className="product-tag"
+                                                                    >
+                                                                        {tag}
+                                                                    </span>
+                                                                ))}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </td>
+                                            </td>
 
-                                        <td className="price-column">
-                                            <div className="price-cell">
-                                                <span className="current-price">
-                                                    {formatCurrency(produit.prix)}
-                                                </span>
-                                                {produit.prixComparaison && produit.prixComparaison > produit.prix && (
-                                                    <span className="old-price">
-                                                        {formatCurrency(produit.prixComparaison)}
+                                            <td className="price-column">
+                                                <div className="price-cell">
+                                                    <span className="current-price">
+                                                        {formatCurrency(
+                                                            produit.prix
+                                                        )}
                                                     </span>
-                                                )}
-                                            </div>
-                                        </td>
-
-                                        <td className="stock-column">
-                                            <div className="stock-cell">
-                                                <span
-                                                    className={`stock-value ${
-                                                        produit.quantite <= (produit.seuilStockFaible || 5) ? 'low' : ''
-                                                    }`}
-                                                >
-                                                    {produit.quantite || 0}
-                                                </span>
-                                                {produit.quantite <= (produit.seuilStockFaible || 5) && (
-                                                    <FontAwesomeIcon icon={faExclamationTriangle} className="stock-warning" />
-                                                )}
-                                            </div>
-                                        </td>
-
-                                        <td className="status-column">
-                                            <div className={`status-cell ${getStatutClass(produit.statut)}`}>
-                                                <FontAwesomeIcon icon={getStatutIcon(produit.statut)} />
-                                                <span>{produit.statut}</span>
-                                            </div>
-                                        </td>
-
-                                        <td className="sales-column">
-                                            <div className="sales-cell">
-                                                <span className="sales-value">{produit.nombreVentes || 0}</span>
-                                                <div className="sales-trend">
-                                                    <FontAwesomeIcon icon={faArrowUp} />
-                                                    <span>+12%</span>
+                                                    {produit.prixComparaison &&
+                                                        produit.prixComparaison >
+                                                            produit.prix && (
+                                                            <span className="old-price">
+                                                                {formatCurrency(
+                                                                    produit.prixComparaison
+                                                                )}
+                                                            </span>
+                                                        )}
                                                 </div>
-                                            </div>
-                                        </td>
+                                            </td>
 
-                                        <td className="views-column">
-                                            <div className="views-cell">{produit.nombreVues || 0}</div>
-                                        </td>
+                                            <td className="stock-column">
+                                                <div className="stock-cell">
+                                                    <span
+                                                        className={`stock-value ${
+                                                            produit.quantite <=
+                                                            (produit.seuilStockFaible ||
+                                                                5)
+                                                                ? 'low'
+                                                                : ''
+                                                        }`}
+                                                    >
+                                                        {produit.quantite || 0}
+                                                    </span>
+                                                    {produit.quantite <=
+                                                        (produit.seuilStockFaible ||
+                                                            5) && (
+                                                        <FontAwesomeIcon
+                                                            icon={
+                                                                faExclamationTriangle
+                                                            }
+                                                            className="stock-warning"
+                                                        />
+                                                    )}
+                                                </div>
+                                            </td>
 
-                                        <td className="date-column">
-                                            <div className="date-cell">{formatDate(produit.createdAt)}</div>
-                                        </td>
+                                            <td className="status-column">
+                                                <div
+                                                    className={`status-cell ${getStatutClass(produit.statut)}`}
+                                                >
+                                                    <FontAwesomeIcon
+                                                        icon={getStatutIcon(
+                                                            produit.statut
+                                                        )}
+                                                    />
+                                                    <span>
+                                                        {produit.statut}
+                                                    </span>
+                                                </div>
+                                            </td>
 
-                                        <td className="actions-column">
-                                            <div className="actions-cell" onClick={(e) => e.stopPropagation()}>
-                                                <button
-                                                    className="table-action view"
-                                                    onClick={() => navigate(`/produit/${produit._id}`)}
+                                            <td className="sales-column">
+                                                <div className="sales-cell">
+                                                    <span className="sales-value">
+                                                        {produit.nombreVentes ||
+                                                            0}
+                                                    </span>
+                                                    <div className="sales-trend">
+                                                        <FontAwesomeIcon
+                                                            icon={faArrowUp}
+                                                        />
+                                                        <span>+12%</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td className="views-column">
+                                                <div className="views-cell">
+                                                    {produit.nombreVues || 0}
+                                                </div>
+                                            </td>
+
+                                            <td className="date-column">
+                                                <div className="date-cell">
+                                                    {formatDate(
+                                                        produit.createdAt
+                                                    )}
+                                                </div>
+                                            </td>
+
+                                            <td className="actions-column">
+                                                <div
+                                                    className="actions-cell"
+                                                    onClick={e =>
+                                                        e.stopPropagation()
+                                                    }
                                                 >
-                                                    <FontAwesomeIcon icon={faEye} />
-                                                </button>
-                                                <button
-                                                    className="table-action edit"
-                                                    onClick={() => {
-                                                        setEditingProduit(produit);
-                                                        setShowAddModal(true);
-                                                    }}
-                                                >
-                                                    <FontAwesomeIcon icon={faEdit} />
-                                                </button>
-                                                <button
-                                                    className="table-action more"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        // Ouvrir menu contextuel
-                                                    }}
-                                                >
-                                                    <FontAwesomeIcon icon={faEllipsisH} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
+                                                    <button
+                                                        className="table-action view"
+                                                        onClick={() =>
+                                                            navigate(
+                                                                `/produit/${produit._id}`
+                                                            )
+                                                        }
+                                                    >
+                                                        <FontAwesomeIcon
+                                                            icon={faEye}
+                                                        />
+                                                    </button>
+                                                    <button
+                                                        className="table-action edit"
+                                                        onClick={() => {
+                                                            setEditingProduit(
+                                                                produit
+                                                            );
+                                                            setShowAddModal(
+                                                                true
+                                                            );
+                                                        }}
+                                                    >
+                                                        <FontAwesomeIcon
+                                                            icon={faEdit}
+                                                        />
+                                                    </button>
+                                                    <button
+                                                        className="table-action more"
+                                                        onClick={e => {
+                                                            e.stopPropagation();
+                                                            // Ouvrir menu contextuel
+                                                        }}
+                                                    >
+                                                        <FontAwesomeIcon
+                                                            icon={faEllipsisH}
+                                                        />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
@@ -1067,66 +1353,103 @@ const MesProduits = () => {
                 {pagination.pages > 1 && (
                     <div className="pagination-container">
                         <div className="pagination-info">
-                            Affichage de {(pagination.page - 1) * pagination.limit + 1} à{' '}
-                            {Math.min(pagination.page * pagination.limit, pagination.total)} sur{' '}
-                            {pagination.total} produits
+                            Affichage de{' '}
+                            {(pagination.page - 1) * pagination.limit + 1} à{' '}
+                            {Math.min(
+                                pagination.page * pagination.limit,
+                                pagination.total
+                            )}{' '}
+                            sur {pagination.total} produits
                         </div>
                         <div className="pagination-controls">
                             <button
                                 className="pagination-btn prev"
-                                onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
+                                onClick={() =>
+                                    setPagination(prev => ({
+                                        ...prev,
+                                        page: prev.page - 1,
+                                    }))
+                                }
                                 disabled={pagination.page === 1}
                             >
-                                <FontAwesomeIcon icon={faArrowUp} rotation={270} />
+                                <FontAwesomeIcon
+                                    icon={faArrowUp}
+                                    rotation={270}
+                                />
                                 Précédent
                             </button>
 
                             <div className="page-numbers">
-                                {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
-                                    let pageNum;
-                                    if (pagination.pages <= 5) {
-                                        pageNum = i + 1;
-                                    } else if (pagination.page <= 3) {
-                                        pageNum = i + 1;
-                                    } else if (pagination.page >= pagination.pages - 2) {
-                                        pageNum = pagination.pages - 4 + i;
-                                    } else {
-                                        pageNum = pagination.page - 2 + i;
+                                {Array.from(
+                                    { length: Math.min(5, pagination.pages) },
+                                    (_, i) => {
+                                        let pageNum;
+                                        if (pagination.pages <= 5) {
+                                            pageNum = i + 1;
+                                        } else if (pagination.page <= 3) {
+                                            pageNum = i + 1;
+                                        } else if (
+                                            pagination.page >=
+                                            pagination.pages - 2
+                                        ) {
+                                            pageNum = pagination.pages - 4 + i;
+                                        } else {
+                                            pageNum = pagination.page - 2 + i;
+                                        }
+
+                                        return (
+                                            <button
+                                                key={pageNum}
+                                                className={`page-btn ${pagination.page === pageNum ? 'active' : ''}`}
+                                                onClick={() =>
+                                                    setPagination(prev => ({
+                                                        ...prev,
+                                                        page: pageNum,
+                                                    }))
+                                                }
+                                            >
+                                                {pageNum}
+                                            </button>
+                                        );
                                     }
-
-                                    return (
-                                        <button
-                                            key={pageNum}
-                                            className={`page-btn ${pagination.page === pageNum ? 'active' : ''}`}
-                                            onClick={() => setPagination((prev) => ({ ...prev, page: pageNum }))}
-                                        >
-                                            {pageNum}
-                                        </button>
-                                    );
-                                })}
-
-                                {pagination.pages > 5 && pagination.page < pagination.pages - 2 && (
-                                    <>
-                                        <span className="page-dots">...</span>
-                                        <button
-                                            className="page-btn"
-                                            onClick={() =>
-                                                setPagination((prev) => ({ ...prev, page: pagination.pages }))
-                                            }
-                                        >
-                                            {pagination.pages}
-                                        </button>
-                                    </>
                                 )}
+
+                                {pagination.pages > 5 &&
+                                    pagination.page < pagination.pages - 2 && (
+                                        <>
+                                            <span className="page-dots">
+                                                ...
+                                            </span>
+                                            <button
+                                                className="page-btn"
+                                                onClick={() =>
+                                                    setPagination(prev => ({
+                                                        ...prev,
+                                                        page: pagination.pages,
+                                                    }))
+                                                }
+                                            >
+                                                {pagination.pages}
+                                            </button>
+                                        </>
+                                    )}
                             </div>
 
                             <button
                                 className="pagination-btn next"
-                                onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
+                                onClick={() =>
+                                    setPagination(prev => ({
+                                        ...prev,
+                                        page: prev.page + 1,
+                                    }))
+                                }
                                 disabled={pagination.page === pagination.pages}
                             >
                                 Suivant
-                                <FontAwesomeIcon icon={faArrowUp} rotation={90} />
+                                <FontAwesomeIcon
+                                    icon={faArrowUp}
+                                    rotation={90}
+                                />
                             </button>
                         </div>
 
@@ -1134,8 +1457,8 @@ const MesProduits = () => {
                             <label>Afficher</label>
                             <select
                                 value={pagination.limit}
-                                onChange={(e) =>
-                                    setPagination((prev) => ({
+                                onChange={e =>
+                                    setPagination(prev => ({
                                         ...prev,
                                         limit: parseInt(e.target.value),
                                         page: 1,
@@ -1160,8 +1483,12 @@ const MesProduits = () => {
                     <div className="modal-container">
                         <div className="modal-header">
                             <h2>
-                                <FontAwesomeIcon icon={editingProduit ? faEdit : faPlus} />
-                                {editingProduit ? 'Éditer le produit' : 'Nouveau produit'}
+                                <FontAwesomeIcon
+                                    icon={editingProduit ? faEdit : faPlus}
+                                />
+                                {editingProduit
+                                    ? 'Éditer le produit'
+                                    : 'Nouveau produit'}
                             </h2>
                             <button
                                 className="modal-close"
@@ -1175,7 +1502,9 @@ const MesProduits = () => {
                         </div>
                         <div className="modal-body">
                             <div className="modal-tabs">
-                                <button className="tab-btn active">Informations</button>
+                                <button className="tab-btn active">
+                                    Informations
+                                </button>
                                 <button className="tab-btn">Images</button>
                                 <button className="tab-btn">Variantes</button>
                                 <button className="tab-btn">SEO</button>
@@ -1191,13 +1520,17 @@ const MesProduits = () => {
                                             type="text"
                                             placeholder="Ex: Smartphone Pro Max 2024"
                                             className="form-input"
-                                            defaultValue={editingProduit?.nom || ''}
+                                            defaultValue={
+                                                editingProduit?.nom || ''
+                                            }
                                         />
                                     </div>
                                     <div className="form-group">
                                         <label>Catégorie *</label>
                                         <select className="form-select">
-                                            <option>Sélectionner une catégorie</option>
+                                            <option>
+                                                Sélectionner une catégorie
+                                            </option>
                                             <option>Électronique</option>
                                             <option>Mode</option>
                                             <option>Maison</option>
@@ -1212,7 +1545,9 @@ const MesProduits = () => {
                                         placeholder="Décrivez votre produit..."
                                         className="form-textarea"
                                         rows={4}
-                                        defaultValue={editingProduit?.description || ''}
+                                        defaultValue={
+                                            editingProduit?.description || ''
+                                        }
                                     />
                                 </div>
 
@@ -1223,7 +1558,9 @@ const MesProduits = () => {
                                             type="number"
                                             placeholder="0.00"
                                             className="form-input"
-                                            defaultValue={editingProduit?.prix || ''}
+                                            defaultValue={
+                                                editingProduit?.prix || ''
+                                            }
                                         />
                                     </div>
                                     <div className="form-group">
@@ -1232,7 +1569,10 @@ const MesProduits = () => {
                                             type="number"
                                             placeholder="0.00"
                                             className="form-input"
-                                            defaultValue={editingProduit?.prixComparaison || ''}
+                                            defaultValue={
+                                                editingProduit?.prixComparaison ||
+                                                ''
+                                            }
                                         />
                                     </div>
                                     <div className="form-group">
@@ -1241,7 +1581,9 @@ const MesProduits = () => {
                                             type="number"
                                             placeholder="0"
                                             className="form-input"
-                                            defaultValue={editingProduit?.quantite || ''}
+                                            defaultValue={
+                                                editingProduit?.quantite || ''
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -1263,14 +1605,23 @@ const MesProduits = () => {
                                             setEditingProduit(null);
                                             addToast({
                                                 type: 'success',
-                                                title: editingProduit ? 'Produit mis à jour' : 'Produit créé',
-                                                message: 'Le produit a été enregistré avec succès',
+                                                title: editingProduit
+                                                    ? 'Produit mis à jour'
+                                                    : 'Produit créé',
+                                                message:
+                                                    'Le produit a été enregistré avec succès',
                                             });
                                             fetchProduits();
                                         }}
                                     >
-                                        <FontAwesomeIcon icon={editingProduit ? faEdit : faPlus} />
-                                        {editingProduit ? 'Mettre à jour' : 'Créer le produit'}
+                                        <FontAwesomeIcon
+                                            icon={
+                                                editingProduit ? faEdit : faPlus
+                                            }
+                                        />
+                                        {editingProduit
+                                            ? 'Mettre à jour'
+                                            : 'Créer le produit'}
                                     </button>
                                 </div>
                             </div>
@@ -1292,14 +1643,18 @@ const MesProduits = () => {
                     <div className="footer-stat">
                         <FontAwesomeIcon icon={faChartLine} />
                         <div className="stat-content">
-                            <span className="stat-value">{stats.totalVentes}</span>
+                            <span className="stat-value">
+                                {stats.totalVentes}
+                            </span>
                             <span className="stat-label">Ventes totales</span>
                         </div>
                     </div>
                     <div className="footer-stat">
                         <FontAwesomeIcon icon={faEye} />
                         <div className="stat-content">
-                            <span className="stat-value">{stats.totalVues}</span>
+                            <span className="stat-value">
+                                {stats.totalVues}
+                            </span>
                             <span className="stat-label">Vues totales</span>
                         </div>
                     </div>

@@ -256,4 +256,4 @@ export const vendeurService = {
     },
 };
 
-export default vendeurService;
+export default vendeurService; //

@@ -593,7 +593,8 @@ export default function Header() {
                                     >
                                         <FontAwesomeIcon icon={faUserCircle} />
                                         <span className="user-name">
-                                            {user.prenom ||
+                                            {user.nomComplet ||
+                                                user.prenom ||
                                                 user.nom ||
                                                 t('header.my_account') ||
                                                 'Mon compte'}
@@ -863,7 +864,8 @@ export default function Header() {
                         >
                             <FontAwesomeIcon icon={faUserCircle} />
                             <span className="user-name">
-                                {user.prenom ||
+                                {user.nomComplet ||
+                                    user.prenom ||
                                     user.nom ||
                                     t('header.my_account') ||
                                     'Mon compte'}

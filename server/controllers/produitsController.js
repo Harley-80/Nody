@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import Produit from '../models/produitModel.js';
 import Categorie from '../models/categorieModel.js';
-import { notifierNouveauProduit } from '../services/websocketService.js'; 
+import { notifierNouveauProduit } from '../services/websocketService.js';
 
 /**
  * Formater les URLs des images avec l'URL complète
@@ -258,7 +258,7 @@ const creerProduit = asyncHandler(async (req, res) => {
 
     const produit = await Produit.create(produitData);
 
-    // Notifier les modérateurs et admin d'un nouveau produit (MODIFICATION INTÉGRÉE)
+    // Notifier les modérateurs et admin d'un nouveau produit
     try {
         if (produit.statut === 'en_attente') {
             const produitPopule = await Produit.findById(produit._id).populate(
@@ -406,11 +406,17 @@ const obtenirProduitsPopulaires = asyncHandler(async (req, res) => {
     const produits = await Produit.find({ estActif: true })
         .sort({ 'evaluations.moyenne': -1, nombreVentes: -1 })
         .limit(limite)
-        .select('nom prix images evaluations slug');
+        .select('nom prix images evaluations slug categorie nombreVentes');
+
+    // formattage des URLs
+    const baseUrl = req.protocol + '://' + req.get('host');
+    const produitsFormates = produits.map(produit =>
+        formaterUrlsImages(produit, baseUrl)
+    );
 
     res.json({
         succes: true,
-        donnees: produits,
+        donnees: produitsFormates,
     });
 });
 
@@ -459,6 +465,47 @@ const obtenirStatistiquesProduits = asyncHandler(async (req, res) => {
     }
 });
 
+/**
+ * Obtenir les produits en vedette
+ */
+const obtenirProduitsVedettes = asyncHandler(async (req, res) => {
+    try {
+        const produits = await Produit.find({
+            estEnVedette: true,
+            estActif: true,
+            statut: 'approuve',
+        })
+            .populate('categorie', 'nom slug')
+            .populate('vendeur', 'nom entreprise')
+            .sort({ createdAt: -1 })
+            .limit(10);
+
+        if (!produits || produits.length === 0) {
+            return res.status(200).json({
+                succes: true,
+                donnees: [],
+                message: 'Aucun produit en vedette pour le moment',
+            });
+        }
+
+        const baseUrl = req.protocol + '://' + req.get('host');
+        const produitsFormates = produits.map(produit =>
+            formaterUrlsImages(produit, baseUrl)
+        );
+
+        res.status(200).json({
+            succes: true,
+            donnees: produitsFormates,
+        });
+    } catch (error) {
+        console.error('Erreur récupération produits vedettes:', error);
+        res.status(500).json({
+            succes: false,
+            erreur: 'Erreur serveur',
+        });
+    }
+});
+
 export {
     obtenirProduits,
     obtenirProduit,
@@ -470,4 +517,5 @@ export {
     obtenirProduitsPopulaires,
     obtenirNouveauxProduits,
     obtenirStatistiquesProduits,
-};
+    obtenirProduitsVedettes,
+};//

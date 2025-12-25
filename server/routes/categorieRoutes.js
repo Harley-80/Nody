@@ -10,6 +10,7 @@ import {
     obtenirCategoriesRacines,
     obtenirBreadcrumb,
     obtenirStatistiques,
+    obtenirSousCategories,
 } from '../controllers/categorieController.js';
 import { proteger, autoriser } from '../middleware/authMiddleware.js';
 import { validerObjectId } from '../middleware/validationMiddleware.js';
@@ -24,6 +25,7 @@ routeur.route('/racines').get(obtenirCategoriesRacines);
 routeur.route('/search').get(rechercherCategories);
 routeur.route('/:id').get(obtenirCategorie);
 routeur.route('/:id/breadcrumb').get(obtenirBreadcrumb);
+routeur.route('/:parentId/sous-categories').get(obtenirSousCategories);
 
 // Routes protégées (admin uniquement)
 routeur.use(proteger);

@@ -624,4 +624,4 @@ export {
     genererRapportVentes,
     getEvolutionVentes,
     getDonneesPerformance,
-};
+};// la  

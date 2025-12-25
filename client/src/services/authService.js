@@ -72,8 +72,11 @@ export const authService = {
             if (response.data.succes && response.data.donnees) {
                 const userData = response.data.donnees;
                 userData.isAdmin = userData.role === 'admin';
+                
+                // Le backend retourne : nom: "Diop" (nom de famille), prenom: "Vendeur" (prénom)
+                // Mais mon frontend attend nomComplet
+                userData.nomComplet = `${userData.prenom} ${userData.nom}`;
 
-                // CORRECTION : Utiliser "token" au lieu de "nodyToken"
                 localStorage.setItem('user', JSON.stringify(userData));
                 localStorage.setItem('token', userData.token);
             }
@@ -119,8 +122,13 @@ export const authService = {
             if (response.data.succes && response.data.donnees) {
                 const userData = response.data.donnees;
                 userData.isAdmin = userData.role === 'admin';
+                
+                userData.nomComplet =
+                    `${userData.prenom || ''} ${userData.nom || ''}`.trim();
+                if (!userData.nomComplet) {
+                    userData.nomComplet = userData.email || 'Utilisateur';
+                }
 
-                // CORRECTION : Utiliser "user" au lieu de "nodyUser"
                 localStorage.setItem('user', JSON.stringify(userData));
             }
 

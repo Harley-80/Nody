@@ -328,4 +328,4 @@ const initializeApp = async () => {
 
 // Exports
 export default initializeApp;
-export { app };
+export { app }; // moi

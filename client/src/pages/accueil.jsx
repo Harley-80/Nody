@@ -1,18 +1,44 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/common/layout/Layout';
 import CarrouselAccueil from '../components/ui/CarrouselAccueil';
 import GrilleProduitsAccueil from '../components/ui/GrilleProduitsAccueil';
 import { useProduits } from '../contexts/ProduitsContext';
 import CarrouselHero from '../components/ui/CarrouselHero';
+import { produitsService } from '../services/produitsService'; 
+import './Accueil.scss'; 
 
 export default function Accueil() {
-    const { produits, chargerProduits, loading, error } = useProduits();
+    const { produits, loading, error, getNouveauxProduits } = useProduits();
+    const [produitsEnVedette, setProduitsEnVedette] = useState([]);
+    const [nouveauxProduits, setNouveauxProduits] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
         chargerProduits();
     }, []);
+
+    const chargerProduits = async () => {
+        try {
+            // Charger les produits en vedette depuis le backend
+            const [produitsVedette, produitsNouveaux] = await Promise.all([
+                produitsService.getFeaturedProduits(),
+                getNouveauxProduits(),
+            ]);
+
+            setProduitsEnVedette(
+                produitsVedette.data || produitsVedette.donnees || []
+            );
+            setNouveauxProduits(
+                produitsNouveaux.data ||
+                    produitsNouveaux.donnees ||
+                    produitsNouveaux ||
+                    []
+            );
+        } catch (err) {
+            console.error('Erreur chargement produits:', err);
+        }
+    };
 
     const handleNavigation = path => {
         navigate(path);
@@ -21,10 +47,9 @@ export default function Accueil() {
     if (loading) {
         return (
             <Layout>
-                <div className="container py-5 text-center">
-                    <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Chargement...</span>
-                    </div>
+                <div className="accueil-loading">
+                    <div className="spinner"></div>
+                    <p>Chargement des produits...</p>
                 </div>
             </Layout>
         );
@@ -33,16 +58,9 @@ export default function Accueil() {
     if (error) {
         return (
             <Layout>
-                <div className="container py-5">
-                    <div className="alert alert-danger text-center">
-                        Erreur lors du chargement des produits : {error.message}
-                        <button
-                            className="btn btn-outline-danger mt-2"
-                            onClick={() => window.location.reload()}
-                        >
-                            Réessayer
-                        </button>
-                    </div>
+                <div className="error-container">
+                    <p>Erreur lors du chargement des produits</p>
+                    <button onClick={chargerProduits}>Réessayer</button>
                 </div>
             </Layout>
         );
@@ -53,24 +71,21 @@ export default function Accueil() {
             <CarrouselHero onShopNow={() => handleNavigation('/boutique')} />
 
             {/* Hero Section */}
-            <section className="hero-section bg-light py-5">
-                <div className="container text-center">
-                    <h1 className="display-4 fw-bold mb-3">
-                        Bienvenue sur Nody
-                    </h1>
-                    <p className="lead text-muted mb-4">
-                        Votre destination premium pour la mode moderne et
-                        africaine, disponible 24/7
+            <section className="hero-section">
+                <div className="container">
+                    <h1>Bienvenue sur Nody 👋</h1>
+                    <p className="subtitle">
+                        Votre destination premium pour la mode 
                     </p>
-                    <div className="d-flex justify-content-center gap-3 flex-wrap">
+                    <div className="hero-actions">
                         <button
-                            className="btn btn-primary btn-lg"
+                            className="btn-primary"
                             onClick={() => handleNavigation('/boutique')}
                         >
                             Découvrir la collection
                         </button>
                         <button
-                            className="btn btn-outline-secondary btn-lg"
+                            className="btn-secondary"
                             onClick={() => handleNavigation('/nouveautes')}
                         >
                             Nouveautés
@@ -79,46 +94,47 @@ export default function Accueil() {
                 </div>
             </section>
 
-            {/* Carrousel des produits phares */}
-            <section className="py-5 bg-white">
+            {/* Produits phares */}
+            <section className="featured-products">
                 <div className="container">
-                    <h2 className="text-center mb-5">Nos produits phares</h2>
-                    <CarrouselAccueil
-                        produits={produits.slice(0, 8)}
-                        onProductClick={id =>
-                            handleNavigation(`/produit/${id}`)
-                        }
-                    />
+                    <h2>Nos produits phares</h2>
+                    {produitsEnVedette.length > 0 ? (
+                        <CarrouselAccueil produits={produitsEnVedette} />
+                    ) : (
+                        <div className="no-products">
+                            <p>Aucun produit en vedette pour le moment</p>
+                        </div>
+                    )}
                 </div>
             </section>
 
-            {/* Grille des produits */}
-            <section className="py-5 bg-light">
+            {/* Nouveautés */}
+            <section className="new-products">
                 <div className="container">
-                    <h2 className="text-center mb-5">
-                        Découvrez nos collections
-                    </h2>
-                    <GrilleProduitsAccueil
-                        produits={produits}
-                        onProductClick={id =>
-                            handleNavigation(`/produit/${id}`)
-                        }
-                    />
+                    <h2>Découvrez nos collections</h2>
+                    {nouveauxProduits.length > 0 ? (
+                        <GrilleProduitsAccueil produits={nouveauxProduits} />
+                    ) : (
+                        <div className="no-products">
+                            <p>Aucun produit disponible</p>
+                            <button
+                                className="btn-primary"
+                                onClick={() => handleNavigation('/boutique')}
+                            >
+                                Voir tous les produits
+                            </button>
+                        </div>
+                    )}
                 </div>
             </section>
 
             {/* CTA Section */}
-            <section className="py-5 bg-dark text-white">
-                <div className="container text-center">
-                    <h2 className="mb-4">
-                        Prêt à révolutionner votre garde-robe ?
-                    </h2>
-                    <p className="lead mb-4">
-                        Inscrivez-vous pour recevoir 10% de réduction sur votre
-                        première commande
-                    </p>
+            <section className="cta-section">
+                <div className="container">
+                    <h2>Prêt à révolutionner votre garde-robe ?</h2>
+                    <p>Inscrivez-vous</p>
                     <button
-                        className="btn btn-light btn-lg px-4"
+                        className="btn-cta"
                         onClick={() => handleNavigation('/inscription')}
                     >
                         Créer un compte

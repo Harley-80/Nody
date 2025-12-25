@@ -60,13 +60,23 @@ export function AuthProvider({ children }) {
 
     const handleAuthResponse = responseData => {
         const userData = responseData.donnees || responseData;
-        userData.nomComplet = `${userData.nom} ${userData.prenom}`;
+
+        // Le backend retourne nom (nom de famille) et prenom (prénom)
+        // Donc nomComplet devrait être "Vendeur Diop" pas "Diop Vendeur"
+        userData.nomComplet =
+            `${userData.prenom || ''} ${userData.nom || ''}`.trim();
+
+        // Si nomComplet est vide, utiliser email
+        if (!userData.nomComplet) {
+            userData.nomComplet = userData.email || 'Utilisateur';
+        }
+
         userData.isAdmin = userData.role === 'admin';
         userData.isModerateur = userData.role === 'moderateur';
         userData.isVendeur = userData.role === 'vendeur';
         userData.isClient = userData.role === 'client';
-        setUser(userData);
 
+        setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
 
         return userData;

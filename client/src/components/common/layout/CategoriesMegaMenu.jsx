@@ -18,11 +18,13 @@ export default function CategoriesMegaMenu({ isOpen, onClose }) {
     const { categories, isLoading } = useCategories();
 
     // Filtrer les catégories par recherche
-    const filteredCategories = categories.filter(
+    const filteredCategories = (
+        Array.isArray(categories) ? categories : []
+    ).filter(
         category =>
-            category.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            category.nom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             category.sousCategories?.some(sub =>
-                sub.nom.toLowerCase().includes(searchTerm.toLowerCase())
+                sub.nom?.toLowerCase().includes(searchTerm.toLowerCase())
             )
     );
 
