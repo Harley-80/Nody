@@ -1,118 +1,344 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
 .carrousel-hero {
     position: relative;
-    max-width: 1400px; // Largeur maximale contrôlée
-    margin: 0 auto;
-    height: 60vh; // Hauteur relative à la vue
-    min-height: 400px; // Hauteur minimale
-    max-height: 600px; // Hauteur maximale
+    width: 100%;
+    height: 100vh;
+    min-height: 600px;
+    max-height: 800px;
     overflow: hidden;
-    border-radius: 12px; // Bords arrondis
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 
-    // Conteneur principal Swiper
-    .swiper {
-        height: 100%;
-        width: 100%;
-    }
-
-    // Styles des slides
-    .swiper-slide {
+    // Loading state
+    &__loading,
+    &__empty {
         display: flex;
         align-items: center;
         justify-content: center;
-        position: relative;
-    }
-
-    // Styles des images
-    .slide-image {
-        width: 100%;
         height: 100%;
-        object-fit: contain; // Garde les images nettes sans étirement
-        object-position: center;
-        background-color: #f5f5f5; // Fond de secours
-        pointer-events: none; // Améliore le scroll tactile
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+
+            i {
+                opacity: 0.5;
+            }
+        }
     }
 
-    // Overlay semi-transparent
-    .slide-overlay {
+    // Badge compteur
+    &__counter {
         position: absolute;
-        top: 0;
-        left: 0;
+        bottom: 30px;
+        right: 30px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: white;
+        z-index: 10;
+        animation: fadeIn 0.5s ease-in-out;
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    }
+
+    // Swiper personnalisé
+    .hero-swiper {
         width: 100%;
         height: 100%;
-        background: linear-gradient(
-            to bottom,
-            rgba(0, 0, 0, 0.1) 0%,
-            rgba(0, 0, 0, 0.01) 50%,
-            rgba(0, 0, 0, 0.1) 100%
-        );
-    }
 
-    // Contrôles de navigation
-    .swiper-button-prev,
-    .swiper-button-next {
-        color: #fff;
-        width: 48px;
-        height: 48px;
-        background: rgba(0, 0, 0, 0.4);
-        border-radius: 50%;
-        backdrop-filter: blur(4px);
-        transition: all 0.3s ease;
-        opacity: 0.8;
-
-        &:hover {
-            background: rgba(0, 0, 0, 0.7);
-            transform: scale(1.1);
-        }
-
-        &::after {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-    }
-
-    // Pagination personnalisée
-    .swiper-pagination {
-        bottom: 20px !important;
-
-        &-bullet {
-            width: 10px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.5);
-            opacity: 1;
-            margin: 0 8px !important;
+        // Navigation arrows
+        .swiper-button-prev,
+        .swiper-button-next {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            color: white;
             transition: all 0.3s ease;
 
-            &-active {
-                width: 30px;
-                border-radius: 5px;
-                background: #fff;
+            &::after {
+                font-size: 20px;
+                font-weight: 700;
+            }
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(1.1);
+            }
+
+            @media (max-width: 768px) {
+                width: 40px;
+                height: 40px;
+
+                &::after {
+                    font-size: 16px;
+                }
+            }
+        }
+
+        .swiper-button-prev {
+            left: 20px;
+        }
+
+        .swiper-button-next {
+            right: 20px;
+        }
+
+        // Pagination
+        .swiper-pagination {
+            bottom: 20px;
+
+            .swiper-pagination-bullet {
+                width: 12px;
+                height: 12px;
+                background: rgba(255, 255, 255, 0.5);
+                opacity: 1;
+                transition: all 0.3s ease;
+
+                &-active {
+                    width: 30px;
+                    border-radius: 6px;
+                    background: white;
+                }
+            }
+        }
+    }
+
+    // Slide individuel
+    .hero-slide {
+        position: relative;
+        width: 100%;
+        height: 100%;
+
+        // Image de fond
+        &__image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            animation: zoomIn 20s ease-out forwards;
+
+            @keyframes zoomIn {
+                from {
+                    transform: scale(1);
+                }
+                to {
+                    transform: scale(1.1);
+                }
+            }
+        }
+
+        // Overlay gradient
+        &__overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                135deg,
+                rgba(102, 126, 234, 0.6) 0%,
+                rgba(118, 75, 162, 0.5) 100%
+            );
+            z-index: 1;
+        }
+
+        // Contenu textuel
+        &__content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+
+            .content-wrapper {
+                max-width: 700px;
+            }
+
+            // Alignements
+            &--left {
+                .content-wrapper {
+                    margin-right: auto;
+                    text-align: left;
+                }
+            }
+
+            &--center {
+                justify-content: center;
+                
+                .content-wrapper {
+                    text-align: center;
+                    margin: 0 auto;
+                }
+            }
+
+            &--right {
+                justify-content: flex-end;
+                
+                .content-wrapper {
+                    margin-left: auto;
+                    text-align: right;
+                }
+            }
+        }
+
+        // Titre principal
+        &__title {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation-delay: 0s !important;
+
+            @media (max-width: 1200px) {
+                font-size: 3rem;
+            }
+
+            @media (max-width: 768px) {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+            }
+        }
+
+        // Sous-titre
+        &__subtitle {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            opacity: 0.95;
+            line-height: 1.3;
+            animation-delay: 0.2s !important;
+
+            @media (max-width: 768px) {
+                font-size: 1.25rem;
+                margin-bottom: 1rem;
+            }
+        }
+
+        // Description
+        &__description {
+            font-size: 1.25rem;
+            font-weight: 400;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            animation-delay: 0.4s !important;
+
+            @media (max-width: 768px) {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        // Call-to-Action
+        &__cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: 2px solid white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            animation-delay: 0.6s !important;
+
+            i {
+                transition: transform 0.3s ease;
+            }
+
+            &:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+                background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+
+                i {
+                    transform: translateX(5px);
+                }
+            }
+
+            @media (max-width: 768px) {
+                padding: 12px 30px;
+                font-size: 1rem;
             }
         }
     }
 
     // Responsive
-    @media (max-width: 992px) {
-        height: 50vh;
-        border-radius: 8px;
-    }
-
     @media (max-width: 768px) {
-        height: 40vh;
-        min-height: 300px;
+        height: 70vh;
+        min-height: 500px;
+        max-height: 600px;
 
-        .swiper-button-prev,
-        .swiper-button-next {
-            display: none;
-        }
-
-        .swiper-pagination {
-            bottom: 10px !important;
+        .hero-slide {
+            &__content {
+                padding: 0 20px;
+            }
         }
     }
+}
 
-    @media (max-width: 576px) {
-        height: 35vh;
-        border-radius: 0;
+// Animations Animate.css (si non présentes)
+.animate__animated {
+    animation-duration: 1s;
+    animation-fill-mode: both;
+}
+
+.animate__fadeInUp {
+    animation-name: fadeInUp;
+}
+
+.animate__delay-1s {
+    animation-delay: 0.2s;
+}
+
+.animate__delay-2s {
+    animation-delay: 0.4s;
+}
+
+.animate__delay-3s {
+    animation-delay: 0.6s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 40px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
     }
 }

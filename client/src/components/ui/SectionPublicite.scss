@@ -1,0 +1,303 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.section-publicite {
+    padding: 80px 0;
+    background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+    overflow: hidden;
+
+    // En-tête
+    .section-header {
+        text-align: center;
+        margin-bottom: 50px;
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: $primary-color;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+
+            i {
+                color: $accent-color;
+            }
+
+            @media (max-width: 768px) {
+                font-size: 2rem;
+            }
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: $text-light;
+            font-weight: 400;
+        }
+    }
+
+    // Grille de bannières
+    .bannieres-grid {
+        display: grid;
+        gap: 30px;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+
+        // Layouts spécifiques selon le nombre de bannières
+        &--1 {
+            grid-template-columns: 1fr;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        &--2 {
+            grid-template-columns: repeat(2, 1fr);
+
+            @media (max-width: 768px) {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        &--3 {
+            grid-template-columns: repeat(3, 1fr);
+
+            @media (max-width: 992px) {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            @media (max-width: 576px) {
+                grid-template-columns: 1fr;
+            }
+        }
+    }
+
+    // Carte bannière
+    .banniere-card {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 400px;
+        background: white;
+
+        &:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+
+            .banniere-image {
+                transform: scale(1.1);
+            }
+
+            .banniere-cta {
+                background: $accent-color;
+                padding-right: 30px;
+
+                i {
+                    transform: translateX(5px);
+                }
+            }
+        }
+
+        // Skeleton loading
+        &.skeleton {
+            animation: pulse 1.5s ease-in-out infinite;
+
+            .skeleton-image {
+                height: 250px;
+                background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+                background-size: 200% 100%;
+                animation: shimmer 1.5s infinite;
+            }
+
+            .skeleton-content {
+                padding: 20px;
+
+                .skeleton-title,
+                .skeleton-text,
+                .skeleton-button {
+                    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+                    background-size: 200% 100%;
+                    animation: shimmer 1.5s infinite;
+                    border-radius: 8px;
+                    margin-bottom: 10px;
+                }
+
+                .skeleton-title {
+                    height: 30px;
+                    width: 70%;
+                }
+
+                .skeleton-text {
+                    height: 20px;
+                    width: 90%;
+                }
+
+                .skeleton-button {
+                    height: 40px;
+                    width: 120px;
+                    margin-top: 20px;
+                }
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+    }
+
+    // Lien bannière
+    .banniere-link {
+        display: block;
+        height: 100%;
+        text-decoration: none;
+        color: inherit;
+        position: relative;
+    }
+
+    // Image de fond
+    .banniere-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    // Overlay
+    .banniere-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            135deg,
+            rgba(0, 0, 0, 0.6) 0%,
+            rgba(0, 0, 0, 0.3) 100%
+        );
+        z-index: 1;
+    }
+
+    // Contenu textuel
+    .banniere-content {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 30px;
+        color: white;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+
+        // Alignements
+        &--left {
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        &--center {
+            align-items: center;
+            text-align: center;
+        }
+
+        &--right {
+            align-items: flex-end;
+            text-align: right;
+        }
+    }
+
+    // Titre bannière
+    .banniere-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        line-height: 1.2;
+
+        @media (max-width: 768px) {
+            font-size: 1.5rem;
+        }
+    }
+
+    // Sous-titre
+    .banniere-subtitle {
+        font-size: 1.2rem;
+        font-weight: 500;
+        margin-bottom: 8px;
+        opacity: 0.95;
+    }
+
+    // Description
+    .banniere-description {
+        font-size: 1rem;
+        font-weight: 400;
+        margin-bottom: 20px;
+        opacity: 0.9;
+        line-height: 1.5;
+    }
+
+    // Call-to-Action
+    .banniere-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 25px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 2px solid white;
+        transition: all 0.3s ease;
+
+        i {
+            transition: transform 0.3s ease;
+        }
+    }
+
+    // Badge "Sponsorisé"
+    .banniere-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: $text-color;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        i {
+            color: $accent-color;
+            font-size: 0.85rem;
+        }
+    }
+
+    // Responsive
+    @media (max-width: 768px) {
+        padding: 50px 0;
+
+        .banniere-card {
+            height: 350px;
+        }
+
+        .banniere-content {
+            padding: 20px;
+        }
+    }
+}

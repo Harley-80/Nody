@@ -5,49 +5,36 @@ import { notifierNouveauProduit } from '../services/websocketService.js';
 
 /**
  * Formater les URLs des images avec l'URL complète
+ * ✅ CORRIGÉ: Gère maintenant le format [String] ET les anciens objets
  */
 const formaterUrlsImages = (produit, baseUrl) => {
-    const produitFormate = produit.toObject
-        ? produit.toObject()
-        : { ...produit };
+    const produitObj = produit.toObject ? produit.toObject() : { ...produit };
 
-    if (produitFormate.images && Array.isArray(produitFormate.images)) {
-        produitFormate.images = produitFormate.images.map(image => {
-            let urlFinale = image.url;
+    if (produitObj.images && Array.isArray(produitObj.images)) {
+        produitObj.images = produitObj.images.map(image => {
+            // Gérer le cas où c'est un objet (ancien format)
+            let imagePath =
+                typeof image === 'string' ? image : image.url || image;
 
-            // Si l'URL n'est pas complète, la formater
-            if (urlFinale && !urlFinale.startsWith('http')) {
-                // Extraire le nom de fichier
-                let filename;
-
-                if (urlFinale.includes('/')) {
-                    filename = urlFinale.split('/').pop();
-                } else if (image.nomFichier) {
-                    filename = image.nomFichier;
-                } else if (image.chemin && image.chemin.includes('/')) {
-                    filename = image.chemin.split('/').pop();
-                } else {
-                    filename = urlFinale;
-                }
-
-                // Construire l'URL complète
-                if (filename) {
-                    urlFinale = `${baseUrl}/uploads/produits/${filename}`;
-                }
+            // Si déjà une URL complète, garder tel quel
+            if (imagePath.startsWith('http')) {
+                return imagePath;
             }
 
-            return {
-                ...image,
-                url: urlFinale || image.url,
-            };
+            // Sinon, construire l'URL complète
+            // Supprimer le slash initial si présent pour éviter double slash
+            const cleanPath = imagePath.startsWith('/')
+                ? imagePath.slice(1)
+                : imagePath;
+            return `${baseUrl}/${cleanPath}`;
         });
     }
 
-    return produitFormate;
+    return produitObj;
 };
 
 /**
- * Obtenir tous les produits avec filtres et pagination
+ * @desc    Obtenir tous les produits avec filtres et pagination
  */
 const obtenirProduits = asyncHandler(async (req, res) => {
     const {
@@ -115,7 +102,6 @@ const obtenirProduits = asyncHandler(async (req, res) => {
     }
 
     const sauter = (page - 1) * limite;
-
     const produits = await Produit.find(requete)
         .populate('categorie', 'nom slug')
         .populate('sousCategorie', 'nom slug')
@@ -123,10 +109,8 @@ const obtenirProduits = asyncHandler(async (req, res) => {
         .skip(sauter)
         .limit(Number(limite));
 
-    const baseUrl = req.protocol + '://' + req.get('host');
-    const produitsFormates = produits.map(produit =>
-        formaterUrlsImages(produit, baseUrl)
-    );
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const produitsFormates = produits.map(p => formaterUrlsImages(p, baseUrl));
 
     const total = await Produit.countDocuments(requete);
 
@@ -164,30 +148,25 @@ const obtenirProduits = asyncHandler(async (req, res) => {
 });
 
 /**
- * Obtenir un produit par ID ou slug
+ * @desc    Obtenir un produit par ID ou slug
  */
 const obtenirProduit = asyncHandler(async (req, res) => {
     const { id } = req.params;
     let produit;
 
-    if (id.match(/^[0-9a-fA-F]{24}$/)) {
-        produit = await Produit.findById(id)
-            .populate('categorie', 'nom slug')
-            .populate('sousCategorie', 'nom slug')
-            .populate('avis.utilisateur', 'prenom nom avatar');
-    } else {
-        produit = await Produit.findOne({ slug: id })
-            .populate('categorie', 'nom slug')
-            .populate('sousCategorie', 'nom slug')
-            .populate('avis.utilisateur', 'prenom nom avatar');
-    }
+    const query = id.match(/^[0-9a-fA-F]{24}$/) ? { _id: id } : { slug: id };
+
+    produit = await Produit.findOne(query)
+        .populate('categorie', 'nom slug')
+        .populate('sousCategorie', 'nom slug')
+        .populate('avis.utilisateur', 'prenom nom avatar');
 
     if (!produit || !produit.estActif) {
         res.status(404);
         throw new Error('Produit non trouvé');
     }
 
-    const baseUrl = req.protocol + '://' + req.get('host');
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     const produitFormate = formaterUrlsImages(produit, baseUrl);
 
     produit.nombreVues += 1;
@@ -200,65 +179,49 @@ const obtenirProduit = asyncHandler(async (req, res) => {
 });
 
 /**
- * Créer un nouveau produit
+ * @desc    Créer un nouveau produit (Admin/Vendeur)
+ * ✅ CORRIGÉ: Stocke maintenant les images comme tableau de strings
  */
 const creerProduit = asyncHandler(async (req, res) => {
-    const imagesPaths = [];
-    if (req.files && req.files.length > 0) {
-        const baseUrl = req.protocol + '://' + req.get('host');
-
-        req.files.forEach(file => {
-            const imageUrl = `${baseUrl}/uploads/produits/${file.filename}`;
-            imagesPaths.push({
-                url: imageUrl,
-                alt: req.body.nom || 'Image produit',
-                estPrincipale: imagesPaths.length === 0,
-            });
+    // Garde-fou : au moins une image obligatoire
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).json({
+            success: false,
+            message: 'Au moins une image produit est obligatoire',
         });
     }
 
-    let dimensions = undefined;
-    if (req.body.dimensions) {
-        try {
+    // ✅ CORRECTION: Stocker uniquement les chemins (strings)
+    const images = req.files.map(file => `uploads/produits/${file.filename}`);
+
+    // Parsing sécurisé des données JSON
+    let dimensions,
+        etiquettes = [];
+    try {
+        if (req.body.dimensions)
             dimensions =
                 typeof req.body.dimensions === 'string'
                     ? JSON.parse(req.body.dimensions)
                     : req.body.dimensions;
-        } catch (e) {
-            console.error('Erreur parsing dimensions:', e);
-        }
-    }
-
-    let etiquettes = [];
-    if (req.body.etiquettes) {
-        try {
+        if (req.body.etiquettes)
             etiquettes =
                 typeof req.body.etiquettes === 'string'
                     ? JSON.parse(req.body.etiquettes)
                     : req.body.etiquettes;
-        } catch (e) {
-            console.error('Erreur parsing etiquettes:', e);
-        }
+    } catch (e) {
+        console.error('Erreur parsing champs complexes:', e);
     }
 
-    const produitData = {
-        nom: req.body.nom,
-        description: req.body.description,
-        prix: parseFloat(req.body.prix),
-        quantite: parseInt(req.body.quantite, 10),
-        categorie: req.body.categorie,
+    const produit = await Produit.create({
+        ...req.body,
+        images, // ✅ Tableau de strings
+        dimensions,
+        etiquettes,
+        vendeur: req.utilisateur._id,
         estActif: req.body.estActif === 'true' || req.body.estActif === true,
-        images: imagesPaths,
-    };
+    });
 
-    if (req.body.marque) produitData.marque = req.body.marque;
-    if (req.body.poids) produitData.poids = parseFloat(req.body.poids);
-    if (dimensions) produitData.dimensions = dimensions;
-    if (etiquettes.length > 0) produitData.etiquettes = etiquettes;
-
-    const produit = await Produit.create(produitData);
-
-    // Notifier les modérateurs et admin d'un nouveau produit
+    // Notification WebSocket
     try {
         if (produit.statut === 'en_attente') {
             const produitPopule = await Produit.findById(produit._id).populate(
@@ -268,21 +231,23 @@ const creerProduit = asyncHandler(async (req, res) => {
             notifierNouveauProduit(produitPopule);
         }
     } catch (notifError) {
-        console.error('Erreur notification produit:', notifError);
+        console.error('Erreur notification:', notifError);
     }
 
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     res.status(201).json({
         succes: true,
-        donnees: produit,
+        donnees: formaterUrlsImages(produit, baseUrl),
         message: 'Produit créé avec succès',
     });
 });
 
 /**
- * Mettre à jour un produit existant
+ * @desc    Mettre à jour un produit
  */
 const mettreAJourProduit = asyncHandler(async (req, res) => {
     let produit = await Produit.findById(req.params.id);
+
     if (!produit) {
         res.status(404);
         throw new Error('Produit non trouvé');
@@ -301,15 +266,16 @@ const mettreAJourProduit = asyncHandler(async (req, res) => {
         runValidators: true,
     }).populate('categorie', 'nom slug');
 
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     res.json({
         succes: true,
-        donnees: produit,
+        donnees: formaterUrlsImages(produit, baseUrl),
         message: 'Produit mis à jour avec succès',
     });
 });
 
 /**
- * Supprimer un produit
+ * @desc    Supprimer un produit
  */
 const supprimerProduit = asyncHandler(async (req, res) => {
     const produit = await Produit.findById(req.params.id);
@@ -327,15 +293,11 @@ const supprimerProduit = asyncHandler(async (req, res) => {
     }
 
     await Produit.findByIdAndDelete(req.params.id);
-
-    res.json({
-        succes: true,
-        message: 'Produit supprimé avec succès',
-    });
+    res.json({ succes: true, message: 'Produit supprimé avec succès' });
 });
 
 /**
- * Ajouter un avis à un produit
+ * @desc    Ajouter un avis
  */
 const ajouterAvis = asyncHandler(async (req, res) => {
     const { note, commentaire, images } = req.body;
@@ -347,9 +309,8 @@ const ajouterAvis = asyncHandler(async (req, res) => {
     }
 
     const dejaEvalue = produit.avis.find(
-        avis => avis.utilisateur.toString() === req.utilisateur._id.toString()
+        a => a.utilisateur.toString() === req.utilisateur._id.toString()
     );
-
     if (dejaEvalue) {
         res.status(400);
         throw new Error('Vous avez déjà évalué ce produit');
@@ -368,13 +329,13 @@ const ajouterAvis = asyncHandler(async (req, res) => {
 
     res.status(201).json({
         succes: true,
-        message: 'Avis ajouté avec succès',
+        message: 'Avis ajouté',
         donnees: produit.avis,
     });
 });
 
 /**
- * Obtenir les produits similaires
+ * @desc    Produits similaires & populaires (Formatage inclus)
  */
 const obtenirProduitsSimilaires = asyncHandler(async (req, res) => {
     const produit = await Produit.findById(req.params.id);
@@ -383,127 +344,67 @@ const obtenirProduitsSimilaires = asyncHandler(async (req, res) => {
         throw new Error('Produit non trouvé');
     }
 
-    const produitsSimilaires = await Produit.find({
+    const produits = await Produit.find({
         _id: { $ne: produit._id },
         categorie: produit.categorie,
         estActif: true,
     })
         .limit(8)
-        .select('nom prix images evaluations slug')
-        .sort({ 'evaluations.moyenne': -1, nombreVentes: -1 });
+        .select('nom prix images evaluations slug');
 
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     res.json({
         succes: true,
-        donnees: produitsSimilaires,
+        donnees: produits.map(p => formaterUrlsImages(p, baseUrl)),
     });
 });
 
-/**
- * Obtenir les produits populaires
- */
 const obtenirProduitsPopulaires = asyncHandler(async (req, res) => {
     const limite = parseInt(req.query.limite) || 8;
     const produits = await Produit.find({ estActif: true })
         .sort({ 'evaluations.moyenne': -1, nombreVentes: -1 })
-        .limit(limite)
-        .select('nom prix images evaluations slug categorie nombreVentes');
+        .limit(limite);
 
-    // formattage des URLs
-    const baseUrl = req.protocol + '://' + req.get('host');
-    const produitsFormates = produits.map(produit =>
-        formaterUrlsImages(produit, baseUrl)
-    );
-
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     res.json({
         succes: true,
-        donnees: produitsFormates,
+        donnees: produits.map(p => formaterUrlsImages(p, baseUrl)),
     });
 });
 
-/**
- * Obtenir les nouveaux produits
- */
 const obtenirNouveauxProduits = asyncHandler(async (req, res) => {
     const limite = parseInt(req.query.limite) || 8;
     const produits = await Produit.find({ estActif: true, estNouveau: true })
         .sort({ creeLe: -1 })
-        .limit(limite)
-        .select('nom prix images evaluations slug');
+        .limit(limite);
 
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     res.json({
         succes: true,
-        donnees: produits,
+        donnees: produits.map(p => formaterUrlsImages(p, baseUrl)),
     });
 });
 
-/**
- * Obtenir les statistiques des produits
- */
 const obtenirStatistiquesProduits = asyncHandler(async (req, res) => {
-    try {
-        const [total, actifs, enRupture, brouillons] = await Promise.all([
-            Produit.countDocuments({ estActif: true }),
-            Produit.countDocuments({ estActif: true, quantite: { $gt: 0 } }),
-            Produit.countDocuments({ estActif: true, quantite: 0 }),
-            Produit.countDocuments({ estActif: false }),
-        ]);
-
-        res.json({
-            succes: true,
-            total,
-            actifs,
-            enRupture,
-            brouillons,
-        });
-    } catch (error) {
-        console.error('Erreur stats produits:', error);
-        res.status(500).json({
-            succes: false,
-            message: 'Erreur lors du calcul des statistiques',
-            error: error.message,
-        });
-    }
+    const [total, actifs, enRupture, brouillons] = await Promise.all([
+        Produit.countDocuments({ estActif: true }),
+        Produit.countDocuments({ estActif: true, quantite: { $gt: 0 } }),
+        Produit.countDocuments({ estActif: true, quantite: 0 }),
+        Produit.countDocuments({ estActif: false }),
+    ]);
+    res.json({ succes: true, total, actifs, enRupture, brouillons });
 });
 
-/**
- * Obtenir les produits en vedette
- */
 const obtenirProduitsVedettes = asyncHandler(async (req, res) => {
-    try {
-        const produits = await Produit.find({
-            estEnVedette: true,
-            estActif: true,
-            statut: 'approuve',
-        })
-            .populate('categorie', 'nom slug')
-            .populate('vendeur', 'nom entreprise')
-            .sort({ createdAt: -1 })
-            .limit(10);
+    const produits = await Produit.find({ estEnVedette: true, estActif: true })
+        .populate('categorie', 'nom slug')
+        .limit(10);
 
-        if (!produits || produits.length === 0) {
-            return res.status(200).json({
-                succes: true,
-                donnees: [],
-                message: 'Aucun produit en vedette pour le moment',
-            });
-        }
-
-        const baseUrl = req.protocol + '://' + req.get('host');
-        const produitsFormates = produits.map(produit =>
-            formaterUrlsImages(produit, baseUrl)
-        );
-
-        res.status(200).json({
-            succes: true,
-            donnees: produitsFormates,
-        });
-    } catch (error) {
-        console.error('Erreur récupération produits vedettes:', error);
-        res.status(500).json({
-            succes: false,
-            erreur: 'Erreur serveur',
-        });
-    }
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    res.json({
+        succes: true,
+        donnees: produits.map(p => formaterUrlsImages(p, baseUrl)),
+    });
 });
 
 export {
@@ -518,4 +419,4 @@ export {
     obtenirNouveauxProduits,
     obtenirStatistiquesProduits,
     obtenirProduitsVedettes,
-};//
+};

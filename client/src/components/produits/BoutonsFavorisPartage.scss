@@ -1,0 +1,69 @@
+.boutons-favoris-partage {
+    display: flex;
+    gap: 10px;
+
+    .btn-action {
+        height: 55px;
+        padding: 0 25px;
+        border: 2px solid #e2e8f0;
+        background: white;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        color: #4a5568;
+
+        i {
+            font-size: 1.2rem;
+        }
+
+        &:hover {
+            background: #f7fafc;
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        &.btn-favoris.active {
+            background: #fff5f5;
+            border-color: #ef4444;
+            color: #ef4444;
+
+            i {
+                color: #ef4444;
+            }
+        }
+
+        .btn-label {
+            @media (max-width: 576px) {
+                display: none;
+            }
+        }
+    }
+
+    .partage-menu {
+        min-width: 200px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        border: none;
+
+        .dropdown-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+
+            i {
+                font-size: 1.3rem;
+                width: 30px;
+            }
+
+            &:hover {
+                background: #f7fafc;
+            }
+        }
+    }
+}

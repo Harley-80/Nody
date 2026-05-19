@@ -22,8 +22,8 @@ export default function Accueil() {
         try {
             // Charger les produits en vedette depuis le backend
             const [produitsVedette, produitsNouveaux] = await Promise.all([
-                produitsService.getFeaturedProduits(),
-                getNouveauxProduits(),
+                produitsService.getProduits({ limite: 8 }), // Tous les produits
+                produitsService.getProduits({ limite: 12 }), // Tous les produits
             ]);
 
             setProduitsEnVedette(

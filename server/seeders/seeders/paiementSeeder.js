@@ -1,4 +1,3 @@
-// Seeder pour les paiements
 import Paiement from '../../models/paiementModel.js';
 
 /**

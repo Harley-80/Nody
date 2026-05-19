@@ -1,0 +1,204 @@
+.produits-similaires {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    padding: 40px;
+
+    .similaires-header {
+        h3 {
+            color: #2d3748;
+            font-weight: 700;
+        }
+    }
+
+    .similaires-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 25px;
+
+        .similaire-card {
+            background: #f7fafc;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+
+            &:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+
+                .similaire-actions {
+                    opacity: 1;
+                }
+            }
+
+            .similaire-image {
+                position: relative;
+                height: 250px;
+                background: white;
+                overflow: hidden;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: transform 0.3s;
+                }
+
+                &:hover img {
+                    transform: scale(1.1);
+                }
+
+                .image-placeholder {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100%;
+                    color: #cbd5e0;
+                    font-size: 3rem;
+                }
+
+                .similaire-badges {
+                    position: absolute;
+                    top: 10px;
+                    left: 10px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+
+                    .badge {
+                        padding: 5px 12px;
+                        border-radius: 20px;
+                        font-size: 0.8rem;
+                        font-weight: 600;
+
+                        &.badge-nouveau {
+                            background: #667eea;
+                            color: white;
+                        }
+
+                        &.badge-promo {
+                            background: #ef4444;
+                            color: white;
+                        }
+                    }
+                }
+
+                .similaire-actions {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    opacity: 0;
+                    transition: opacity 0.3s;
+
+                    .btn-action {
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        background: white;
+                        border: none;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+                        transition: all 0.3s;
+
+                        &:hover {
+                            background: #667eea;
+                            color: white;
+                            transform: scale(1.1);
+                        }
+                    }
+                }
+            }
+
+            .similaire-info {
+                padding: 20px;
+
+                .similaire-categorie {
+                    font-size: 0.8rem;
+                    color: #6c757d;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 8px;
+                }
+
+                .similaire-nom {
+                    font-size: 1.1rem;
+                    font-weight: 700;
+                    color: #2d3748;
+                    margin-bottom: 10px;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+
+                .similaire-note {
+                    margin-bottom: 10px;
+
+                    i {
+                        color: #ddd;
+                        font-size: 0.9rem;
+
+                        &.filled {
+                            color: #fbbf24;
+                        }
+                    }
+
+                    .note-text {
+                        font-size: 0.85rem;
+                        color: #6c757d;
+                        margin-left: 5px;
+                    }
+                }
+
+                .similaire-prix {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin-bottom: 10px;
+
+                    .prix-promo,
+                    .prix-normal {
+                        font-size: 1.3rem;
+                        font-weight: 700;
+                        color: #667eea;
+                    }
+
+                    .prix-original {
+                        font-size: 1rem;
+                        color: #6c757d;
+                        text-decoration: line-through;
+                    }
+                }
+
+                .similaire-stock {
+                    font-size: 0.85rem;
+
+                    .stock-available {
+                        color: #10b981;
+                        font-weight: 600;
+
+                        i {
+                            margin-right: 5px;
+                        }
+                    }
+
+                    .stock-unavailable {
+                        color: #ef4444;
+                        font-weight: 600;
+
+                        i {
+                            margin-right: 5px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,121 @@
+.sticky-cart-button {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.15);
+    padding: 15px 0;
+    z-index: 1000;
+    animation: slideUp 0.3s ease-out;
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(100%);
+        }
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    .sticky-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+
+        .sticky-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+
+            .sticky-image {
+                width: 60px;
+                height: 60px;
+                border-radius: 10px;
+                overflow: hidden;
+                background: #f7fafc;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+
+                i {
+                    font-size: 2rem;
+                    color: #cbd5e0;
+                }
+            }
+
+            .sticky-details {
+                .sticky-nom {
+                    font-weight: 700;
+                    color: #2d3748;
+                    font-size: 0.95rem;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 1;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+
+                .sticky-prix {
+                    color: #667eea;
+                    font-weight: 700;
+                    font-size: 1.1rem;
+                }
+            }
+        }
+
+        .sticky-btn-add {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+
+            &:hover:not(:disabled) {
+                transform: scale(1.05);
+                box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            }
+
+            &:disabled {
+                background: #cbd5e0;
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    @media (max-width: 576px) {
+        .sticky-content {
+            .sticky-info {
+                .sticky-image {
+                    width: 50px;
+                    height: 50px;
+                }
+
+                .sticky-details {
+                    .sticky-nom {
+                        font-size: 0.85rem;
+                    }
+
+                    .sticky-prix {
+                        font-size: 1rem;
+                    }
+                }
+            }
+
+            .sticky-btn-add {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    }
+}

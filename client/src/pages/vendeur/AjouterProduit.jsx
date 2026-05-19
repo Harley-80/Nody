@@ -387,52 +387,109 @@ const AjouterProduit = () => {
 
     const handleSubmit = async () => {
         if (!validerEtape(activeStep)) return;
+
+        // ✅ DEBUG : Vérifier les images avant envoi
+        console.log('📸 Images à envoyer:', images.length);
+        console.log('Premier fichier:', images[0]);
+
+        if (images.length === 0) {
+            addToast({
+                type: 'error',
+                title: 'Erreur',
+                message: 'Veuillez ajouter au moins une image',
+            });
+            return;
+        }
+
         setLoading(true);
+
         try {
             const formDataToSend = new FormData();
 
+            // ✅ Champs texte obligatoires
             formDataToSend.append('nom', formData.nom);
             formDataToSend.append('description', formData.description);
             formDataToSend.append('prix', formData.prix);
             formDataToSend.append('categorie', formData.categorie);
             formDataToSend.append('stock', formData.stock);
 
-            if (formData.marque)
+            // ✅ Champs optionnels
+            if (formData.marque) {
                 formDataToSend.append('marque', formData.marque);
-            if (formData.prixPromo)
+            }
+            if (formData.prixPromo) {
                 formDataToSend.append('prixPromo', formData.prixPromo);
-            if (formData.sousCategorie)
+            }
+            if (formData.sousCategorie) {
                 formDataToSend.append('sousCategorie', formData.sousCategorie);
-            if (formData.delaiLivraison)
+            }
+            if (formData.delaiLivraison) {
                 formDataToSend.append(
                     'delaiLivraison',
                     formData.delaiLivraison
                 );
-            if (formData.fraisLivraison)
+            }
+            if (formData.fraisLivraison) {
                 formDataToSend.append(
                     'fraisLivraison',
                     formData.fraisLivraison
                 );
-            if (formData.garantie)
+            }
+            if (formData.garantie) {
                 formDataToSend.append('garantie', formData.garantie);
-            if (formData.caracteristiques.length > 0)
+            }
+
+            // ✅ Tableaux (stringifiés)
+            if (formData.caracteristiques.length > 0) {
                 formDataToSend.append(
                     'caracteristiques',
                     JSON.stringify(formData.caracteristiques)
                 );
-            if (formData.tags.length > 0)
+            }
+            if (formData.tags.length > 0) {
                 formDataToSend.append('tags', JSON.stringify(formData.tags));
-            if (formData.dimensions)
+            }
+
+            // ✅ Dimensions (stringifiées)
+            if (
+                formData.dimensions &&
+                (formData.dimensions.longueur ||
+                    formData.dimensions.largeur ||
+                    formData.dimensions.hauteur ||
+                    formData.dimensions.poids)
+            ) {
                 formDataToSend.append(
                     'dimensions',
                     JSON.stringify(formData.dimensions)
                 );
+            }
 
-            images.forEach((image, index) => {
-                formDataToSend.append('images', image);
+            // ✅ IMAGES : Ajouter les fichiers (pas de JSON !)
+            images.forEach(imageFile => {
+                console.log(
+                    'Ajout fichier:',
+                    imageFile.name,
+                    imageFile.type,
+                    imageFile.size
+                );
+                formDataToSend.append('images', imageFile);
             });
 
+            // ✅ DEBUG : Afficher le contenu de FormData
+            console.log('📦 Contenu FormData :');
+            for (let [key, value] of formDataToSend.entries()) {
+                if (value instanceof File) {
+                    console.log(
+                        `  ${key}: [Fichier] ${value.name} (${value.size} bytes)`
+                    );
+                } else {
+                    console.log(`  ${key}: ${value}`);
+                }
+            }
+
+            console.log('🚀 Envoi vers API...');
             const response = await vendeurService.creerProduit(formDataToSend);
+            console.log('✅ Réponse API:', response);
 
             addToast({
                 type: 'success',
@@ -442,7 +499,9 @@ const AjouterProduit = () => {
 
             setTimeout(() => navigate('/vendeur/mes-produits'), 1500);
         } catch (error) {
-            console.error('Erreur ajout produit:', error);
+            console.error('❌ Erreur ajout produit:', error);
+            console.error('Détails:', error.response?.data);
+
             addToast({
                 type: 'error',
                 title: 'Erreur',
@@ -454,6 +513,7 @@ const AjouterProduit = () => {
             setLoading(false);
         }
     };
+
 
     const renderStepContent = step => {
         switch (step) {

@@ -147,4 +147,10 @@ export const handleMulterError = (err, req, res, next) => {
     next();
 };
 
+// Export pour les produits (array de 6 images max)
+export const uploadProduitImages = uploadProduits.array('images', 6);
+
+// Export pour un seul produit
+export const uploadSingleProduitImage = uploadProduits.single('image');
+
 export default upload;

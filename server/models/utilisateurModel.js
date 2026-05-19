@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import { ROLES } from '../constants/roles.js';
 
-// Définition du schéma pour les utilisateurs
+// SCHÉMA UTILISATEUR 
 const utilisateurSchema = new mongoose.Schema(
     {
         nom: {
@@ -62,7 +62,7 @@ const utilisateurSchema = new mongoose.Schema(
         },
         statutVerification: {
             type: String,
-            enum: ['en_attente', 'verifie', 'rejete', 'approuve'], 
+            enum: ['en_attente', 'verifie', 'rejete', 'approuve'],
             default: 'en_attente',
         },
         dateVerification: {
@@ -71,7 +71,7 @@ const utilisateurSchema = new mongoose.Schema(
         raisonRejet: {
             type: String,
         },
-        // Champs spécifiques aux vendeurs
+        // Champs spécifiques aux vendeurs (Boutique)
         boutique: {
             nomBoutique: String,
             descriptionBoutique: String,
@@ -80,6 +80,66 @@ const utilisateurSchema = new mongoose.Schema(
             banniere: String,
             politiqueRetour: String,
             conditionsVente: String,
+        },
+        // CHAMPS : SYSTÈME DE CRÉDITS BANNIÈRES (POUR VENDEURS)
+        creditsBannieres: {
+            type: Number,
+            default: 5,
+            min: [0, 'Les crédits ne peuvent pas être négatifs'],
+            validate: {
+                validator: Number.isInteger,
+                message: 'Les crédits doivent être un nombre entier',
+            },
+        },
+        historiqueCredits: [
+            {
+                type: {
+                    type: String,
+                    enum: ['credit', 'debit', 'bonus', 'penalite'],
+                    required: true,
+                },
+                montant: {
+                    type: Number,
+                    required: true,
+                },
+                raison: {
+                    type: String,
+                    required: true,
+                },
+                banniereId: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'Banniere',
+                },
+                soldeApres: {
+                    type: Number,
+                    required: true,
+                },
+                date: {
+                    type: Date,
+                    default: Date.now,
+                },
+            },
+        ],
+        statistiquesBannieres: {
+            totalBannieresCreees: { type: Number, default: 0 },
+            bannieresApprouvees: { type: Number, default: 0 },
+            bannieresRejetees: { type: Number, default: 0 },
+            totalVentesAttribuees: { type: Number, default: 0 },
+            montantTotalVentes: { type: Number, default: 0 },
+            dernierBonusVentes: { type: Date },
+        },
+        // CHAMPS : DÉLÉGATION DE RÔLE MARKETING (POUR MODÉRATEURS)
+        roleEtendu: {
+            type: String,
+            enum: ['', 'moderateur_marketing'],
+            default: '',
+        },
+        delegationPar: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Utilisateur',
+        },
+        dateDelegation: {
+            type: Date,
         },
         avatar: {
             type: String,
@@ -109,26 +169,11 @@ const utilisateurSchema = new mongoose.Schema(
             },
         ],
         preferences: {
-            newsletter: {
-                type: Boolean,
-                default: true,
-            },
-            marketing: {
-                type: Boolean,
-                default: false,
-            },
-            notifications: {
-                type: Boolean,
-                default: true,
-            },
-            langue: {
-                type: String,
-                default: 'fr',
-            },
-            devise: {
-                type: String,
-                default: 'XOF',
-            },
+            newsletter: { type: Boolean, default: true },
+            marketing: { type: Boolean, default: false },
+            notifications: { type: Boolean, default: true },
+            langue: { type: String, default: 'fr' },
+            devise: { type: String, default: 'XOF' },
         },
         profilsSociaux: {
             google: String,
@@ -207,6 +252,7 @@ const utilisateurSchema = new mongoose.Schema(
     {
         timestamps: true,
         toJSON: {
+            virtuals: true,
             transform: function (doc, ret) {
                 delete ret.motDePasse;
                 delete ret.jetonReinitialisationMotDePasse;
@@ -219,19 +265,19 @@ const utilisateurSchema = new mongoose.Schema(
     }
 );
 
-// Index pour améliorer les performances
-//utilisateurSchema.index({ email: 1 });
+// INDEXES 
+utilisateurSchema.index({ email: 1 });
 utilisateurSchema.index({ role: 1 });
 utilisateurSchema.index({ 'adresses.pays': 1 });
 utilisateurSchema.index({ createdAt: -1 });
 utilisateurSchema.index({ role: 1, statutVerification: 1 });
 utilisateurSchema.plugin(mongoosePaginate);
 
-// Middleware pour hacher le mot de passe avant la sauvegarde
-utilisateurSchema.pre('save', async function (next) {
-    // Si le mot de passe n'a pas été modifié, on passe au middleware suivant
-    if (!this.isModified('motDePasse')) return next();
+// MIDDLEWARES PRÉ-ENREGISTRER
 
+// Hachage du mot de passe
+utilisateurSchema.pre('save', async function (next) {
+    if (!this.isModified('motDePasse')) return next();
     try {
         const sel = await bcrypt.genSalt(12);
         this.motDePasse = await bcrypt.hash(this.motDePasse, sel);
@@ -241,29 +287,39 @@ utilisateurSchema.pre('save', async function (next) {
     }
 });
 
-// Middleware pour nettoyer le téléphone avant sauvegarde
+// Nettoyage téléphone et Crédits initiaux
 utilisateurSchema.pre('save', function (next) {
+    // Téléphone
     if (this.telephone && this.isModified('telephone')) {
         this.telephone = this.telephone.replace(/[\s\-\(\)\.]/g, '');
+    }
+
+    // Crédits vendeurs à l'inscription
+    if (
+        this.isNew &&
+        this.role === ROLES.VENDEUR &&
+        (this.creditsBannieres === undefined || this.creditsBannieres === 5)
+    ) {
+        this.creditsBannieres = 5;
     }
     next();
 });
 
-// Méthode pour comparer les mots de passe
+// MÉTHODES D'INSTANCE 
 utilisateurSchema.methods.comparerMotDePasse = async function (
     motDePasseCandidat
 ) {
     return await bcrypt.compare(motDePasseCandidat, this.motDePasse);
 };
 
-// Méthode pour incrémenter le compteur de connexions
+// Gestion des connexions
 utilisateurSchema.methods.incrementerNombreConnexions = function () {
     this.nombreConnexions += 1;
     this.derniereConnexion = new Date();
     return this.save();
 };
 
-// Méthode pour vérifier si l'utilisateur est vérifié selon son rôle
+// Vérification du compte
 utilisateurSchema.methods.estVerifie = function () {
     if (this.role === ROLES.CLIENT) {
         return this.emailVerifie;
@@ -272,12 +328,74 @@ utilisateurSchema.methods.estVerifie = function () {
     }
 };
 
-// Virtual pour le nom complet
+// Gestion des crédits
+utilisateurSchema.methods.crediterPoints = async function (
+    montant,
+    raison,
+    banniereId = null
+) {
+    this.creditsBannieres += montant;
+    this.historiqueCredits.push({
+        type: 'credit',
+        montant,
+        raison,
+        banniereId,
+        soldeApres: this.creditsBannieres,
+    });
+    return await this.save();
+};
+
+// Débiter des points avec vérification de solde
+utilisateurSchema.methods.debiterPoints = async function (
+    montant,
+    raison,
+    banniereId = null
+) {
+    if (this.creditsBannieres < montant) {
+        throw new Error('Crédits insuffisants');
+    }
+    this.creditsBannieres -= montant;
+    this.historiqueCredits.push({
+        type: 'debit',
+        montant: -montant,
+        raison,
+        banniereId,
+        soldeApres: this.creditsBannieres,
+    });
+    return await this.save();
+};
+
+// Vérification de la possibilité de créer une bannière
+utilisateurSchema.methods.peutCreerBanniere = function () {
+    const COUT_BANNIERE = 2;
+    return this.creditsBannieres >= COUT_BANNIERE;
+};
+
+// Gestion Délégation
+utilisateurSchema.methods.deleguerRoleMarketing = async function (adminId) {
+    if (this.role !== ROLES.MODERATEUR && this.role !== 'moderateur') {
+        throw new Error('Seul un modérateur peut recevoir cette délégation');
+    }
+    this.roleEtendu = 'moderateur_marketing';
+    this.delegationPar = adminId;
+    this.dateDelegation = Date.now();
+    return await this.save();
+};
+
+// Révocation de la délégation
+utilisateurSchema.methods.revoquerDelegation = async function () {
+    this.roleEtendu = '';
+    this.delegationPar = null;
+    this.dateDelegation = null;
+    return await this.save();
+};
+
+// VIRTUELS 
 utilisateurSchema.virtual('nomComplet').get(function () {
     return `${this.nom} ${this.prenom}`;
 });
 
-// Virtual pour le nom de la boutique (si vendeur)
+// Affichage du nom de la boutique pour les vendeurs, sinon le nom complet
 utilisateurSchema.virtual('nomBoutiqueAffichage').get(function () {
     if (
         this.role === ROLES.VENDEUR &&
@@ -289,8 +407,7 @@ utilisateurSchema.virtual('nomBoutiqueAffichage').get(function () {
     return this.nomComplet;
 });
 
-// Création du modèle Utilisateur
+// MODÈLE
 const Utilisateur = mongoose.model('Utilisateur', utilisateurSchema);
 
-// Exportation du modèle
 export default Utilisateur;

@@ -28,9 +28,7 @@ const TableauProduitsPopulaires = ({ produits }) => {
                         {produits.map((produit, index) => {
                             // Extraction propre de l'URL de l'image
                             const imagePath =
-                                produit.image ||
-                                produit.images?.[0]?.url ||
-                                '/uploads/produits/default-product.jpg';
+                                produit.images?.[0] || produit.image;
 
                             return (
                                 <tr key={produit._id || `produit-${index}`}>

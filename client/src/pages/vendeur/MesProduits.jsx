@@ -89,35 +89,62 @@ const MesProduits = () => {
 
     // Fonction utilitaire pour obtenir l'URL de l'image
     const getProductImageUrl = produit => {
+        // 1️⃣ Vérifier si le produit a des images
         if (!produit?.images || produit.images.length === 0) {
-            return '/images/default-product.jpg';
+            return null; // ✅ Retourner null au lieu de forcer un placeholder
         }
 
         const firstImage = produit.images[0];
 
-        // Si l'image a une propriété url
-        if (firstImage && firstImage.url) {
-            let imageUrl = firstImage.url;
-            // Ajouter l'URL du serveur si c'est un chemin relatif
+        // 2️⃣ Cas 1: L'image est déjà une URL complète (STRING)
+        // L'API retourne maintenant: "http://localhost:5000/uploads/produits/xxx.jpg"
+        if (typeof firstImage === 'string') {
+            // Si c'est déjà une URL absolue (commence par http)
             if (
-                imageUrl &&
-                !imageUrl.startsWith('http') &&
-                imageUrl.startsWith('/')
+                firstImage.startsWith('http://') ||
+                firstImage.startsWith('https://')
             ) {
-                imageUrl = `http://localhost:5000${imageUrl}`;
+                return firstImage; // ✅ Retourner directement l'URL complète
             }
-            return imageUrl;
+
+            // Si c'est un chemin relatif (cas legacy: "uploads/produits/xxx.jpg")
+            if (firstImage.startsWith('uploads/')) {
+                return `${import.meta.env.VITE_API_URL?.replace('/api', '')}/${firstImage}`;
+            }
+
+            // Si c'est un chemin absolu (/uploads/produits/xxx.jpg)
+            if (firstImage.startsWith('/uploads/')) {
+                return `${import.meta.env.VITE_API_URL?.replace('/api', '')}${firstImage}`;
+            }
         }
 
-        // SI PAS DE URL, générer une URL basée sur l'ID (si c'est ainsi que vos fichiers sont nommés)
-        // Cette logique dépend de comment vous stockez les fichiers
-        if (firstImage && firstImage._id) {
-            // Exemple : si vos fichiers sont nommés avec l'ID
-            return `http://localhost:5000/uploads/produits/${firstImage._id}.jpg`;
+        // 3️⃣ Cas 2: Format ancien (OBJET avec propriété url)
+        // Exemple: { url: "uploads/produits/xxx.jpg", alt: "...", estPrincipale: true }
+        if (typeof firstImage === 'object' && firstImage.url) {
+            const imageUrl = firstImage.url;
+
+            // Si l'URL est déjà absolue
+            if (
+                imageUrl.startsWith('http://') ||
+                imageUrl.startsWith('https://')
+            ) {
+                return imageUrl;
+            }
+
+            // Si c'est un chemin relatif
+            if (imageUrl.startsWith('uploads/')) {
+                return `${import.meta.env.VITE_API_URL?.replace('/api', '')}/${imageUrl}`;
+            }
+
+            // Si c'est un chemin absolu
+            if (imageUrl.startsWith('/uploads/')) {
+                return `${import.meta.env.VITE_API_URL?.replace('/api', '')}${imageUrl}`;
+            }
         }
 
-        // Fallback
-        return '/images/default-product.jpg';
+        // 4️⃣ Aucun format reconnu - retourner null
+        console.warn("⚠️ Format d'image non reconnu:", firstImage);
+        return null;
     };
 
     // Chargement initial

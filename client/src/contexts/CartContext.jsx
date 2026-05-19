@@ -54,7 +54,16 @@ export function CartProvider({ children }) {
                         : item
                 );
             } else {
-                return [...prevPanier, { ...produit, quantite, options }];
+                return [
+                    ...prevPanier,
+                    {
+                        ...produit,
+                        quantite,
+                        options,
+                        // S'assurer que les images sont bien stockées
+                        images: produit.images || [],
+                    },
+                ];
             }
         });
     };

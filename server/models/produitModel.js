@@ -125,13 +125,16 @@ const produitSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Utilisateur',
         },
-        images: [
-            {
-                url: String,
-                alt: String,
-                estPrincipale: { type: Boolean, default: false },
+        images: {
+            type: [String],
+            default: [],
+            validate: {
+                validator: function (arr) {
+                    return arr.length <= 6; // Max 6 images
+                },
+                message: 'Un produit ne peut pas avoir plus de 6 images',
             },
-        ],
+        },
         variantes: [
             {
                 nom: String,
@@ -161,6 +164,16 @@ const produitSchema = new mongoose.Schema(
                 valeur: String,
             },
         ],
+        noteMoyenne: {
+            type: Number,
+            default: 0,
+            min: 0,
+            max: 5,
+        },
+        nombreAvis: {
+            type: Number,
+            default: 0,
+        },
         evaluations: {
             moyenne: {
                 type: Number,
@@ -253,9 +266,13 @@ produitSchema.pre('save', async function (next) {
 produitSchema.methods.recalculerNoteMoyenne = function () {
     if (this.avis && this.avis.length > 0) {
         const total = this.avis.reduce((sum, avis) => sum + avis.note, 0);
-        this.evaluations.moyenne = total / this.avis.length;
-        this.evaluations.nombre = this.avis.length;
+        this.noteMoyenne = total / this.avis.length;
+        this.nombreAvis = this.avis.length;
+        this.evaluations.moyenne = this.noteMoyenne;
+        this.evaluations.nombre = this.nombreAvis;
     } else {
+        this.noteMoyenne = 0;
+        this.nombreAvis = 0;
         this.evaluations.moyenne = 0;
         this.evaluations.nombre = 0;
     }
@@ -269,6 +286,7 @@ produitSchema.index({
 });
 produitSchema.index({ categorie: 1, estActif: 1 });
 produitSchema.index({ prix: 1, estActif: 1 });
+produitSchema.index({ noteMoyenne: -1 });
 produitSchema.index({ 'evaluations.moyenne': -1 });
 produitSchema.index({ nombreVentes: -1, estActif: 1 });
 produitSchema.index({ createdAt: -1 });

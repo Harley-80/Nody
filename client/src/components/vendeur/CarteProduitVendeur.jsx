@@ -81,9 +81,14 @@ const CarteProduitVendeur = ({ produit, onEdit, onDelete, onView }) => {
             <div className="carte-image">
                 {produit.images && produit.images.length > 0 ? (
                     <img
-                        src={produit.images[0].url || produit.images[0]}
+                        src={produit.images[0]}
                         alt={produit.nom}
                         className="image-produit"
+                        onError={e => {
+                            e.target.style.display = 'none';
+                            e.target.parentElement.innerHTML =
+                                '<i class="fas fa-box"></i>';
+                        }}
                     />
                 ) : (
                     <div className="image-placeholder">

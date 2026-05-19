@@ -41,7 +41,10 @@ export default function Panier() {
                                 <td>
                                     <div className="d-flex align-items-center">
                                         <img
-                                            src={item.image}
+                                            src={
+                                                item.images?.[0] ||
+                                                '/images/placeholder.jpg'
+                                            }
                                             alt={item.nom}
                                             style={{
                                                 width: '60px',
@@ -49,6 +52,9 @@ export default function Panier() {
                                                 objectFit: 'cover',
                                             }}
                                             className="me-2 rounded"
+                                            onError={e => {
+                                                e.target.style.display = 'none';
+                                            }}
                                         />
                                         <span>{item.nom}</span>
                                     </div>

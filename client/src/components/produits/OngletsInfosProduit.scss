@@ -1,0 +1,155 @@
+.onglets-info-produit {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+
+    .tabs-custom {
+        border-bottom: 2px solid #e2e8f0;
+        padding: 0 30px;
+
+        .nav-item {
+            .nav-link {
+                border: none;
+                color: #6c757d;
+                font-weight: 600;
+                padding: 20px 25px;
+                position: relative;
+                transition: all 0.3s;
+
+                i {
+                    margin-right: 8px;
+                }
+
+                &:hover {
+                    color: #667eea;
+                }
+
+                &.active {
+                    color: #667eea;
+
+                    &::after {
+                        content: '';
+                        position: absolute;
+                        bottom: -2px;
+                        left: 0;
+                        right: 0;
+                        height: 3px;
+                        background: #667eea;
+                        border-radius: 3px 3px 0 0;
+                    }
+                }
+            }
+        }
+    }
+
+    .tabs-content-custom {
+        .tab-pane-custom {
+            padding: 40px;
+            animation: fadeIn 0.3s;
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            // Description
+            .description-content {
+                p {
+                    font-size: 1.05rem;
+                    line-height: 1.8;
+                    color: #4a5568;
+                }
+
+                .details-supplementaires {
+                    h5 {
+                        color: #2d3748;
+                        margin-bottom: 20px;
+                        font-weight: 700;
+                    }
+                }
+            }
+
+            // Caractéristiques
+            .caracteristiques-content {
+                .caracteristiques-table {
+                    tbody {
+                        tr {
+                            &:hover {
+                                background-color: #f7fafc;
+                            }
+
+                            th {
+                                font-weight: 600;
+                                color: #4a5568;
+                                width: 200px;
+                                padding: 15px;
+
+                                i {
+                                    color: #667eea;
+                                }
+                            }
+
+                            td {
+                                color: #6c757d;
+                                padding: 15px;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Livraison
+            .livraison-content {
+                .info-card {
+                    background: #f7fafc;
+                    border-radius: 12px;
+                    padding: 25px;
+                    height: 100%;
+
+                    .info-icon {
+                        width: 60px;
+                        height: 60px;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-bottom: 20px;
+
+                        i {
+                            font-size: 1.8rem;
+                            color: white;
+                        }
+                    }
+
+                    h5 {
+                        color: #2d3748;
+                        font-weight: 700;
+                        margin-bottom: 15px;
+                    }
+
+                    .info-list {
+                        list-style: none;
+                        padding: 0;
+                        margin: 0;
+
+                        li {
+                            padding: 8px 0;
+                            color: #4a5568;
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

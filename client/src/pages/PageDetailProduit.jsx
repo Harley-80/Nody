@@ -1,25 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import produitsService from '../services/produitsService';
+
+// Import des nouveaux composants
+import GalerieImagesZoom from '../components/produits/GalerieImagesZoom';
+import SelecteurVariantes from '../components/produits/SelecteurVariantes';
+import OngletsInfosProduit from '../components/produits/OngletsInfosProduit';
+import SectionAvisClients from '../components/produits/SectionAvisClients';
+import ProduitsSimilaires from '../components/produits/ProduitsSimilaires';
+import BoutonsFavorisPartage from '../components/produits/BoutonsFavorisPartage';
+import StickyCartButton from '../components/produits/StickyCartButton';
+
+import './PageDetailProduit.scss';
 
 export default function PageDetailProduit() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { ajouterAuPanier } = useCart();
+    const { utilisateur } = useAuth();
 
     // États de base
     const [produit, setProduit] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedQuantity, setSelectedQuantity] = useState(1);
-
-    // États pour la galerie d'images et les options
-    const [activeImage, setActiveImage] = useState('');
     const [selectedOptions, setSelectedOptions] = useState({});
+    const [activeImage, setActiveImage] = useState('');
 
-    const { ajouterAuPanier } = useCart();
+    // États pour les nouvelles fonctionnalités
+    const [avis, setAvis] = useState([]);
+    const [produitsSimilaires, setProduitsSimilaires] = useState([]);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [showSuccessToast, setShowSuccessToast] = useState(false);
+    const [isSticky, setIsSticky] = useState(false);
 
-    // Effet pour charger le produit depuis l'API
+    // Charger le produit
     useEffect(() => {
         const fetchProduit = async () => {
             try {
@@ -30,12 +47,17 @@ export default function PageDetailProduit() {
 
                 if (data && data.donnees) {
                     setProduit(data.donnees);
-                    // Définit la première image comme image active par défaut
+
+                    // Définir l'image active
                     if (data.donnees.images && data.donnees.images.length > 0) {
                         setActiveImage(data.donnees.images[0]);
-                    } else if (data.donnees.image) {
-                        setActiveImage(data.donnees.image);
                     }
+
+                    // Charger les avis
+                    fetchAvis(id);
+
+                    // Charger les produits similaires
+                    fetchProduitsSimilaires(id, data.donnees.categorie?._id);
                 } else {
                     setError('Produit non trouvé.');
                 }
@@ -53,15 +75,44 @@ export default function PageDetailProduit() {
         fetchProduit();
     }, [id]);
 
-    // Gestion du changement de quantité
-    const handleQuantityChange = e => {
-        const value = parseInt(e.target.value);
-        if (!isNaN(value) && value > 0 && value <= (produit?.stock || 99)) {
-            setSelectedQuantity(value);
+    // Charger les avis
+    const fetchAvis = async produitId => {
+        try {
+            const response = await produitsService.getAvis(produitId);
+            if (response?.donnees) {
+                setAvis(response.donnees);
+            }
+        } catch (err) {
+            console.error('Erreur chargement avis:', err);
         }
     };
 
-    // Ajout au panier avec les options sélectionnées
+    // Charger les produits similaires
+    const fetchProduitsSimilaires = async (produitId, categorieId) => {
+        try {
+            const response = await produitsService.getProduitsSimilaires(
+                produitId,
+                categorieId
+            );
+            if (response?.donnees) {
+                setProduitsSimilaires(response.donnees);
+            }
+        } catch (err) {
+            console.error('Erreur chargement produits similaires:', err);
+        }
+    };
+
+    // Gestion du scroll pour sticky button
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsSticky(window.scrollY > 600);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Ajout au panier avec animation
     const handleAddToCart = () => {
         if (!produit) return;
 
@@ -81,8 +132,39 @@ export default function PageDetailProduit() {
             selectedOptions
         );
 
-        alert(`${selectedQuantity} x ${produit.nom} ajouté(s) au panier !`);
+        // Animation de succès
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
     };
+
+    // Toggle favoris
+    const handleToggleFavorite = async () => {
+        if (!utilisateur) {
+            alert('Connectez-vous pour ajouter aux favoris');
+            navigate('/connexion');
+            return;
+        }
+
+        try {
+            if (isFavorite) {
+                await produitsService.retirerDesFavoris(id);
+                setIsFavorite(false);
+            } else {
+                await produitsService.ajouterAuxFavoris(id);
+                setIsFavorite(true);
+            }
+        } catch (err) {
+            console.error('Erreur favoris:', err);
+        }
+    };
+
+    // Calcul de la note moyenne
+    const noteMoyenne =
+        avis.length > 0
+            ? (avis.reduce((acc, a) => acc + a.note, 0) / avis.length).toFixed(
+                    1
+                )
+            : 0;
 
     // Affichage pendant le chargement
     if (loading) {
@@ -97,12 +179,12 @@ export default function PageDetailProduit() {
     }
 
     // Gestion des erreurs
-    if (error) {
+    if (error || !produit || produit.estActif === false) {
         return (
             <div className="container mt-5 py-5">
                 <div className="alert alert-danger text-center">
                     <h5>Produit introuvable</h5>
-                    <p>{error}</p>
+                    <p>{error || "Ce produit n'est pas disponible"}</p>
                     <button
                         onClick={() => navigate('/boutique')}
                         className="btn btn-primary"
@@ -114,333 +196,356 @@ export default function PageDetailProduit() {
         );
     }
 
-    // Produit non trouvé
-    if (!produit) {
-        return (
-            <div className="container mt-5 py-5 text-center">
-                <div className="alert alert-warning">
-                    <h5>Produit introuvable</h5>
-                    <p>Le produit demandé n'existe pas ou a été supprimé.</p>
-                    <button
-                        onClick={() => navigate('/boutique')}
-                        className="btn btn-primary"
-                    >
-                        Retour à la boutique
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    // Vérifier si le produit est actif
-    if (produit.estActif === false) {
-        return (
-            <div className="container mt-5 py-5 text-center">
-                <div className="alert alert-warning">
-                    <h5>Produit indisponible</h5>
-                    <p>
-                        Ce produit n'est actuellement pas disponible à la vente.
-                    </p>
-                    <button
-                        onClick={() => navigate('/boutique')}
-                        className="btn btn-primary"
-                    >
-                        Retour à la boutique
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    // Récupérer toutes les images disponibles
     const images = [
         ...(produit.images || []),
         ...(produit.image ? [produit.image] : []),
     ].filter(Boolean);
 
     return (
-        <div className="container my-5">
-            {/* Breadcrumb */}
-            <nav aria-label="breadcrumb" className="mb-4">
-                <ol className="breadcrumb">
-                    <li className="breadcrumb-item">
-                        <a
-                            href="/"
-                            onClick={e => {
-                                e.preventDefault();
-                                navigate('/');
-                            }}
-                        >
-                            Accueil
-                        </a>
-                    </li>
-                    <li className="breadcrumb-item">
-                        <a
-                            href="/boutique"
-                            onClick={e => {
-                                e.preventDefault();
-                                navigate('/boutique');
-                            }}
-                        >
-                            Boutique
-                        </a>
-                    </li>
-                    <li className="breadcrumb-item">
-                        <a
-                            href={`/categories/${produit.categorie?.slug || produit.categorie}`}
-                            onClick={e => {
-                                e.preventDefault();
-                                navigate(
-                                    `/categories/${produit.categorie?.slug || produit.categorie}`
-                                );
-                            }}
-                        >
-                            {produit.categorie?.nom || produit.categorie}
-                        </a>
-                    </li>
-                    <li className="breadcrumb-item active" aria-current="page">
-                        {produit.nom}
-                    </li>
-                </ol>
-            </nav>
-
-            <div className="row">
-                {/* Section Galerie d'images */}
-                <div className="col-md-6">
-                    {/* Image principale */}
-                    {activeImage ? (
-                        <img
-                            src={activeImage}
-                            alt={produit.nom}
-                            className="img-fluid rounded shadow-sm mb-3"
-                            style={{ maxHeight: '500px', objectFit: 'contain' }}
-                        />
-                    ) : (
-                        <div
-                            className="bg-light rounded d-flex align-items-center justify-content-center"
-                            style={{ height: '400px' }}
-                        >
-                            <span className="text-muted">
-                                Image non disponible
-                            </span>
-                        </div>
-                    )}
-
-                    {/* Miniatures de la galerie (si plusieurs images) */}
-                    {images.length > 1 && (
-                        <div className="d-flex flex-wrap gap-2 mt-3">
-                            {images.map((imgSrc, index) => (
-                                <img
-                                    key={index}
-                                    src={imgSrc}
-                                    onClick={() => setActiveImage(imgSrc)}
-                                    alt={`Vue ${index + 1} de ${produit.nom}`}
-                                    className={`img-thumbnail ${imgSrc === activeImage ? 'border border-primary' : ''}`}
-                                    style={{
-                                        width: '80px',
-                                        height: '80px',
-                                        objectFit: 'cover',
-                                        cursor: 'pointer',
-                                    }}
-                                />
-                            ))}
-                        </div>
-                    )}
-
-                    {/* Section Vidéo (si disponible) */}
-                    {produit.video && (
-                        <div className="mt-4">
-                            <h5 className="mb-3">Vidéo du produit</h5>
-                            <div className="ratio ratio-16x9">
-                                <video
-                                    src={produit.video}
-                                    controls
-                                    className="rounded"
-                                ></video>
-                            </div>
-                        </div>
-                    )}
+        <div className="page-detail-produit">
+            {/* Toast de succès */}
+            {showSuccessToast && (
+                <div className="toast-success-custom">
+                    <i className="fas fa-check-circle"></i>
+                    <span>Produit ajouté au panier !</span>
                 </div>
+            )}
 
-                {/* Section Détails du produit */}
-                <div className="col-md-6">
-                    <h1 className="mb-3">{produit.nom}</h1>
-
-                    {/* Prix */}
-                    <div className="d-flex align-items-center mb-4">
-                        <span
-                            className="lead text-primary fw-bold me-3"
-                            style={{ fontSize: '2rem' }}
-                        >
-                            {parseFloat(produit.prix).toLocaleString()} XOF
-                        </span>
-                        {produit.prixPromo && (
-                            <span className="text-decoration-line-through text-muted me-2">
-                                {parseFloat(produit.prixPromo).toLocaleString()}{' '}
-                                XOF
-                            </span>
-                        )}
-                    </div>
-
-                    {/* Description */}
-                    <div className="mb-4">
-                        <h5 className="mb-2">Description</h5>
-                        <p className="text-muted">
-                            {produit.description ||
-                                'Aucune description disponible.'}
-                        </p>
-                    </div>
-
-                    {/* Sélecteurs d'options dynamiques */}
-                    {produit.variations && produit.variations.length > 0
-                        ? produit.variations.map((variation, index) => (
-                              <div className="mb-3" key={index}>
-                                  <label
-                                      htmlFor={`select-${variation.type}`}
-                                      className="form-label fw-bold"
-                                  >
-                                      Sélectionnez {variation.type} :
-                                  </label>
-                                  <select
-                                      className="form-select"
-                                      id={`select-${variation.type}`}
-                                      onChange={e =>
-                                          setSelectedOptions(prev => ({
-                                              ...prev,
-                                              [variation.type]: e.target.value,
-                                          }))
-                                      }
-                                      defaultValue={variation.options[0]}
-                                  >
-                                      {variation.options.map((option, idx) => (
-                                          <option key={idx} value={option}>
-                                              {option}
-                                          </option>
-                                      ))}
-                                  </select>
-                              </div>
-                          ))
-                        : null}
-
-                    {/* Sélecteur de quantité */}
-                    <div className="mb-4">
-                        <label
-                            htmlFor="quantity"
-                            className="form-label fw-bold"
-                        >
-                            Quantité :
-                        </label>
-                        <div className="d-flex align-items-center">
-                            <button
-                                className="btn btn-outline-secondary"
-                                onClick={() =>
-                                    setSelectedQuantity(prev =>
-                                        Math.max(1, prev - 1)
-                                    )
-                                }
-                                disabled={selectedQuantity <= 1}
+            <div className="container my-5">
+                {/* Breadcrumb amélioré */}
+                <nav aria-label="breadcrumb" className="breadcrumb-custom mb-4">
+                    <ol className="breadcrumb">
+                        <li className="breadcrumb-item">
+                            <a
+                                href="/"
+                                onClick={e => {
+                                    e.preventDefault();
+                                    navigate('/');
+                                }}
                             >
-                                -
-                            </button>
-                            <input
-                                type="number"
-                                id="quantity"
-                                className="form-control mx-2 text-center"
-                                value={selectedQuantity}
-                                onChange={handleQuantityChange}
-                                min="1"
-                                max={produit.stock || 99}
-                                style={{ width: '80px' }}
-                            />
-                            <button
-                                className="btn btn-outline-secondary"
-                                onClick={() =>
-                                    setSelectedQuantity(prev =>
-                                        Math.min(produit.stock || 99, prev + 1)
-                                    )
-                                }
-                                disabled={
-                                    selectedQuantity >= (produit.stock || 99)
-                                }
+                                <i className="fas fa-home"></i> Accueil
+                            </a>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <a
+                                href="/boutique"
+                                onClick={e => {
+                                    e.preventDefault();
+                                    navigate('/boutique');
+                                }}
                             >
-                                +
-                            </button>
-                        </div>
-                        {produit.stock !== undefined && (
-                            <small className="text-muted mt-1 d-block">
-                                {produit.stock > 0
-                                    ? `${produit.stock} unité(s) disponible(s)`
-                                    : 'Rupture de stock'}
-                            </small>
-                        )}
+                                Boutique
+                            </a>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <a
+                                href={`/categories/${produit.categorie?.slug || produit.categorie}`}
+                                onClick={e => {
+                                    e.preventDefault();
+                                    navigate(
+                                        `/categories/${produit.categorie?.slug || produit.categorie}`
+                                    );
+                                }}
+                            >
+                                {produit.categorie?.nom || produit.categorie}
+                            </a>
+                        </li>
+                        <li
+                            className="breadcrumb-item active"
+                            aria-current="page"
+                        >
+                            {produit.nom}
+                        </li>
+                    </ol>
+                </nav>
+
+                <div className="row">
+                    {/* Section Galerie d'images avec zoom */}
+                    <div className="col-lg-6 col-md-12 mb-4">
+                        <GalerieImagesZoom
+                            images={images}
+                            activeImage={activeImage}
+                            setActiveImage={setActiveImage}
+                            nomProduit={produit.nom}
+                        />
                     </div>
 
-                    {/* Bouton d'ajout au panier */}
-                    <button
-                        className="btn btn-dark btn-lg w-100 mb-4"
-                        onClick={handleAddToCart}
-                        disabled={produit.stock === 0}
-                    >
-                        <i className="fas fa-cart-plus me-2"></i>
-                        {produit.stock === 0
-                            ? 'Rupture de stock'
-                            : 'Ajouter au panier'}
-                    </button>
+                    {/* Section Détails du produit */}
+                    <div className="col-lg-6 col-md-12">
+                        <div className="product-details-header">
+                            {/* Badges */}
+                            <div className="product-badges mb-3">
+                                {produit.estNouveau && (
+                                    <span className="badge badge-nouveau">
+                                        <i className="fas fa-star"></i> Nouveau
+                                    </span>
+                                )}
+                                {produit.estEnVedette && (
+                                    <span className="badge badge-vedette">
+                                        <i className="fas fa-fire"></i>{' '}
+                                        Populaire
+                                    </span>
+                                )}
+                                {produit.prixPromo && (
+                                    <span className="badge badge-promo">
+                                        <i className="fas fa-tag"></i> Promo
+                                    </span>
+                                )}
+                            </div>
 
-                    {/* Informations supplémentaires */}
-                    <div className="border rounded p-3">
-                        <h6 className="mb-3">Informations complémentaires</h6>
-                        <div className="row">
-                            <div className="col-6">
-                                <p className="mb-2">
-                                    <strong>Catégorie :</strong>
-                                    <br />
-                                    <span className="text-muted">
+                            {/* Titre */}
+                            <h1 className="product-title mb-3">
+                                {produit.nom}
+                            </h1>
+
+                            {/* Note et avis */}
+                            <div className="product-rating mb-3">
+                                <div className="stars">
+                                    {[1, 2, 3, 4, 5].map(star => (
+                                        <i
+                                            key={star}
+                                            className={`fas fa-star ${star <= Math.round(noteMoyenne) ? 'filled' : ''}`}
+                                        ></i>
+                                    ))}
+                                </div>
+                                <span className="rating-text">
+                                    {noteMoyenne} ({avis.length} avis)
+                                </span>
+                            </div>
+
+                            {/* Prix */}
+                            <div className="product-price mb-4">
+                                {produit.prixPromo ? (
+                                    <>
+                                        <span className="price-promo">
+                                            {parseFloat(
+                                                produit.prixPromo
+                                            ).toLocaleString()}{' '}
+                                            XOF
+                                        </span>
+                                        <span className="price-original">
+                                            {parseFloat(
+                                                produit.prix
+                                            ).toLocaleString()}{' '}
+                                            XOF
+                                        </span>
+                                        <span className="price-reduction">
+                                            -
+                                            {Math.round(
+                                                ((produit.prix -
+                                                    produit.prixPromo) /
+                                                    produit.prix) *
+                                                    100
+                                            )}
+                                            %
+                                        </span>
+                                    </>
+                                ) : (
+                                    <span className="price-current">
+                                        {parseFloat(
+                                            produit.prix
+                                        ).toLocaleString()}{' '}
+                                        XOF
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Stock */}
+                            <div className="product-stock mb-4">
+                                {produit.stock > 0 ? (
+                                    <div className="stock-available">
+                                        <i className="fas fa-check-circle"></i>
+                                        <span className="stock-text">
+                                            En stock ({produit.stock} disponible
+                                            {produit.stock > 1 ? 's' : ''})
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <div className="stock-unavailable">
+                                        <i className="fas fa-times-circle"></i>
+                                        <span className="stock-text">
+                                            Rupture de stock
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Description courte */}
+                            <div className="product-description-short mb-4">
+                                <p className="text-muted">
+                                    {produit.description?.substring(0, 150) ||
+                                        'Aucune description disponible.'}
+                                    {produit.description?.length > 150 && '...'}
+                                </p>
+                            </div>
+
+                            {/* Sélecteur de variantes */}
+                            {produit.variations &&
+                                produit.variations.length > 0 && (
+                                    <SelecteurVariantes
+                                        variations={produit.variations}
+                                        selectedOptions={selectedOptions}
+                                        setSelectedOptions={setSelectedOptions}
+                                    />
+                                )}
+
+                            {/* Sélecteur de quantité */}
+                            <div className="quantity-selector mb-4">
+                                <label className="form-label fw-bold">
+                                    Quantité :
+                                </label>
+                                <div className="quantity-controls">
+                                    <button
+                                        className="btn-quantity btn-minus"
+                                        onClick={() =>
+                                            setSelectedQuantity(prev =>
+                                                Math.max(1, prev - 1)
+                                            )
+                                        }
+                                        disabled={selectedQuantity <= 1}
+                                    >
+                                        <i className="fas fa-minus"></i>
+                                    </button>
+                                    <input
+                                        type="number"
+                                        className="quantity-input"
+                                        value={selectedQuantity}
+                                        onChange={e => {
+                                            const value = parseInt(
+                                                e.target.value
+                                            );
+                                            if (
+                                                !isNaN(value) &&
+                                                value > 0 &&
+                                                value <= (produit.stock || 99)
+                                            ) {
+                                                setSelectedQuantity(value);
+                                            }
+                                        }}
+                                        min="1"
+                                        max={produit.stock || 99}
+                                    />
+                                    <button
+                                        className="btn-quantity btn-plus"
+                                        onClick={() =>
+                                            setSelectedQuantity(prev =>
+                                                Math.min(
+                                                    produit.stock || 99,
+                                                    prev + 1
+                                                )
+                                            )
+                                        }
+                                        disabled={
+                                            selectedQuantity >=
+                                            (produit.stock || 99)
+                                        }
+                                    >
+                                        <i className="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Boutons d'action */}
+                            <div className="product-actions mb-4">
+                                <button
+                                    className="btn-add-cart btn-primary"
+                                    onClick={handleAddToCart}
+                                    disabled={produit.stock === 0}
+                                >
+                                    <i className="fas fa-shopping-cart me-2"></i>
+                                    {produit.stock === 0
+                                        ? 'Rupture de stock'
+                                        : 'Ajouter au panier'}
+                                </button>
+
+                                <BoutonsFavorisPartage
+                                    isFavorite={isFavorite}
+                                    onToggleFavorite={handleToggleFavorite}
+                                    produit={produit}
+                                />
+                            </div>
+
+                            {/* Informations complémentaires */}
+                            <div className="product-meta">
+                                <div className="meta-item">
+                                    <span className="meta-label">
+                                        <i className="fas fa-tag"></i> Catégorie
+                                        :
+                                    </span>
+                                    <span className="meta-value">
                                         {produit.categorie?.nom ||
                                             produit.categorie ||
                                             'Non spécifié'}
                                     </span>
-                                </p>
-                            </div>
-                            <div className="col-6">
-                                <p className="mb-2">
-                                    <strong>Statut :</strong>
-                                    <br />
-                                    <span
-                                        className={`badge ${produit.stock > 0 ? 'bg-success' : 'bg-danger'}`}
-                                    >
-                                        {produit.stock > 0
-                                            ? 'En stock'
-                                            : 'Rupture'}
-                                    </span>
-                                </p>
-                            </div>
-                            {produit.marque && (
-                                <div className="col-6">
-                                    <p className="mb-2">
-                                        <strong>Marque :</strong>
-                                        <br />
-                                        <span className="text-muted">
+                                </div>
+                                {produit.marque && (
+                                    <div className="meta-item">
+                                        <span className="meta-label">
+                                            <i className="fas fa-trademark"></i>{' '}
+                                            Marque :
+                                        </span>
+                                        <span className="meta-value">
                                             {produit.marque}
                                         </span>
-                                    </p>
-                                </div>
-                            )}
-                            {produit.reference && (
-                                <div className="col-6">
-                                    <p className="mb-2">
-                                        <strong>Référence :</strong>
-                                        <br />
-                                        <span className="text-muted">
+                                    </div>
+                                )}
+                                {produit.reference && (
+                                    <div className="meta-item">
+                                        <span className="meta-label">
+                                            <i className="fas fa-barcode"></i>{' '}
+                                            Référence :
+                                        </span>
+                                        <span className="meta-value">
                                             {produit.reference}
                                         </span>
-                                    </p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Garanties et sécurité */}
+                            <div className="product-guarantees mt-4">
+                                <div className="guarantee-item">
+                                    <i className="fas fa-shield-alt"></i>
+                                    <span>Paiement sécurisé</span>
                                 </div>
-                            )}
+                                <div className="guarantee-item">
+                                    <i className="fas fa-truck"></i>
+                                    <span>Livraison rapide</span>
+                                </div>
+                                <div className="guarantee-item">
+                                    <i className="fas fa-undo"></i>
+                                    <span>Retour sous 14 jours</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                {/* Onglets d'informations */}
+                <OngletsInfosProduit produit={produit} />
+
+                {/* Section Avis clients */}
+                <SectionAvisClients
+                    avis={avis}
+                    produitId={id}
+                    noteMoyenne={noteMoyenne}
+                    onAvisAjoute={() => fetchAvis(id)}
+                />
+
+                {/* Produits similaires */}
+                {produitsSimilaires.length > 0 && (
+                    <ProduitsSimilaires produits={produitsSimilaires} />
+                )}
             </div>
+
+            {/* Sticky button mobile */}
+            {isSticky && (
+                <StickyCartButton
+                    produit={produit}
+                    selectedQuantity={selectedQuantity}
+                    onAddToCart={handleAddToCart}
+                />
+            )}
         </div>
     );
 }

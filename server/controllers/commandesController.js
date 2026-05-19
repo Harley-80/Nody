@@ -3,7 +3,8 @@ import mongoose from 'mongoose';
 import Commande from '../models/commandeModel.js';
 import Produit from '../models/produitModel.js';
 import Utilisateur from '../models/utilisateurModel.js';
-import vendeurNotificationService from '../services/vendeurNotificationService.js'; // 1. NOUVEL IMPORT
+import vendeurNotificationService from '../services/vendeurNotificationService.js';
+import { verifierEtAttribuerVente } from '../services/suiviService.js';
 
 // Simulation d'un logger global pour les besoins du code
 const logger = {
@@ -28,19 +29,19 @@ const creerCommande = asyncHandler(async (req, res) => {
         methodeLivraison,
         methodePaiement,
         notesClient,
-        devise, // Ajouter la devise depuis la requête
+        devise,
     } = req.body;
 
     try {
         // Vérifier le stock et calculer les totaux
         let sousTotal = 0;
         const articlesCommande = [];
-        const produitsAMettreAJour = []; // Stocker les articles avec infos vendeur/produit complets
+        const produitsAMettreAJour = [];
 
         for (const article of articles) {
             const produit = await Produit.findById(article.produit)
                 .session(session)
-                .populate('vendeur', '_id'); // Populater le vendeur pour les notifications
+                .populate('vendeur', '_id');
 
             if (!produit) {
                 throw new Error(`Produit non trouvé: ${article.produit}`);
@@ -62,7 +63,6 @@ const creerCommande = asyncHandler(async (req, res) => {
                 sku: produit.sku,
             });
 
-            // Préparer pour la mise à jour du stock et les notifications
             produitsAMettreAJour.push({
                 produitId: produit._id,
                 quantite: article.quantite,
@@ -70,10 +70,10 @@ const creerCommande = asyncHandler(async (req, res) => {
             });
         }
 
-        // Calculer les totaux (simplifié)
-        const taxe = sousTotal * 0.2; // 20% de TVA
+        // Calculer les totaux
+        const taxe = sousTotal * 0.2;
         const livraison = methodeLivraison?.cout || 0;
-        const remise = 0; // À implémenter avec les coupons
+        const remise = 0;
         const total = sousTotal + taxe + livraison - remise;
 
         // Créer la commande
@@ -103,7 +103,6 @@ const creerCommande = asyncHandler(async (req, res) => {
 
         // Mettre à jour le stock et alerter le stock faible
         for (const articleAUpdater of produitsAMettreAJour) {
-            // Mettre à jour le stock
             const produitMisAJour = await Produit.findByIdAndUpdate(
                 articleAUpdater.produitId,
                 {
@@ -112,10 +111,10 @@ const creerCommande = asyncHandler(async (req, res) => {
                         nombreVentes: articleAUpdater.quantite,
                     },
                 },
-                { new: true, session } // 'new: true' pour obtenir le document mis à jour
+                { new: true, session }
             );
 
-            // 3. ALERTE STOCK FAIBLE
+            // Alerte stock faible
             if (produitMisAJour.quantite < 10 && articleAUpdater.vendeurId) {
                 try {
                     await vendeurNotificationService.notifierStockFaible(
@@ -147,7 +146,7 @@ const creerCommande = asyncHandler(async (req, res) => {
 
         await session.commitTransaction();
 
-        // Récupérer la commande pour les notifications (avec les détails du vendeur)
+        // Récupérer la commande pour les notifications
         const commandePopulee = await Commande.findById(commande._id).populate({
             path: 'articles.produit',
             select: 'vendeur nom prix quantite images',
@@ -157,10 +156,8 @@ const creerCommande = asyncHandler(async (req, res) => {
             },
         });
 
-        // 2. NOTIFIER CHAQUE VENDEUR CONCERNÉ
+        // Notifier chaque vendeur concerné
         const vendeursNotifies = new Set();
-
-        // On itère sur la commande populée après le commit pour éviter les problèmes de transaction
         for (const article of commandePopulee.articles) {
             if (article.produit?.vendeur) {
                 vendeursNotifies.add(article.produit.vendeur._id.toString());
@@ -171,7 +168,7 @@ const creerCommande = asyncHandler(async (req, res) => {
             try {
                 await vendeurNotificationService.notifierNouvelleCommande(
                     vendeurId,
-                    commandePopulee // Utiliser la commande populée complète
+                    commandePopulee
                 );
                 logger.info(
                     `Notification nouvelle commande envoyée au vendeur ${vendeurId}`
@@ -182,6 +179,29 @@ const creerCommande = asyncHandler(async (req, res) => {
                     notifError
                 );
             }
+        }
+
+        // ATTRIBUTION DE LA VENTE VIA LE SYSTÈME DE SUIVI
+        try {
+            await verifierEtAttribuerVente({
+                commandeId: commande._id,
+                clientId: req.utilisateur._id,
+                ipClient: req.ip,
+                montantFCFA: total,
+                produits: articlesCommande.map(a => ({
+                    produit: a.produit,
+                    prix: a.prix,
+                    quantite: a.quantite,
+                })),
+            });
+            logger.info(
+                `Vente attribuée via suivi pour commande ${commande._id}`
+            );
+        } catch (suiviError) {
+            // Ne pas faire échouer la commande si l'attribution échoue
+            logger.warn(
+                `Attribution suivi échouée (non bloquant): ${suiviError.message}`
+            );
         }
 
         res.status(201).json({
@@ -198,8 +218,6 @@ const creerCommande = asyncHandler(async (req, res) => {
     }
 });
 
-// ... Autres fonctions
-
 /**
  * @desc    Récupérer les commandes de l'utilisateur
  * @route   GET /api/commandes
@@ -211,9 +229,9 @@ const obtenirMesCommandes = asyncHandler(async (req, res) => {
     const sauter = (page - 1) * limite;
 
     const commandes = await Commande.find({ client: req.utilisateur._id })
-        .populate('articles.produit', 'nom images') // Un seul populate suffit
-        .sort({ createdAt: -1 }) // Trier par date de création
-        .skip(sauter) // Appliquer la pagination
+        .populate('articles.produit', 'nom images')
+        .sort({ createdAt: -1 })
+        .skip(sauter)
         .limit(limite);
 
     const total = await Commande.countDocuments({
@@ -276,15 +294,14 @@ const mettreAJourStatutCommande = asyncHandler(async (req, res) => {
             path: 'vendeur',
             select: 'nom email',
         },
-    }); // Populater pour les notifications
+    });
 
     if (!commande) {
         res.status(404);
         throw new Error('Commande non trouvée');
     }
 
-    const ancienStatut = commande.statut; // Définir l'ancien statut
-
+    const ancienStatut = commande.statut;
     commande.statut = statut;
 
     if (note) {
@@ -297,11 +314,9 @@ const mettreAJourStatutCommande = asyncHandler(async (req, res) => {
 
     await commande.save();
 
-    // 4. NOTIFIER LE(S) VENDEUR(S)
+    // Notifier le(s) vendeur(s)
     const vendeursNotifies = new Set();
-
     for (const article of commande.articles) {
-        // Le produit est déjà populé dans la requête findById
         if (article.produit?.vendeur) {
             vendeursNotifies.add(article.produit.vendeur._id.toString());
         }
@@ -403,7 +418,7 @@ const obtenirToutesCommandes = asyncHandler(async (req, res) => {
     if (client) requete.client = client;
 
     if (dateDebut || dateFin) {
-        requete.createdAt = {}; // Correction: utiliser createdAt
+        requete.createdAt = {};
         if (dateDebut) requete.createdAt.$gte = new Date(dateDebut);
         if (dateFin) requete.createdAt.$lte = new Date(dateFin);
     }
@@ -412,7 +427,7 @@ const obtenirToutesCommandes = asyncHandler(async (req, res) => {
 
     const commandes = await Commande.find(requete)
         .populate('client', 'prenom nom email')
-        .sort({ createdAt: -1 }) // Utiliser 'createdAt' pour le tri, car 'creeLe' n'est pas standard Mongoose
+        .sort({ createdAt: -1 })
         .skip(sauter)
         .limit(Number(limite));
 
@@ -420,9 +435,7 @@ const obtenirToutesCommandes = asyncHandler(async (req, res) => {
 
     // Statistiques
     const stats = await Commande.aggregate([
-        {
-            $match: requete, // Appliquer les filtres de la requête aux statistiques
-        },
+        { $match: requete },
         {
             $group: {
                 _id: null,

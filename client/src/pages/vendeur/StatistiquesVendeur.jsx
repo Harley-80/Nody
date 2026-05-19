@@ -446,7 +446,7 @@ const StatistiquesVendeur = () => {
             <div className="performance-report">
                 <div className="report-header">
                     <h3>Rapport de Performance Mensuel</h3>
-                    <div className="report-period">Novembre 2024</div>
+                    <div className="report-period">Décembre 2025</div>
                 </div>
 
                 <div className="report-metrics">

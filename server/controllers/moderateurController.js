@@ -13,6 +13,43 @@ const logger = {
     error: (message, error) => console.error(`ERROR: ${message}`, error),
 };
 
+// ✅ AJOUT: Fonction pour formater les URLs d'images
+const formaterUrlsImages = (produit, baseUrl) => {
+    if (!produit || !produit.images) return produit;
+
+    produit.images = produit.images.map(img => {
+        // Si c'est déjà une URL absolue, on la garde telle quelle
+        if (
+            typeof img === 'string' &&
+            (img.startsWith('http://') || img.startsWith('https://'))
+        ) {
+            return img;
+        }
+
+        // Si c'est un objet (ancien format), extraire l'URL
+        if (typeof img === 'object' && img.url) {
+            const imageUrl = img.url;
+            if (
+                imageUrl.startsWith('http://') ||
+                imageUrl.startsWith('https://')
+            ) {
+                return imageUrl;
+            }
+            // Chemin relatif
+            return `${baseUrl}/${imageUrl.replace(/^\//, '')}`;
+        }
+
+        // Si c'est une string relative, construire l'URL complète
+        if (typeof img === 'string') {
+            return `${baseUrl}/${img.replace(/^\//, '')}`;
+        }
+
+        return img;
+    });
+
+    return produit;
+};
+
 /**
  * Obtenir les statistiques pour le tableau de bord du modérateur
  */
@@ -97,13 +134,11 @@ const obtenirDemandes = asyncHandler(async (req, res) => {
                 .skip(skip)
                 .limit(limit)
                 .lean();
-
-            demandes = demandes.map(produit => {
-                if (produit.images && produit.images.length > 0) {
-                    produit.images = produit.images.map(img => img.url || img);
-                }
-                return produit;
-            });
+            
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            demandes = demandes.map(produit =>
+                formaterUrlsImages(produit, baseUrl)
+            );
         } else if (type === 'vendeur') {
             filtre.role = 'vendeur';
             filtre.statutVerification = statut;
@@ -169,7 +204,7 @@ const validerProduit = asyncHandler(async (req, res) => {
             });
         }
 
-        produit.statut = decision;
+        produit.statut = decision === 'approuve' ? 'actif' : 'rejete';
         produit.raisonRejet = decision === 'rejete' ? motif : undefined;
         produit.moderateur = req.utilisateur._id;
         produit.dateValidation = new Date();
@@ -214,10 +249,14 @@ const validerProduit = asyncHandler(async (req, res) => {
 
         emitNotification(notificationAdmin, 'role:admin');
 
+        // ✅ AJOUT: Formater les URLs d'images avant de renvoyer
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const produitFormate = formaterUrlsImages(produit.toObject(), baseUrl);
+
         res.json({
             succes: true,
             message: `Produit ${decision} avec succès`,
-            donnees: produit,
+            donnees: produitFormate,
         });
     } catch (error) {
         console.error('Erreur validation produit:', error);
@@ -440,12 +479,10 @@ const modifierStatutUtilisateur = asyncHandler(async (req, res) => {
         }
 
         if (['admin', 'moderateur'].includes(utilisateur.role)) {
-            return res
-                .status(403)
-                .json({
-                    succes: false,
-                    message: 'Action interdite sur le staff',
-                });
+            return res.status(403).json({
+                succes: false,
+                message: 'Action interdite sur le staff',
+            });
         }
 
         utilisateur.estActif = estActif;

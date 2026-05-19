@@ -1,0 +1,111 @@
+.selecteur-variantes {
+    .variante-group {
+        margin-bottom: 20px;
+
+        .variante-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+            font-size: 1rem;
+
+            .variante-selected {
+                color: #667eea;
+                font-weight: 700;
+            }
+        }
+
+        // Options de couleur
+        .color-options {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+
+            .color-option {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                border: 3px solid #e2e8f0;
+                cursor: pointer;
+                position: relative;
+                transition: all 0.3s;
+                background: white;
+                padding: 4px;
+
+                .color-swatch {
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 50%;
+                    display: block;
+                }
+
+                .check-icon {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    color: white;
+                    font-size: 1.2rem;
+                    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+                }
+
+                &.selected {
+                    border-color: #667eea;
+                    transform: scale(1.1);
+                    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+                }
+
+                &:hover {
+                    transform: scale(1.05);
+                }
+            }
+        }
+
+        // Options de taille
+        .size-options {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+
+            .size-option {
+                min-width: 60px;
+                height: 50px;
+                border: 2px solid #e2e8f0;
+                border-radius: 10px;
+                background: white;
+                cursor: pointer;
+                font-weight: 600;
+                color: #4a5568;
+                transition: all 0.3s;
+                padding: 0 15px;
+
+                &.selected {
+                    background: #667eea;
+                    color: white;
+                    border-color: #667eea;
+                    transform: scale(1.05);
+                }
+
+                &:hover:not(.selected) {
+                    border-color: #667eea;
+                    color: #667eea;
+                }
+            }
+        }
+
+        // Select par défaut
+        .variante-select {
+            height: 50px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-weight: 600;
+
+            &:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+        }
+    }
+}

@@ -1,6 +1,3 @@
-/**
- * Utilitaires pour le traitement des paiements
- */
 const UtilitairesPaiement = {
     /**
      * Calculer les totaux d'une commande

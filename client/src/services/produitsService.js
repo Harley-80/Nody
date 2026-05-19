@@ -137,6 +137,118 @@ export const produitsService = {
             throw error;
         }
     },
+
+    /**
+     * Récupérer les avis d'un produit
+     * @param {string} produitId - ID du produit
+     * @returns {Promise}
+     */
+    async getAvis(produitId) {
+        try {
+            const response = await api.get(`/produits/${produitId}/avis`);
+            return response.data;
+        } catch (error) {
+            console.error('Erreur lors de la récupération des avis:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Poster un avis sur un produit
+     * @param {string} produitId - ID du produit
+     * @param {Object} avisData - { note, titre, commentaire }
+     * @returns {Promise}
+     */
+    async posterAvis(produitId, avisData) {
+        try {
+            const response = await api.post(
+                `/produits/${produitId}/avis`,
+                avisData
+            );
+            return response.data;
+        } catch (error) {
+            console.error("Erreur lors de la création de l'avis:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Récupérer les produits similaires
+     * @param {string} produitId - ID du produit actuel
+     * @param {string} categorieId - ID de la catégorie (optionnel)
+     * @returns {Promise}
+     */
+    async getProduitsSimilaires(produitId, categorieId = null) {
+        try {
+            const params = {};
+            if (categorieId) {
+                params.categorie = categorieId;
+            }
+
+            const response = await api.get(
+                `/produits/${produitId}/similaires`,
+                { params }
+            );
+            return response.data;
+        } catch (error) {
+            console.error(
+                'Erreur lors de la récupération des produits similaires:',
+                error
+            );
+            throw error;
+        }
+    },
+
+    /**
+     * Ajouter un produit aux favoris
+     * @param {string} produitId - ID du produit
+     * @returns {Promise}
+     */
+    async ajouterAuxFavoris(produitId) {
+        try {
+            const response = await api.post(
+                `/utilisateurs/favoris/${produitId}`
+            );
+            return response.data;
+        } catch (error) {
+            console.error("Erreur lors de l'ajout aux favoris:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Retirer un produit des favoris
+     * @param {string} produitId - ID du produit
+     * @returns {Promise}
+     */
+    async retirerDesFavoris(produitId) {
+        try {
+            const response = await api.delete(
+                `/utilisateurs/favoris/${produitId}`
+            );
+            return response.data;
+        } catch (error) {
+            console.error('Erreur lors du retrait des favoris:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Vérifier si un produit est dans les favoris
+     * @param {string} produitId - ID du produit
+     * @returns {Promise<boolean>}
+     */
+    async estDansFavoris(produitId) {
+        try {
+            const response = await api.get(
+                `/utilisateurs/favoris/${produitId}`
+            );
+            return response.data.isFavorite || false;
+        } catch (error) {
+            console.error('Erreur lors de la vérification des favoris:', error);
+            return false;
+        }
+    },
 };
 
 export default produitsService;

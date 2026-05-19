@@ -187,3 +187,38 @@ Créer un seeder pour peupler la base de données avec des données initiales po
 ### Endpoints d'Inscription par Rôle
 
 #### Inscription Standard (Client par défaut)
+
+# (Étape 14) : système crédits et suivi publicitaire 
+
+### Tâches :
+## Système de crédits vendeurs complet :
+  • Attribution automatique +5 points à l'inscription
+  • Débit -2 crédits par bannière créée (middleware verifierCredits)
+  • Bonus +1 point tous les 10 ventes attribuées
+  • Historique transactions & statistiques détaillées
+  • Routes API : /api/vendeur/credits/{solde,historique,verifier}
+
+## Système de suivi conversions (convention française) :
+  • suiviModel.js : cookieSuiviId unique, expiration 7 jours
+  • suiviService.js : creerSuiviClic, verifierEtAttribuerVente
+  • suiviRoutes.js : endpoints /api/suivi/{clic,attribution,historique,stats}
+  • Attribution automatique vente → vendeur via cookie valide
+  • Stats conversion : taux, montants, meilleures bannières
+
+## Worker automatisé (node-cron) :
+  • banniereTache.js : tâches quotidiennes 00:00
+  • Désactivation bannières expirées (>30 jours)
+  • Nettoyage cookies suivi expirés (>7 jours)
+  • Calcul & attribution bonus ventes quotidiens
+  • Rapport journalier avec stats globales
+
+## Intégrations transverses :
+  • banniereController.js : débit crédits après création réussie
+  • banniereRoutes.js : middleware verifierCredits sur POST /
+  • commandesController.js : attribution vente via suivi après commande
+  • app.js : enregistrement routes /api/vendeur/credits et /api/suivi
+
+## Tests & validation :
+  • Workflow complet : clic → cookie → achat → attribution → bonus
+  • Logs worker vérifiables en console
+  • Gestion d'erreur non-bloquante pour attribution vente

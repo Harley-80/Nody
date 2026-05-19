@@ -4,6 +4,29 @@ import Categorie from '../models/categorieModel.js';
 import Commande from '../models/commandeModel.js';
 import Utilisateur from '../models/utilisateurModel.js';
 
+/**
+ * Formater les URLs des images avec l'URL complète
+ */
+const formaterUrlsImages = (produit, baseUrl) => {
+    const produitObj = produit.toObject ? produit.toObject() : { ...produit };
+
+    if (produitObj.images && Array.isArray(produitObj.images)) {
+        produitObj.images = produitObj.images.map(imagePath => {
+            // Si déjà une URL complète, garder tel quel
+            if (typeof imagePath === 'string' && imagePath.startsWith('http')) {
+                return imagePath;
+            }
+            // Construire l'URL complète
+            const cleanPath = imagePath.startsWith('/')
+                ? imagePath.slice(1)
+                : imagePath;
+            return `${baseUrl}/${cleanPath}`;
+        });
+    }
+
+    return produitObj;
+};
+
 // @desc    Obtenir les statistiques vendeur (avec filtres)
 // @route   GET /api/vendeur/statistiques
 // @access  Private/Vendeur
@@ -11,7 +34,6 @@ const getStatistiques = asyncHandler(async (req, res) => {
     const vendeurId = req.utilisateur._id;
     const { periode, dateDebut, dateFin } = req.query;
 
-    // Filtre par période
     let filtreDate = {};
     const maintenant = new Date();
 
@@ -41,25 +63,21 @@ const getStatistiques = asyncHandler(async (req, res) => {
         };
     }
 
-    // Statistiques des produits
     const totalProduits = await Produit.countDocuments({
         vendeur: vendeurId,
         ...filtreDate,
     });
-
     const produitsActifs = await Produit.countDocuments({
         vendeur: vendeurId,
         statut: 'actif',
         ...filtreDate,
     });
-
     const produitsEnAttente = await Produit.countDocuments({
         vendeur: vendeurId,
         statut: 'en_attente',
         ...filtreDate,
     });
 
-    // Statistiques des commandes
     const totalCommandes = await Commande.countDocuments({
         'produits.vendeur': vendeurId,
         ...filtreDate,
@@ -77,13 +95,11 @@ const getStatistiques = asyncHandler(async (req, res) => {
         { $group: { _id: null, total: { $sum: '$produits.prix' } } },
     ]);
 
-    // Taux de conversion (exemple simplifié)
     const commandesEnAttente = await Commande.countDocuments({
         'produits.vendeur': vendeurId,
         statut: 'en_attente',
         ...filtreDate,
     });
-
     const commandesLivrees = await Commande.countDocuments({
         'produits.vendeur': vendeurId,
         statut: 'livree',
@@ -93,7 +109,6 @@ const getStatistiques = asyncHandler(async (req, res) => {
     const tauxConversion =
         totalCommandes > 0 ? (commandesLivrees / totalCommandes) * 100 : 0;
 
-    // Panier moyen
     const panierMoyen = await Commande.aggregate([
         { $unwind: '$produits' },
         {
@@ -141,21 +156,15 @@ const getEvolutionVentes = asyncHandler(async (req, res) => {
 
     if (periode === '7j') {
         dateDebut.setDate(dateDebut.getDate() - 7);
-        groupBy = {
-            $dayOfWeek: '$createdAt',
-        };
+        groupBy = { $dayOfWeek: '$createdAt' };
         formatDate = '%a %d-%m';
     } else if (periode === 'mois') {
         dateDebut.setMonth(dateDebut.getMonth() - 1);
-        groupBy = {
-            $dayOfMonth: '$createdAt',
-        };
+        groupBy = { $dayOfMonth: '$createdAt' };
         formatDate = '%d-%m';
     } else if (periode === 'annee') {
         dateDebut.setFullYear(dateDebut.getFullYear() - 1);
-        groupBy = {
-            $month: '$createdAt',
-        };
+        groupBy = { $month: '$createdAt' };
         formatDate = '%b %Y';
     }
 
@@ -185,7 +194,6 @@ const getEvolutionVentes = asyncHandler(async (req, res) => {
         },
     ]);
 
-    // Remplir les jours manquants avec des zéros
     const joursAttendus = periode === '7j' ? 7 : periode === 'mois' ? 30 : 12;
     const evolutionComplete = Array(joursAttendus)
         .fill()
@@ -202,19 +210,14 @@ const getEvolutionVentes = asyncHandler(async (req, res) => {
 
 // @desc    Obtenir les données de performance (graphiques)
 // @route   GET /api/vendeur/statistiques/performance
-// @route   GET /api/vendeur/statistiques/performance?periode=7j
 // @access  Private/Vendeur
 const getDonneesPerformance = asyncHandler(async (req, res) => {
     const vendeurId = req.utilisateur._id;
     const { periode = '7j' } = req.query;
 
-    // Logique similaire à getEvolutionVentes, mais adaptée pour les performances
     const dateDebut = new Date();
-    if (periode === '7j') {
-        dateDebut.setDate(dateDebut.getDate() - 7);
-    } else if (periode === 'mois') {
-        dateDebut.setMonth(dateDebut.getMonth() - 1);
-    }
+    if (periode === '7j') dateDebut.setDate(dateDebut.getDate() - 7);
+    else if (periode === 'mois') dateDebut.setMonth(dateDebut.getMonth() - 1);
 
     const performance = await Commande.aggregate([
         { $unwind: '$produits' },
@@ -236,7 +239,6 @@ const getDonneesPerformance = asyncHandler(async (req, res) => {
         { $sort: { _id: 1 } },
     ]);
 
-    // Formater les labels et données pour Recharts
     const labels = performance.map(item => {
         const date = new Date(item._id);
         return periode === '7j'
@@ -247,15 +249,12 @@ const getDonneesPerformance = asyncHandler(async (req, res) => {
               });
     });
 
-    const ventes = performance.map(item => item.ventes);
-    const revenus = performance.map(item => item.revenu);
-
     res.json({
         succes: true,
         data: {
             labels,
-            ventes,
-            revenus,
+            ventes: performance.map(item => item.ventes),
+            revenus: performance.map(item => item.revenu),
         },
     });
 });
@@ -281,10 +280,14 @@ const getMesProduits = asyncHandler(async (req, res) => {
 
     const total = await Produit.countDocuments(filtre);
 
+    // ✅ AJOUT: Formater les URLs des images
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const produitsFormates = produits.map(p => formaterUrlsImages(p, baseUrl));
+
     res.json({
         succes: true,
         data: {
-            produits,
+            produits: produitsFormates,
             pagination: {
                 page,
                 pages: Math.ceil(total / limit),
@@ -313,9 +316,13 @@ const getProduit = asyncHandler(async (req, res) => {
         throw new Error('Non autorisé à accéder à ce produit');
     }
 
+    // ✅ AJOUT: Formater les URLs des images
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const produitFormate = formaterUrlsImages(produit, baseUrl);
+
     res.status(200).json({
         succes: true,
-        data: produit,
+        data: produitFormate,
     });
 });
 
@@ -329,22 +336,56 @@ const creerProduit = asyncHandler(async (req, res) => {
         prix,
         categorie,
         quantite,
-        images,
         caracteristiques,
         marque,
         etiquettes,
+        stock,
+        tags,
     } = req.body;
+
+    if (!req.files || req.files.length === 0) {
+        return res
+            .status(400)
+            .json({
+                success: false,
+                message: 'Au moins une image est requise',
+            });
+    }
+
+    const imagesArray = req.files.map(
+        file => `uploads/produits/${file.filename}`
+    );
+    let caracteristiquesParsed = [],
+        etiquettesParsed = [],
+        tagsParsed = [];
+
+    try {
+        if (caracteristiques)
+            caracteristiquesParsed =
+                typeof caracteristiques === 'string'
+                    ? JSON.parse(caracteristiques)
+                    : caracteristiques;
+        if (etiquettes)
+            etiquettesParsed =
+                typeof etiquettes === 'string'
+                    ? JSON.parse(etiquettes)
+                    : etiquettes;
+        if (tags)
+            tagsParsed = typeof tags === 'string' ? JSON.parse(tags) : tags;
+    } catch (e) {
+        console.error('Erreur parsing JSON:', e);
+    }
 
     const produit = await Produit.create({
         nom,
         description,
         prix,
         categorie,
-        quantite,
-        images: images || [],
-        caracteristiques: caracteristiques || [],
+        quantite: stock || quantite || 0,
+        images: imagesArray,
+        caracteristiques: caracteristiquesParsed,
         marque,
-        etiquettes: etiquettes || [],
+        etiquettes: etiquettesParsed.length > 0 ? etiquettesParsed : tagsParsed,
         vendeur: req.utilisateur._id,
         statut: 'en_attente',
     });
@@ -365,28 +406,23 @@ const creerProduit = asyncHandler(async (req, res) => {
 // @access  Private/Vendeur
 const modifierProduit = asyncHandler(async (req, res) => {
     const produit = await Produit.findById(req.params.id);
-    if (!produit) {
-        res.status(404);
-        throw new Error('Produit non trouvé');
-    }
-
-    if (produit.vendeur.toString() !== req.utilisateur._id.toString()) {
-        res.status(403);
-        throw new Error('Non autorisé à modifier ce produit');
+    if (
+        !produit ||
+        produit.vendeur.toString() !== req.utilisateur._id.toString()
+    ) {
+        res.status(produit ? 403 : 404);
+        throw new Error(produit ? 'Non autorisé' : 'Produit non trouvé');
     }
 
     const produitModifie = await Produit.findByIdAndUpdate(
         req.params.id,
-        {
-            ...req.body,
-            statut: 'en_attente',
-        },
+        { ...req.body, statut: 'en_attente' },
         { new: true, runValidators: true }
     ).populate('categorie', 'nom');
 
     res.json({
         succes: true,
-        message: 'Produit modifié avec succès et en attente de validation',
+        message: 'Produit modifié avec succès',
         data: produitModifie,
     });
 });
@@ -396,21 +432,16 @@ const modifierProduit = asyncHandler(async (req, res) => {
 // @access  Private/Vendeur
 const supprimerProduit = asyncHandler(async (req, res) => {
     const produit = await Produit.findById(req.params.id);
-    if (!produit) {
-        res.status(404);
-        throw new Error('Produit non trouvé');
-    }
-
-    if (produit.vendeur.toString() !== req.utilisateur._id.toString()) {
-        res.status(403);
-        throw new Error('Non autorisé à supprimer ce produit');
+    if (
+        !produit ||
+        produit.vendeur.toString() !== req.utilisateur._id.toString()
+    ) {
+        res.status(produit ? 403 : 404);
+        throw new Error(produit ? 'Non autorisé' : 'Produit non trouvé');
     }
 
     await Produit.findByIdAndDelete(req.params.id);
-    res.json({
-        succes: true,
-        message: 'Produit supprimé avec succès',
-    });
+    res.json({ succes: true, message: 'Produit supprimé avec succès' });
 });
 
 // @desc    Obtenir les commandes du vendeur
@@ -431,19 +462,13 @@ const getMesCommandes = asyncHandler(async (req, res) => {
         .skip(skip)
         .limit(limit)
         .sort({ createdAt: -1 });
-
     const total = await Commande.countDocuments(filtre);
 
     res.json({
         succes: true,
         data: {
             commandes,
-            pagination: {
-                page,
-                pages: Math.ceil(total / limit),
-                total,
-                limit,
-            },
+            pagination: { page, pages: Math.ceil(total / limit), total, limit },
         },
     });
 });
@@ -466,20 +491,14 @@ const mettreAJourStatutProduit = asyncHandler(async (req, res) => {
             p._id.toString() === produitId &&
             p.vendeur.toString() === req.utilisateur._id.toString()
     );
-
     if (!produitCommande) {
         res.status(404);
-        throw new Error('Produit non trouvé dans la commande');
+        throw new Error('Produit non trouvé');
     }
 
     produitCommande.statutVendeur = statut;
     await commande.save();
-
-    res.json({
-        succes: true,
-        message: 'Statut du produit mis à jour',
-        data: commande,
-    });
+    res.json({ succes: true, message: 'Statut mis à jour', data: commande });
 });
 
 // @desc    Obtenir les produits les plus vendus du vendeur
@@ -489,17 +508,18 @@ const obtenirProduitsPopulairesVendeur = asyncHandler(async (req, res) => {
     const vendeurId = req.utilisateur._id;
     const limite = parseInt(req.query.limite) || 4;
 
-    const produits = await Produit.find({
-        vendeur: vendeurId,
-        statut: 'actif',
-    })
+    const produits = await Produit.find({ vendeur: vendeurId, statut: 'actif' })
         .sort({ nombreVentes: -1 })
         .limit(limite)
         .select('nom nombreVentes prix images');
 
+    // ✅ AJOUT: Formater les URLs des images
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const produitsFormates = produits.map(p => formaterUrlsImages(p, baseUrl));
+
     res.json({
         succes: true,
-        data: produits,
+        data: produitsFormates,
     });
 });
 
@@ -510,18 +530,13 @@ const obtenirCommandesRecentes = asyncHandler(async (req, res) => {
     const vendeurId = req.utilisateur._id;
     const limite = parseInt(req.query.limite) || 5;
 
-    const commandes = await Commande.find({
-        'produits.vendeur': vendeurId,
-    })
+    const commandes = await Commande.find({ 'produits.vendeur': vendeurId })
         .populate('utilisateur', 'nom prenom')
         .sort({ createdAt: -1 })
         .limit(limite)
         .select('numeroCommande montantTotal statut createdAt');
 
-    res.json({
-        succes: true,
-        data: commandes,
-    });
+    res.json({ succes: true, data: commandes });
 });
 
 // @desc    Obtenir les informations de la boutique du vendeur
@@ -531,11 +546,7 @@ const getMaBoutique = asyncHandler(async (req, res) => {
     const vendeur = await Utilisateur.findById(req.utilisateur._id).select(
         'boutique nom prenom email'
     );
-
-    res.json({
-        succes: true,
-        data: vendeur,
-    });
+    res.json({ succes: true, data: vendeur });
 });
 
 // @desc    Mettre à jour les informations de la boutique
@@ -543,18 +554,12 @@ const getMaBoutique = asyncHandler(async (req, res) => {
 // @access  Private/Vendeur
 const mettreAJourBoutique = asyncHandler(async (req, res) => {
     const { boutique } = req.body;
-
     const vendeur = await Utilisateur.findByIdAndUpdate(
         req.utilisateur._id,
         { boutique },
         { new: true, runValidators: true }
     ).select('boutique nom prenom email');
-
-    res.json({
-        succes: true,
-        message: 'Boutique mise à jour avec succès',
-        data: vendeur,
-    });
+    res.json({ succes: true, message: 'Boutique mise à jour', data: vendeur });
 });
 
 // @desc    Générer un rapport de ventes
@@ -565,13 +570,10 @@ const genererRapportVentes = asyncHandler(async (req, res) => {
     const { periode } = req.query;
 
     let dateDebut = new Date();
-    if (periode === '7j') {
-        dateDebut.setDate(dateDebut.getDate() - 7);
-    } else if (periode === 'mois') {
-        dateDebut.setMonth(dateDebut.getMonth() - 1);
-    } else if (periode === 'annee') {
+    if (periode === '7j') dateDebut.setDate(dateDebut.getDate() - 7);
+    else if (periode === 'mois') dateDebut.setMonth(dateDebut.getMonth() - 1);
+    else if (periode === 'annee')
         dateDebut.setFullYear(dateDebut.getFullYear() - 1);
-    }
 
     const ventes = await Commande.aggregate([
         { $unwind: '$produits' },
@@ -624,4 +626,4 @@ export {
     genererRapportVentes,
     getEvolutionVentes,
     getDonneesPerformance,
-};// la  
+};

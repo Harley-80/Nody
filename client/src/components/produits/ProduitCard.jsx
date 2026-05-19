@@ -31,15 +31,8 @@ export default function ProduitCard({ produit }) {
         if (!produit.images || produit.images.length === 0) {
             return '/images/placeholder.jpg';
         }
-
-        const image = produit.images[0];
-        if (typeof image === 'string') {
-            return image;
-        }
-        if (image.url) {
-            return image.url; 
-        }
-        return '/images/placeholder.jpg';
+        // Les images sont déjà des URLs complètes depuis le backend
+        return produit.images[0];
     };
 
     // Vérifier si produit est nouveau (moins de 7 jours)

@@ -14,6 +14,27 @@ import NotificationService from '../services/notificationService.js';
 
 // UTILITAIRES
 /**
+ * Formater les URLs des images avec l'URL complète
+ */
+const formaterUrlsImages = (produit, baseUrl) => {
+    const produitObj = produit.toObject ? produit.toObject() : { ...produit };
+
+    if (produitObj.images && Array.isArray(produitObj.images)) {
+        produitObj.images = produitObj.images.map(imagePath => {
+            if (typeof imagePath === 'string' && imagePath.startsWith('http')) {
+                return imagePath;
+            }
+            const cleanPath = imagePath.startsWith('/')
+                ? imagePath.slice(1)
+                : imagePath;
+            return `${baseUrl}/${cleanPath}`;
+        });
+    }
+
+    return produitObj;
+};
+
+/**
  * Calculer la date de début en fonction de la période
  * @param {string} periode - 'aujourdhui', 'semaine', 'mois', 'trimestre', 'annee'
  * @returns {Date} Date de début de la période
@@ -1017,7 +1038,7 @@ const obtenirStatistiquesDashboard = asyncHandler(async (req, res) => {
     });
 
     // 4. Produits populaires
-    const produitsPopulaires = await Commande.aggregate([
+    const produitsPopulairesRaw = await Commande.aggregate([
         {
             $match: {
                 createdAt: {
@@ -1054,12 +1075,19 @@ const obtenirStatistiquesDashboard = asyncHandler(async (req, res) => {
             $project: {
                 _id: 1,
                 nom: '$infoProduit.nom',
-                image: '$infoProduit.images.principale',
+                images: '$infoProduit.images',
                 totalVendu: 1,
                 revenu: 1,
+                prix: '$infoProduit.prix',
             },
         },
     ]);
+
+    // ✅ AJOUT: Formater les URLs des images
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const produitsPopulaires = produitsPopulairesRaw.map(p =>
+        formaterUrlsImages(p, baseUrl)
+    );
 
     // 5. Évolution des ventes (7 derniers jours)
     const evolutionVentes = [];

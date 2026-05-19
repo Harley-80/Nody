@@ -9,6 +9,11 @@ import config from './config/env.js';
 import logger from './utils/logger.js';
 import { fermerRedis } from './config/configRedis.js';
 import { initialiserWebSocket } from './services/websocketService.js';
+// Import du planificateur de tâches
+import {
+    demarrerPlanificateur,
+    arreterPlanificateur,
+} from './taches/banniereTache.js';
 
 // Constantes pour ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -17,6 +22,9 @@ const __dirname = path.dirname(__filename);
 const PORT = config.port || 5000;
 const HOST = config.host || '0.0.0.0';
 let server;
+
+// Référence au job cron pour l'arrêt propre
+let cronJob = null;
 
 // Vérifier les prérequis système
 function verifierPreRequis() {
@@ -37,7 +45,7 @@ function verifierPreRequis() {
     });
 }
 
-// Créer un serveur HTTP ou HTTPS
+// Créer un serveur HTTPS
 function creerServeur(app) {
     if (config.nodeEnv === 'production' && config.sslEnabled) {
         try {
@@ -89,6 +97,16 @@ async function arretProgressif(signal, error = null) {
         process.exit(error ? 1 : 0);
     }
 
+    // Arrêter le planificateur de tâches
+    if (cronJob) {
+        try {
+            arreterPlanificateur(cronJob);
+            logger.info('Planificateur de tâches arrêté');
+        } catch (err) {
+            logger.error('Erreur arrêt planificateur:', err);
+        }
+    }
+
     // Fermer le serveur
     server.close(async () => {
         logger.info('Serveur HTTP fermé');
@@ -135,6 +153,21 @@ async function demarrerServeur() {
         initialiserWebSocket(server);
         logger.info('WebSocket initialisé');
 
+        // Démarrer le planificateur de tâches (après connexion DB)
+        try {
+            const planificateur = demarrerPlanificateur();
+            if (planificateur.succes) {
+                cronJob = planificateur.job;
+                logger.info('Planificateur de tâches démarré avec succès');
+                logger.info(
+                    `Prochaine exécution: ${planificateur.config.prochaineExecution}`
+                );
+            }
+        } catch (err) {
+            logger.error('Erreur démarrage planificateur:', err);
+            // Ne pas bloquer le serveur si le scheduler échoue
+        }
+
         // Gestion des erreurs du serveur
         server.on('error', error => {
             if (error.code === 'EADDRINUSE') {
@@ -179,7 +212,7 @@ process.on('uncaughtException', error => {
     arretProgressif('UNCAUGHT_EXCEPTION', error);
 });
 
-// Démarrer le serveur
+// Démarrer le serveur dans une IIFE pour gérer les erreurs de démarrage
 (async () => {
     try {
         logger.info('Démarrage du serveur Nody...');
@@ -188,4 +221,4 @@ process.on('uncaughtException', error => {
         logger.error('Échec du démarrage:', error);
         process.exit(1);
     }
-})(); // super  
+})();

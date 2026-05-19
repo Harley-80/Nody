@@ -43,6 +43,9 @@ import vendeurRoutes from './routes/vendeurRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import statistiquesRoutes from './routes/statistiquesRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import banniereRoutes from './routes/banniereRoutes.js';
+import creditsRoutes from './routes/creditsRoutes.js';
+import suiviRoutes from './routes/suiviRoutes.js'; 
 
 // Constantes pour ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -276,6 +279,9 @@ const initializeApp = async () => {
         app.use('/api/statistiques', statistiquesRoutes);
         app.use('/api/statistiques', statistiquesRoutes);
         app.use('/api/notifications', notificationRoutes);
+        app.use('/api/bannieres', banniereRoutes);
+        app.use('/api/vendeur/credits', creditsRoutes);
+        app.use('/api/suivi', suiviRoutes);
 
         // Route health check
         app.get('/api/health', (req, res) => {
