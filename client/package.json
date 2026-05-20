@@ -42,7 +42,7 @@
         "recharts": "^3.4.1",
         "sass": "^1.96.0",
         "socket.io-client": "^4.8.1",
-        "swiper": "^11.2.8",
+        "swiper": "^12.1.4",
         "xlsx": "https://cdn.sheetjs.com/xlsx-latest/xlsx-latest.tgz"
     },
     "devDependencies": {

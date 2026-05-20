@@ -28,6 +28,7 @@ import AdminProduits from '../pages/admin/Produits/Produits.jsx';
 import CategoriesAdmin from '../pages/admin/Categories/Categories.jsx';
 import Parametres from '../pages/admin/Parametres/Parametres.jsx';
 import Messages from '../pages/admin/Messages/Messages.jsx';
+import GestionBannieres from '../pages/admin/GestionBannieres';
 
 // Import des pages modérateur
 import DashboardModerateur from '../pages/moderateur/DashboardModerateur.jsx';
@@ -43,7 +44,7 @@ import AjouterProduit from '../pages/vendeur/AjouterProduit';
 import ModifierProduit from '../pages/vendeur/ModifierProduit';
 import MaBoutique from '../pages/vendeur/MaBoutique';
 
-// ✅ CORRECTION 3 : Créer un Layout Vendeur qui rend <Outlet />
+// Créer un Layout Vendeur qui rend <Outlet />
 const VendeurLayout = () => {
     return (
         <div className="vendeur-layout">
@@ -73,6 +74,7 @@ export default function AppRoutes() {
             <Route path="/categories/:categorySlug" element={<Categories />} />
             <Route path="/confirmation" element={<Confirmation />} />
             <Route path="/admin-login" element={<AuthAdmin />} />
+            <Route path="/admin/bannieres" element={<GestionBannieres />} />
 
             {/* Routes protégées générales (Clients) */}
             <Route
@@ -174,7 +176,7 @@ export default function AppRoutes() {
                 }
             />
 
-            {/* ✅ SECTION VENDEUR CORRIGÉE */}
+            {/* Section vendeur */}
             <Route
                 path="/vendeur"
                 element={

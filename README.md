@@ -222,3 +222,36 @@ Créer un seeder pour peupler la base de données avec des données initiales po
   • Workflow complet : clic → cookie → achat → attribution → bonus
   • Logs worker vérifiables en console
   • Gestion d'erreur non-bloquante pour attribution vente
+  
+# (Étape 15) : Dashboard Admin - Gestion des Bannières
+
+### Interface créée
+- **Page** : `client/src/pages/admin/GestionBannieres.jsx`
+- **Styles** : `client/src/pages/admin/GestionBannieres.scss`
+
+### Fonctionnalités implémentées
+
+**Tableau de bord statistique**
+- 4 cartes animées avec compteurs temps réel
+
+**Tableau des bannières**
+
+**Filtres avancés**
+- Recherche textuelle (titre, description)
+- Filtre par type (hero, promo, pub)
+- Filtre par statut (en_attente, approuve, rejete)
+- Filtre par état (actif/inactif)
+- Bouton réinitialisation rapide
+
+**Actions disponibles**
+- Approuver (bannières en attente)
+- Rejeter avec saisie raison
+- Modifier (navigation vers édition)
+- Supprimer avec confirmation
+
+**Pagination**
+- Navigation Précédent/Suivant
+- Affichage "Page X sur Y"
+- Nombre total de résultats
+
+

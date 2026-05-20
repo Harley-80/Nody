@@ -12,6 +12,7 @@ import './GestionBannieres.scss';
 // Page de gestion des bannières pour les administrateurs - Affiche la liste des bannières avec options de filtrage, pagination, et actions d'approbation/rejet/suppression
 const GestionBannieres = () => {
     const navigate = useNavigate();
+    // Etats statistiques et données
     const [bannieres, setBannieres] = useState([]);
     const [stats, setStats] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -29,7 +30,8 @@ const GestionBannieres = () => {
         total: 0,
     });
 
-    // Charger les bannières
+    // Charegement des données 
+    // Charger les bannières 
     useEffect(() => {
         chargerBannieres();
         chargerStatistiques();
