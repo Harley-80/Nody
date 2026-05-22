@@ -14,7 +14,7 @@ const TACHES_CONFIG = {
     // Pour les tests : toutes les 5 minutes
     // CRON_EXPRESSION: '*/5 * * * *',
 
-    TIMEZONE: 'Africa/Abidjan', // Fuseau horaire Côte d'Ivoire
+    TIMEZONE: 'Africa/Sénégal', // Fuseau horaire Sénégal
 
     // Nombre de jours avant expiration
     DUREE_EXPIRATION_JOURS: 30,
@@ -65,7 +65,7 @@ export const desactiverBannieresExpirees = async () => {
         };
     } catch (error) {
         console.error(
-            'Erreur lors de la désactivation des bannières expirées:',
+            `Erreur lors de la désactivation des bannières expirées:`,
             error
         );
         throw error;
@@ -74,7 +74,7 @@ export const desactiverBannieresExpirees = async () => {
 
 /**
  * @desc    Nettoyer les cookies de suivi expirés (> 7 jours)
- * @returns {Promise} Résultat de l'opération
+ * @returns {Promise} Résultat du nettoyage
  */
 export const nettoyerCookiesExpires = async () => {
     try {
@@ -84,7 +84,10 @@ export const nettoyerCookiesExpires = async () => {
 
         return result;
     } catch (error) {
-        console.error('Erreur lors du nettoyage des cookies expirés:', error);
+        console.error(
+            `Erreur lors du nettoyage des cookies expirés:`,
+            error
+        );
         throw error;
     }
 };
@@ -101,7 +104,7 @@ export const calculerBonusVentes = async () => {
 
         return result;
     } catch (error) {
-        console.error('Erreur lors du calcul des bonus ventes:', error);
+        console.error(`Erreur lors du calcul des bonus ventes:`, error);
         throw error;
     }
 };
@@ -192,7 +195,7 @@ export const genererRapportQuotidien = async () => {
         };
     } catch (error) {
         console.error(
-            'Erreur lors de la génération du rapport quotidien:',
+            ` Erreur lors de la génération du rapport quotidien:`,
             error
         );
         throw error;
@@ -204,7 +207,7 @@ export const genererRapportQuotidien = async () => {
  * @returns {Promise} Résultats de toutes les tâches
  */
 export const executerTachesQuotidiennes = async () => {
-    console.log('\n DÉMARRAGE DES TÂCHES QUOTIDIENNES');
+    console.log(`\n DÉMARRAGE DES TÂCHES QUOTIDIENNES`);
     console.log(
         `${new Date().toLocaleString('fr-FR', { timeZone: TACHES_CONFIG.TIMEZONE })}\n`
     );
@@ -223,7 +226,9 @@ export const executerTachesQuotidiennes = async () => {
 
         // Tâche 2 : Nettoyer les cookies de suivi expirés
         if (TACHES_CONFIG.ACTIVER_NETTOYAGE_SUIVI) {
-            console.log('Tâche 2 : Nettoyage des cookies de suivi expirés...');
+            console.log(
+                'Tâche 2 : Nettoyage des cookies de suivi expirés...'
+            );
             resultats.taches.nettoyage = await nettoyerCookiesExpires();
         }
 
@@ -240,7 +245,7 @@ export const executerTachesQuotidiennes = async () => {
         }
 
         console.log(
-            '\n TOUTES LES TÂCHES QUOTIDIENNES TERMINÉES AVEC SUCCÈS\n'
+            `\n TOUTES LES TÂCHES QUOTIDIENNES TERMINÉES AVEC SUCCÈS\n`
         );
 
         return {
@@ -249,7 +254,7 @@ export const executerTachesQuotidiennes = async () => {
         };
     } catch (error) {
         console.error(
-            "\n ERREUR LORS DE L'EXÉCUTION DES TÂCHES QUOTIDIENNES:",
+            `\n ERREUR LORS DE L'EXÉCUTION DES TÂCHES QUOTIDIENNES:`,
             error
         );
 
@@ -284,7 +289,6 @@ export const demarrerPlanificateur = () => {
 
     // Exécuter immédiatement au démarrage (optionnel)
     // executerTachesQuotidiennes();
-
     return {
         succes: true,
         message: 'Planificateur démarré avec succès',

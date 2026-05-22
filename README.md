@@ -254,4 +254,16 @@ Créer un seeder pour peupler la base de données avec des données initiales po
 - Affichage "Page X sur Y"
 - Nombre total de résultats
 
+---
 
+# (Étape 16) : Interface Vendeur Complète avec Système de Crédits/Suivi
+
+### Frontend
+- **CreerBanniere.jsx** : Formulaire, preview live, validation crédits en temps réel, compteurs caractères (titre/sous-titre/description), planification dates, position/priorité
+- **MesBannieres.jsx** : Dashboard statistiques (total, en validation, approuvées, ventes/FCFA), modale historique crédits, filtres avancés (recherche, statut, état), tableau responsive avec countdown expiration, actions (modifier/rejeter, supprimer), pagination
+
+### Backend 
+- **suiviModel.js** : (`cookieSuiviId`, `Suivi`), expiration 7j, virtuals (`estValide`, `joursRestants`), méthodes conversion & nettoyage
+- **creditsMiddleware.js & creditsService.js** : +5 crédits initiaux, -2 par création, +1 bonus tous les 10 ventes, middleware `verifierCredits`, historique paginé, stats globales
+- **suiviService.js** : `creerSuiviClic`, `verifierEtAttribuerVente`, stats conversion par vendeur, historique client, désactivation RGPD, `SUIVI_CONFIG`
+- **banniereTache.js** : CRON quotidien `00:00` (Africa/Sénégal ), désactivation bannières >30j, nettoyage suivis >7j, calcul bonus, rapport journalier
