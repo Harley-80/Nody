@@ -33,6 +33,7 @@ import GestionBannieres from '../pages/admin/GestionBannieres';
 // Import des pages modérateur
 import DashboardModerateur from '../pages/moderateur/DashboardModerateur.jsx';
 import DemandesValidation from '../pages/moderateur/DemandesValidation.jsx';
+import ValidationBannieres from '../pages/moderateur/ValidationBannieres';
 
 // Import des pages Vendeur
 import DashboardVendeur from '../pages/vendeur/DashboardVendeur';
@@ -172,6 +173,14 @@ export default function AppRoutes() {
                                 Page en construction...
                             </p>
                         </div>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/moderateur/validation-bannieres"
+                element={
+                    <ProtectedRoute roles={['moderateur', 'admin']}>
+                        <ValidationBannieres />
                     </ProtectedRoute>
                 }
             />

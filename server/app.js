@@ -277,7 +277,6 @@ const initializeApp = async () => {
         app.use('/api/vendeur', vendeurRoutes);
         app.use('/api/admin', adminRoutes);
         app.use('/api/statistiques', statistiquesRoutes);
-        app.use('/api/statistiques', statistiquesRoutes);
         app.use('/api/notifications', notificationRoutes);
         app.use('/api/bannieres', banniereRoutes);
         app.use('/api/vendeur/credits', creditsRoutes);
@@ -334,4 +333,4 @@ const initializeApp = async () => {
 
 // Exports
 export default initializeApp;
-export { app }; // moi
+export { app };

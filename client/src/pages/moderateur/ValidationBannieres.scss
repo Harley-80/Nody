@@ -1,0 +1,435 @@
+$primary-color: #16213e;
+$primary-light: #1f2d54;
+$success-color: #1dd1a1;
+$warning-color: #feca57;
+$danger-color: #ee5a6f;
+$gray-text: #95a5a6;
+$border-color: #e1e8ed;
+$white: #ffffff;
+$transition-speed: 0.3s;
+
+// Styles globaux 
+.validation-bannieres {
+    padding: 2rem;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+
+        .header-left {
+            .page-title {
+                font-size: 1.8rem;
+                color: $primary-color;
+                margin: 0 0 0.5rem 0;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+
+                i { color: $primary-light; }
+            }
+            .page-subtitle {
+                color: $gray-text;
+                margin: 0;
+            }
+        }
+
+        .header-stats {
+            .stat-item {
+                background: $white;
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                font-weight: 600;
+                color: $warning-color;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            }
+        }
+    }
+
+    .filtres-section {
+        background: $white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+        .filtres-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+
+            .form-control, .form-select {
+                flex: 1;
+                min-width: 200px;
+                padding: 0.75rem;
+                border: 2px solid $border-color;
+                border-radius: 8px;
+                font-size: 0.95rem;
+
+                &:focus {
+                    outline: none;
+                    border-color: $primary-color;
+                }
+            }
+
+            .btn-outline {
+                background: $white;
+                border: 2px solid $border-color;
+                padding: 0.75rem 1.5rem;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all $transition-speed;
+
+                &:hover {
+                    background: $primary-color;
+                    color: $white;
+                    border-color: $primary-color;
+                }
+            }
+        }
+    }
+
+    .bannieres-liste {
+        background: $white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+
+            thead {
+                background: linear-gradient(135deg, $primary-color, $primary-light);
+                color: $white;
+
+                th {
+                    padding: 1rem;
+                    text-align: left;
+                    font-weight: 600;
+                    font-size: 0.85rem;
+                    text-transform: uppercase;
+                }
+            }
+
+            tbody {
+                tr {
+                    border-bottom: 1px solid $border-color;
+                    transition: background-color $transition-speed;
+
+                    &:hover {
+                        background-color: rgba($primary-color, 0.03);
+                    }
+
+                    &.row-pending {
+                        background-color: rgba($warning-color, 0.08);
+                        border-left: 4px solid $warning-color;
+                    }
+
+                    td {
+                        padding: 1rem;
+                        vertical-align: middle;
+
+                        .banniere-thumbnail {
+                            width: 100px;
+                            height: 60px;
+                            object-fit: cover;
+                            border-radius: 6px;
+                            border: 1px solid $border-color;
+                        }
+
+                        .badge {
+                            padding: 0.35rem 0.75rem;
+                            border-radius: 20px;
+                            font-size: 0.8rem;
+                            font-weight: 600;
+
+                            &.badge-warning {
+                                background: rgba($warning-color, 0.15);
+                                color: darken($warning-color, 20%);
+                            }
+                            &.badge-success {
+                                background: rgba($success-color, 0.15);
+                                color: darken($success-color, 20%);
+                            }
+                            &.badge-danger {
+                                background: rgba($danger-color, 0.15);
+                                color: darken($danger-color, 20%);
+                            }
+                        }
+
+                        .stats-cell {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 0.25rem;
+                            font-size: 0.9rem;
+
+                            i { color: $primary-color; margin-right: 0.25rem; }
+                        }
+
+                        .actions-cell {
+                            display: flex;
+                            gap: 0.5rem;
+
+                            .btn-sm {
+                                padding: 0.5rem 0.75rem;
+                                border: none;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                transition: transform 0.2s;
+
+                                &:hover { transform: translateY(-2px); }
+
+                                &.btn-success { background: $success-color; color: $white; }
+                                &.btn-danger { background: $danger-color; color: $white; }
+                                &.btn-outline {
+                                    background: $white;
+                                    border: 1px solid $border-color;
+                                    color: $primary-color;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .pagination-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: $white;
+        border-top: 1px solid $border-color;
+
+        .btn-outline {
+            padding: 0.5rem 1.25rem;
+            border: 2px solid $primary-color;
+            border-radius: 8px;
+            background: $white;
+            color: $primary-color;
+            cursor: pointer;
+            transition: all $transition-speed;
+
+            &:hover:not(:disabled) {
+                background: $primary-color;
+                color: $white;
+            }
+            &:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+        }
+
+        .pagination-info {
+            font-weight: 600;
+            color: $primary-color;
+        }
+    }
+
+    // Modale de rejet
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+
+        .modal-content {
+            background: $white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1.5rem;
+                border-bottom: 1px solid $border-color;
+
+                h3 {
+                    margin: 0;
+                    color: $danger-color;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
+
+                .btn-close {
+                    background: none;
+                    border: none;
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    color: $gray-text;
+                    padding: 0.5rem;
+
+                    &:hover { color: $danger-color; }
+                }
+            }
+
+            .modal-body {
+                padding: 1.5rem;
+
+                .form-group {
+                    margin-bottom: 1rem;
+
+                    .form-label {
+                        display: block;
+                        margin-bottom: 0.5rem;
+                        font-weight: 600;
+                        color: $primary-color;
+
+                        &.required::after {
+                            content: ' *';
+                            color: $danger-color;
+                        }
+                    }
+
+                    .form-control {
+                        width: 100%;
+                        padding: 0.75rem;
+                        border: 2px solid $border-color;
+                        border-radius: 8px;
+                        font-size: 0.95rem;
+                        resize: vertical;
+                        min-height: 80px;
+
+                        &:focus {
+                            outline: none;
+                            border-color: $primary-color;
+                        }
+                    }
+                }
+            }
+
+            .modal-footer {
+                display: flex;
+                justify-content: flex-end;
+                gap: 1rem;
+                padding: 1.5rem;
+                border-top: 1px solid $border-color;
+
+                .btn {
+                    padding: 0.75rem 1.5rem;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all $transition-speed;
+
+                    &.btn-secondary {
+                        background: $gray-text;
+                        color: $white;
+
+                        &:hover { background: darken($gray-text, 10%); }
+                    }
+
+                    &.btn-danger {
+                        background: $danger-color;
+                        color: $white;
+
+                        &:hover { background: darken($danger-color, 10%); }
+                    }
+                }
+            }
+        }
+    }
+
+    // États
+    .loading-state, .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 2rem;
+        text-align: center;
+        color: $gray-text;
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border: 3px solid $primary-color;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        h3 {
+            color: $primary-color;
+            margin: 0 0 0.5rem 0;
+        }
+    }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .validation-bannieres {
+        padding: 1rem;
+
+        .filtres-row {
+            flex-direction: column;
+
+            .form-control, .form-select, .btn-outline {
+                width: 100%;
+            }
+        }
+
+        .table {
+            thead { display: none; }
+
+            tbody {
+                tr {
+                    display: block;
+                    margin-bottom: 1rem;
+                    border: 1px solid $border-color;
+                    border-radius: 8px;
+                    overflow: hidden;
+
+                    td {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 0.75rem 1rem;
+                        border-bottom: 1px solid $border-color;
+
+                        &:last-child { border-bottom: none; }
+
+                        &::before {
+                            content: attr(data-label);
+                            font-weight: 600;
+                            color: $primary-color;
+                            text-transform: uppercase;
+                            font-size: 0.8rem;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
